@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../routes/app_pages.dart';
-import '../../../service/task_service.dart';
 import '../../../translations/app_translations.dart';
 import '../../../utils/stroage_manage.dart';
 import '../controllers/home_controller.dart';
@@ -40,9 +39,7 @@ class HomeView extends GetView<HomeController> {
                         CupertinoDialogAction(
                           child: const Text('確認'),
                           onPressed: () async {
-                            if (TaskService.to.isRunning.value) {
-                              TaskService.to.stopService();
-                            }
+                            await ctl.closeService();
                             final box = StorageManage();
                             box.delete("hasLOgin");
                             box.delete("loginInfo");
@@ -107,7 +104,7 @@ class HomeView extends GetView<HomeController> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Obx(() => Text(
-                  TaskService.to.isRunning.value ? LocaleKeys.serviceIsRunning.tr : LocaleKeys.serviceIsStopped.tr,
+                  ctl.isRunning.value ? LocaleKeys.serviceIsRunning.tr : LocaleKeys.serviceIsStopped.tr,
                   style: const TextStyle(fontSize: 30),
                 )),
             const SizedBox(height: 10),
@@ -115,18 +112,18 @@ class HomeView extends GetView<HomeController> {
               alignment: MainAxisAlignment.center,
               children: [
                 Obx(() => ElevatedButton(
-                      onPressed: TaskService.to.isRunning.value
+                      onPressed: ctl.isRunning.value
                           ? null
                           : () async {
-                              TaskService.to.startService();
+                              await ctl.startService();
                             },
                       child: Text(LocaleKeys.start.tr),
                     )),
                 const SizedBox(width: 20),
                 Obx(() => ElevatedButton(
-                      onPressed: TaskService.to.isRunning.value
+                      onPressed: ctl.isRunning.value
                           ? () {
-                              TaskService.to.stopService();
+                              ctl.startService();
                             }
                           : null,
                       child: Text(LocaleKeys.stop.tr),

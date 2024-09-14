@@ -21,8 +21,7 @@ Future<Locale> getSavedLocale() async {
 Future<void> initService() async {
   // 初始化存储
   await GetStorage.init();
-  // 初始化服务
-  await Get.putAsync<TaskService>(() async => TaskService());
+  await initializeService();
 }
 
 Future<void> main() async {
@@ -70,8 +69,7 @@ class MyApp extends StatelessWidget {
 
         //设置文字大小不随系统设置改变
         child = MediaQuery(
-          data: MediaQuery.of(context)
-              .copyWith(textScaler: const TextScaler.linear(1.0)),
+          data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: child,
         );
         return child;
