@@ -1700,7 +1700,7 @@ Future<List<String>> printTakeaway({
         if (item.mCustTel.toString() == "0") {
           method += "自取:"; //自取
           if (item.mCustFax.toString() == "0") {
-            method += "儘快:"; //儘快
+            method += "儘快"; //儘快
           } else {
             method += DateFormat('HH:mm').format(DateTime.parse(item.mCustDelTime.toString()));
           }
