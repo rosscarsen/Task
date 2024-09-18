@@ -50,7 +50,7 @@ class LoginController extends GetxController {
         Response response = await apiClient.post(Config.login, data: loginData);
 
         if (response.statusCode == 200) {
-          LoginModel ret = LoginModel.fromJson(response.data);
+          final LoginModel ret = LoginModel.fromJson(response.data);
 
           if (ret.status == 200) {
             storageManage.delete("loginInfo");

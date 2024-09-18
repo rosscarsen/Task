@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../../utils/stroage_manage.dart';
 
 class HomeController extends GetxController {
+  static HomeController get to => Get.find();
   RxBool isRunning = false.obs;
   final StorageManage storageManage = StorageManage();
   Rx<Locale> locale = const Locale("zh", "HK").obs;

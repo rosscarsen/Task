@@ -11,8 +11,6 @@ class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
   @override
   Widget build(BuildContext context) {
-    final ctl = Get.put(HomeController());
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -39,10 +37,9 @@ class HomeView extends GetView<HomeController> {
                         CupertinoDialogAction(
                           child: const Text('確認'),
                           onPressed: () async {
-                            await ctl.closeService();
+                            await HomeController.to.closeService();
                             final box = StorageManage();
-                            box.delete("hasLOgin");
-                            box.delete("loginInfo");
+                            await box.delete("hasLogin");
                             Get.offAllNamed(Routes.LOGIN);
                           },
                         ),
@@ -65,7 +62,7 @@ class HomeView extends GetView<HomeController> {
               PopupMenuItem(
                 value: "zh_HK",
                 onTap: () {
-                  ctl.changeLanguage(const Locale('zh', "HK"));
+                  HomeController.to.changeLanguage(const Locale('zh', "HK"));
                   Get.updateLocale(const Locale('zh', "HK"));
                 },
                 child: Row(
@@ -73,7 +70,9 @@ class HomeView extends GetView<HomeController> {
                   children: [
                     const Text("繁體"),
                     Icon(Icons.check,
-                        color: ctl.locale.value == const Locale('zh', "HK") ? Colors.green : Colors.transparent)
+                        color: HomeController.to.locale.value == const Locale('zh', "HK")
+                            ? Colors.green
+                            : Colors.transparent)
                   ],
                 ),
               ),
@@ -84,11 +83,13 @@ class HomeView extends GetView<HomeController> {
                   children: [
                     const Text("English"),
                     Icon(Icons.check,
-                        color: ctl.locale.value == const Locale('en', "US") ? Colors.green : Colors.transparent)
+                        color: HomeController.to.locale.value == const Locale('en', "US")
+                            ? Colors.green
+                            : Colors.transparent)
                   ],
                 ),
                 onTap: () {
-                  ctl.changeLanguage(const Locale('en', "US"));
+                  HomeController.to.changeLanguage(const Locale('en', "US"));
                   Get.updateLocale(const Locale('en', "US"));
                 },
               ),
@@ -104,7 +105,7 @@ class HomeView extends GetView<HomeController> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Obx(() => Text(
-                  ctl.isRunning.value ? LocaleKeys.serviceIsRunning.tr : LocaleKeys.serviceIsStopped.tr,
+                  HomeController.to.isRunning.value ? LocaleKeys.serviceIsRunning.tr : LocaleKeys.serviceIsStopped.tr,
                   style: const TextStyle(fontSize: 30),
                 )),
             const SizedBox(height: 10),
@@ -112,18 +113,18 @@ class HomeView extends GetView<HomeController> {
               alignment: MainAxisAlignment.center,
               children: [
                 Obx(() => ElevatedButton(
-                      onPressed: ctl.isRunning.value
+                      onPressed: HomeController.to.isRunning.value
                           ? null
                           : () async {
-                              await ctl.startService();
+                              await HomeController.to.startService();
                             },
                       child: Text(LocaleKeys.start.tr),
                     )),
                 const SizedBox(width: 20),
                 Obx(() => ElevatedButton(
-                      onPressed: ctl.isRunning.value
+                      onPressed: HomeController.to.isRunning.value
                           ? () {
-                              ctl.startService();
+                              HomeController.to.closeService();
                             }
                           : null,
                       child: Text(LocaleKeys.stop.tr),
