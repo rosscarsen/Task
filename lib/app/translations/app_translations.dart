@@ -4,6 +4,7 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'zh_HK': {
+          "airprintSetting": "列印設置",
           "startAirprint": "開始列印",
           "stopAirprint": "停止列印",
           "confirmLoginOut": "確定要登出嗎？",
@@ -71,6 +72,7 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未設置手機網站",
         },
         'zh_CN': {
+          "airprintSetting": "列印设置",
           "startAirprint": "开始列印",
           "stopAirprint": "停止列印",
           "confirmLoginOut": "确认登出吗?",
@@ -138,6 +140,7 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未设置手机网站",
         },
         'en_US': {
+          "airprintSetting": "Airprint setting",
           "startAirprint": "Start airprint",
           "stopAirprint": "Stop airprint",
           "confirmLoginOut": "Are you sure you want to log out?",
@@ -209,6 +212,7 @@ class AppTranslations extends Translations {
 
 abstract class LocaleKeys {
   LocaleKeys._();
+  static String airprintSetting = 'airprintSetting';
   static String startAirprint = "startAirprint";
   static String stopAirprint = "stopAirprint";
   static String confirmLoginOut = "confirmLoginOut";
