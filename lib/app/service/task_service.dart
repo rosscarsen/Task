@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:esc_pos_printer/esc_pos_printer.dart';
@@ -22,7 +21,6 @@ import '../utils/esc_helper.dart';
 import '../utils/stroage_manage.dart';
 import 'api_client.dart';
 
-Timer? timer;
 RxBool isRunning = false.obs;
 bool printStatus = true;
 final ApiClient apiClient = ApiClient();
@@ -44,7 +42,7 @@ Future<void> initializeService() async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized();
+  //DartPluginRegistrant.ensureInitialized();
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
       service.setAsForegroundService();
