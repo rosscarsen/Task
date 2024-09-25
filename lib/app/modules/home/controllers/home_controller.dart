@@ -91,6 +91,12 @@ class HomeController extends GetxController {
                           Get.offAllNamed(Routes.LOGIN);
                         },
                       ),
+                      CupertinoDialogAction(
+                        child: Text('close'.tr),
+                        onPressed: () {
+                          webViewController.reload();
+                        },
+                      ),
                     ],
                   );
                 });

@@ -52,8 +52,8 @@ class AirprintSettingView extends GetView<AirprintSettingController> {
                 const SizedBox(width: 20),
                 Obx(() => ElevatedButton(
                       onPressed: AirprintSettingController.to.isRunning.value
-                          ? () {
-                              AirprintSettingController.to.closeService();
+                          ? () async {
+                              await AirprintSettingController.to.closeService();
                             }
                           : null,
                       child: Text(LocaleKeys.stopAirprint.tr),

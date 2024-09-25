@@ -68,14 +68,15 @@ void onStart(ServiceInstance service) async {
         );
       }
     }
-    UserData? loginUser = getLoginInfo();
-    print("object${loginUser?.toJson()}");
+    UserData? loginUser = await getLoginInfo();
 
     if (loginUser != null) {
       debugPrint("打印状态：$printStatus");
       if (printStatus) {
         getPrintData(queryData: loginUser.toJson());
       }
+    } else {
+      debugPrint("本地信息为空");
     }
   });
 }
@@ -254,7 +255,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           }
         }
 
-        logger.f(jsonEncode(queueIDs));
+        //logger.f(jsonEncode(queueIDs));
 
         ///发票号码发送给后端
         if (queueIDs.isNotEmpty) {
@@ -292,8 +293,8 @@ Future<void> deleteQueue(Map<String, dynamic> queryData, List queueIDs) async {
 }
 
 ///获取本地存储信息
-UserData? getLoginInfo() {
-  var loginUserJson = box.read(Config.localStroageloginInfo);
+Future<UserData?> getLoginInfo() async {
+  var loginUserJson = await box.read(Config.localStroageloginInfo);
   UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
   if (loginUser != null) {
     return loginUser;
