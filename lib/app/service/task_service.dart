@@ -69,6 +69,7 @@ void onStart(ServiceInstance service) async {
       }
     }
     UserData? loginUser = getLoginInfo();
+    print("object${loginUser?.toJson()}");
 
     if (loginUser != null) {
       debugPrint("打印状态：$printStatus");
