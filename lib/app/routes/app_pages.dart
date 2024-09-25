@@ -1,22 +1,25 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'package:get/get.dart';
-import 'package:task/app/config.dart';
-import 'package:task/app/utils/stroage_manage.dart';
 
+import '../config.dart';
+import '../modules/airprint_setting/bindings/airprint_setting_binding.dart';
+import '../modules/airprint_setting/views/airprint_setting_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/ip_ping/bindings/ip_ping_binding.dart';
 import '../modules/ip_ping/views/ip_ping_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
+import '../utils/stroage_manage.dart';
+
+// ignore_for_file: non_constant_identifier_names
 
 part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
   static final box = StorageManage();
-  static final INITIAL = (box.hasData(Config.localStroagehasLogin) && box.read(Config.localStroagehasLogin) == true)
+  static final INITIAL = (box.hasData(Config.localStroagehasLogin) &&
+          box.read(Config.localStroagehasLogin) == true)
       ? Routes.HOME
       : Routes.LOGIN;
 
@@ -35,6 +38,11 @@ class AppPages {
       name: _Paths.IP_PING,
       page: () => const IpPingView(),
       binding: IpPingBinding(),
+    ),
+    GetPage(
+      name: _Paths.AIRPRINT_SETTING,
+      page: () => const AirprintSettingView(),
+      binding: AirprintSettingBinding(),
     ),
   ];
 }

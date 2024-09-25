@@ -138,6 +138,8 @@ class LoginController extends GetxController {
         }
       } on DioException {
         errorLoding(LocaleKeys.requestFailed.tr);
+      } on Exception {
+        errorLoding(LocaleKeys.requestFailed.tr);
       }
     }
   }

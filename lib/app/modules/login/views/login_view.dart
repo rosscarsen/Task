@@ -114,7 +114,7 @@ class LoginView extends GetView<LoginController> {
                     lableText: LocaleKeys.password.tr,
                     keyboardType: TextInputType.visiblePassword,
                     textInputAction: TextInputAction.done,
-                    obscureText: LoginController.to.visibility.value,
+                    obscureText: !LoginController.to.visibility.value,
                     suffixIcon: LoginController.to.visibility.value ? Icons.visibility : Icons.visibility_off,
                     onTap: () => LoginController.to.visibility.value = !LoginController.to.visibility.value,
                   );

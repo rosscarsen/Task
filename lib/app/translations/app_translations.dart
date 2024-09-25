@@ -4,6 +4,8 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'zh_HK': {
+          "airprintService": "列印服務",
+          "loadException": "加載異常",
           "airprintSetting": "列印設置",
           "startAirprint": "開始列印",
           "stopAirprint": "停止列印",
@@ -17,11 +19,11 @@ class AppTranslations extends Translations {
           "loginFailed": "登入失敗",
           "loginSuccess": "登入成功",
           "requestFailed": "請求失敗",
-          "start": "開始",
-          "stop": "停止",
+          "startArirprintService": "開始列印服務",
+          "stopAirprintService": "停止列印服務",
           "logout": "登出",
-          "serviceIsRunning": "服務正在運行",
-          "serviceIsStopped": "服務已停止",
+          "airprintServiceIsRunning": "列印服務正在運行",
+          "airprintServiceIsStopped": "列印服務已停止",
           "connectTest": "連接測試",
           "testConnect": "測試連接",
           "connectSuccess": "連接成功",
@@ -72,6 +74,8 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未設置手機網站",
         },
         'zh_CN': {
+          "airprintService": "打印服务",
+          "loadException": "加载异常",
           "airprintSetting": "列印设置",
           "startAirprint": "开始列印",
           "stopAirprint": "停止列印",
@@ -85,11 +89,11 @@ class AppTranslations extends Translations {
           "loginFailed": "登录失败",
           "loginSuccess": "登录成功",
           "requestFailed": "请求失败",
-          "start": "开始",
-          "stop": "停止",
+          "startArirprintService": "开始打印服务",
+          "stopAirprintService": "停止打印服务",
           "logout": "登出",
-          "serviceIsRunning": "服务正在运行",
-          "serviceIsStopped": "服务已停止",
+          "airprintServiceIsRunning": "打印服务正在运行",
+          "airprintServiceIsStopped": "打印服务已停止",
           "connectTest": "连接测试",
           "testConnect": "测试连接",
           "connectSuccess": "连接成功",
@@ -140,6 +144,8 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未设置手机网站",
         },
         'en_US': {
+          "airprintService": "Airprint service",
+          "loadException": "Load exception",
           "airprintSetting": "Airprint setting",
           "startAirprint": "Start airprint",
           "stopAirprint": "Stop airprint",
@@ -156,11 +162,11 @@ class AppTranslations extends Translations {
           "loginFailed": "Login failed",
           "loginSuccess": "Login success",
           "requestFailed": "request failed",
-          "start": "Start",
-          "stop": "Stop",
+          "startAirprintService": "Start airprint service",
+          "stopAirprintService": "Stop airprint service",
           "logout": "Logout",
-          "serviceIsRunning": "Service is running",
-          "serviceIsStopped": "Service is stopped",
+          "airprintServiceIsRunning": "Airprint service is running",
+          "airprintServiceIsStopped": "Airprint service is stopped",
           "connectTest": "Connect test",
           "testConnect": "Test connect",
           "connectSuccess": "Connect success",
@@ -212,6 +218,8 @@ class AppTranslations extends Translations {
 
 abstract class LocaleKeys {
   LocaleKeys._();
+  static String airprintService = "airprintService";
+  static String loadException = 'loadException';
   static String airprintSetting = 'airprintSetting';
   static String startAirprint = "startAirprint";
   static String stopAirprint = "stopAirprint";
@@ -226,11 +234,10 @@ abstract class LocaleKeys {
   static String loginFailed = "loginFailed";
   static String loginSuccess = "loginSuccess";
   static String requestFailed = "requestFailed";
-  static String start = "start";
-  static String stop = "stop";
+  static String startArirprintService = "startArirprintService";
   static String logout = "logout";
-  static String serviceIsRunning = "serviceIsRunning";
-  static String serviceIsStopped = "serviceIsStopped";
+  static String airprintServiceIsRunning = "airprintServiceIsRunning";
+  static String airprintServiceIsStopped = "airprintServiceIsStopped";
   static String connectTest = "connectTest";
   static String testConnect = "testConnect";
   static String connectSuccess = "connectSuccess";

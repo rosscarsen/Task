@@ -16,6 +16,8 @@ class ApiClient {
       baseUrl: Config.baseurl,
       contentType: "application/x-www-form-urlencoded",
       responseType: ResponseType.json,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
       validateStatus: (status) {
         return status != null;
       },
@@ -39,11 +41,9 @@ class ApiClient {
   ///
   /// [path]：API的相对路径
   /// [data]：请求参数
-  Future<Response> post(String path,
-      {dynamic data, Map<String, dynamic>? queryParameters}) async {
+  Future<Response> post(String path, {dynamic data, Map<String, dynamic>? queryParameters}) async {
     try {
-      Response response =
-          await _dio.post(path, data: data, queryParameters: queryParameters);
+      Response response = await _dio.post(path, data: data, queryParameters: queryParameters);
       return response;
     } catch (e) {
       throw Exception(e);
@@ -54,11 +54,9 @@ class ApiClient {
   ///
   /// [path]：API的相对路径
   /// [params]：查询参数
-  Future<Response> get(String path,
-      {Map<String, dynamic>? queryParameters}) async {
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
     try {
-      Response response =
-          await _dio.get(path, queryParameters: queryParameters);
+      Response response = await _dio.get(path, queryParameters: queryParameters);
       return response;
     } catch (e) {
       throw Exception(e);

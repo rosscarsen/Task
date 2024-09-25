@@ -13,8 +13,7 @@ import '../../../utils/stroage_manage.dart';
 
 class HomeController extends GetxController {
   static HomeController get to => Get.find();
-  //打印服务是否运行
-  RxBool isRunning = false.obs;
+
   //存储类
   final StorageManage storageManage = StorageManage();
 
@@ -79,14 +78,14 @@ class HomeController extends GetxController {
                 builder: (context) {
                   return CupertinoAlertDialog(
                     title: Text('systemMessages'.tr),
-                    content: Text('loading error'.tr),
+                    content: Text(LocaleKeys.loadException.tr),
                     actions: <Widget>[
                       CupertinoDialogAction(
                         child: Text('close'.tr),
                         onPressed: () {
                           Get.back();
                           box.delete(Config.localStroagehasLogin);
-                          Get.toNamed(Routes.LOGIN);
+                          Get.offAllNamed(Routes.LOGIN);
                         },
                       ),
                     ],
@@ -142,6 +141,9 @@ class HomeController extends GetxController {
         box.save(Config.localStroagelanguage, locale.toString());
         Get.updateLocale(locale);
       })
+      ..addJavaScriptChannel("flutterAirprintSetting", onMessageReceived: (JavaScriptMessage message) {
+        Get.toNamed(Routes.AIRPRINT_SETTING);
+      })
       ..setOnConsoleMessage((message) {
         log("控制台消息: ${message.message}");
       })
@@ -153,7 +155,6 @@ class HomeController extends GetxController {
     var ret = await _service.isRunning();
     if (ret) {
       _service.invoke("stopService");
-      isRunning.value = false;
     }
   }
 
@@ -162,38 +163,38 @@ class HomeController extends GetxController {
     var ret = await _service.isRunning();
     if (!ret) {
       _service.startService();
-      isRunning.value = true;
     }
-  }
-
-  Future<void> checkServicRuning() async {
-    isRunning.value = await _service.isRunning();
   }
 
   ///添加airprint网页设置按钮
   Future<void> addAirPrintSettingButton({required WebViewController controller}) async {
-    String addAirprintDiv = '''
-    function openPrintSetting() {
-        try { 
-            window.openPrinterSetting.postMessage("openAirprintSetting"); 
-            document.querySelector('.setting_content').style.display = 'none';
-            document.querySelector('.menu-bt').click();
-        } catch (e) {
-            document.querySelector('.setting_content').style.display = 'none';
-            document.querySelector('.menu-bt').click();
+    var addAirprintDiv = '''
+        function openAirprintSetting() {
+            try { 
+                window.flutterAirprintSetting.postMessage("js打开app设置页面"); 
+                document.querySelector('.setting_content').style.display = 'none';
+                document.querySelector('.menu-bt').click();
+            } catch (e) {
+                document.querySelector('.setting_content').style.display = 'none';
+                document.querySelector('.menu-bt').click();
+            }
         }
-    }
-    var newAnchorHTML = `
-        <a href="javascript:void(0);" 
-           onclick="openAirprintSetting()" 
-           class="i"
-           style=" border: none; background:#3575f0;color:#fff;line-height: 26px;border-radius: 4px;  margin: 20px; padding: 5px 20px;  text-align: center;">
-           ${LocaleKeys.airprintSetting.tr}
-        </a>`;
-    var parentDiv = document.getElementById('setting');
-    parentDiv.appendChild(newAnchorHTML);
-''';
-
+        var newAnchor = document.createElement('a');
+        newAnchor.href = "javascript:void(0);";
+        newAnchor.onclick = openAirprintSetting;
+        newAnchor.innerHTML = '${'airprintSetting'.tr}';
+        newAnchor.className = 'i';
+        newAnchor.style.border = 'none';
+        newAnchor.style.background = '#3575f0';
+        newAnchor.style.color = '#fff';
+        newAnchor.style.lineHeight = '26px';
+        newAnchor.style.borderRadius = '4px';
+        newAnchor.style.margin = '20px';
+        newAnchor.style.padding = '5px 20px';
+        newAnchor.style.textAlign = 'center';
+        var parentDiv = document.getElementById('setting');
+        parentDiv.appendChild(newAnchor);
+    ''';
     await controller.runJavaScript(addAirprintDiv);
   }
 }

@@ -6,6 +6,7 @@ abstract class Routes {
   static const HOME = _Paths.HOME;
   static const LOGIN = _Paths.LOGIN;
   static const IP_PING = _Paths.IP_PING;
+  static const AIRPRINT_SETTING = _Paths.AIRPRINT_SETTING;
 }
 
 abstract class _Paths {
@@ -13,4 +14,5 @@ abstract class _Paths {
   static const HOME = '/home';
   static const LOGIN = '/login';
   static const IP_PING = '/ip-ping';
+  static const AIRPRINT_SETTING = '/airprint-setting';
 }
