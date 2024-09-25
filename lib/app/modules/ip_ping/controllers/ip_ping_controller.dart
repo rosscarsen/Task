@@ -17,13 +17,15 @@ class IpPingController extends GetxController {
   GetStorage box = GetStorage();
   RxList<IpData> allIp = <IpData>[].obs;
   RxBool loadding = false.obs;
+
+  ///获取所有ip
   Future<void> getAllIP() async {
     UserData? loginUser = getLoginInfo();
+
     if (loginUser != null) {
       try {
         loadding(true);
-        Map<String, dynamic> queryData = {"dsn": loginUser.frontDsn!.toJson(), "company": loginUser.company};
-        var response = await apiCli.post(Config.getAllLocalIP, data: queryData);
+        var response = await apiCli.post(Config.getAllLocalIP, data: {"loginUserInfo": jsonEncode(loginUser)});
         if (response.statusCode == 200) {
           final ipPing = ipPingFromJson(json.encode(response.data));
           if (ipPing.state == 200) {
@@ -38,8 +40,9 @@ class IpPingController extends GetxController {
     }
   }
 
+  ///获取登录信息
   UserData? getLoginInfo() {
-    var loginUserJson = box.read("loginInfo");
+    var loginUserJson = box.read(Config.localStroageloginInfo);
     UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
     if (loginUser != null) {
       return loginUser;
@@ -47,8 +50,9 @@ class IpPingController extends GetxController {
     return null;
   }
 
+  /// ping测试
   Future<void> testConnection(String host, {int port = 80}) async {
-    showLoding("$host正在連接中，請稍候...");
+    showLoding("$host ${LocaleKeys.testConnect.tr}...");
     try {
       final socket = await Socket.connect(host, port, timeout: const Duration(seconds: 5));
       socket.destroy();

@@ -10,7 +10,8 @@ class IpPingView extends GetView<IpPingController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('IP 連接測試'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text('IP ${LocaleKeys.connectTest.tr}'),
         centerTitle: true,
       ),
       body: SafeArea(
