@@ -4,6 +4,8 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'zh_HK': {
+          "reload": "重新加載",
+          "close": "關閉",
           "logoutFailed": "登出失敗",
           "currentStationCannotSetUpAirprintService": "當前收銀機(%s)無法設置列印服務",
           "airprintService": "列印服務",
@@ -76,6 +78,8 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未設置手機網站",
         },
         'zh_CN': {
+          "reload": "重新加载",
+          "close": "关闭",
           "logoutFailed": "登出失败",
           "currentStationCannotSetUpAirprintService": "当前收银机(%s)无法设置打印服务",
           "airprintService": "打印服务",
@@ -148,6 +152,8 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未设置手机网站",
         },
         'en_US': {
+          "reload": "Reload",
+          "close": "Close",
           "logoutFailed": "Logout failed",
           "currentStationCannotSetUpAirprintService": "Current station (%s) cannot set up airprint service",
           "airprintService": "Airprint service",
@@ -224,6 +230,8 @@ class AppTranslations extends Translations {
 
 abstract class LocaleKeys {
   LocaleKeys._();
+  static String reload = "reload";
+  static String close = "close";
   static String logoutFailed = "logoutFailed";
   static String currentStationCannotSetUpAirprintService = "currentStationCannotSetUpAirprintService";
   static String airprintService = "airprintService";
