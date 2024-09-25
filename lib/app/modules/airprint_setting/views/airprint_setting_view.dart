@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 
 import '../../../routes/app_pages.dart';
@@ -35,7 +33,7 @@ class AirprintSettingView extends GetView<AirprintSettingController> {
           children: [
             Obx(() => Text(
                   AirprintSettingController.to.isRunning.value
-                      ? LocaleKeys.startArirprintService.tr
+                      ? LocaleKeys.airprintServiceIsRunning.tr
                       : LocaleKeys.airprintServiceIsStopped.tr,
                   style: const TextStyle(fontSize: 30),
                 )),
