@@ -204,13 +204,17 @@ class HomeController extends GetxController {
 
   ///退出登录
   Future<void> logout() async {
+    Get.back();
+    showLoding("${LocaleKeys.logout.tr}...");
     final UserData? loginUser = getLoginInfo();
     if (loginUser != null) {
-      String? comapny = loginUser.company;
+      String? company = loginUser.company;
       String? station = loginUser.station;
       try {
-        var response = await apiClient.post(Config.logout, data: {"comapny": comapny, "station": station});
+        var response = await apiClient.post(Config.logout, data: {"company": company, "station": station});
+
         if (response.statusCode == 200) {
+          dismissLoding();
           await closeService();
           box.delete(Config.localStroagehasLogin);
           Get.offAllNamed(Routes.LOGIN);

@@ -3,13 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:esc_pos_printer/esc_pos_printer.dart';
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 import 'package:image/image.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../config.dart';
 import '../model/login_model.dart';
@@ -17,10 +21,6 @@ import '../model/printer_model.dart';
 import '../utils/esc_helper.dart';
 import '../utils/stroage_manage.dart';
 import 'api_client.dart';
-import 'package:collection/collection.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
 
 Timer? timer;
 RxBool isRunning = false.obs;
@@ -292,7 +292,7 @@ Future<void> deleteQueue(Map<String, dynamic> queryData, List queueIDs) async {
 
 ///获取本地存储信息
 UserData? getLoginInfo() {
-  var loginUserJson = box.read("loginInfo");
+  var loginUserJson = box.read(Config.localStroageloginInfo);
   UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
   if (loginUser != null) {
     return loginUser;
