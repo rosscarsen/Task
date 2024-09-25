@@ -82,3 +82,9 @@ showToast(String msg) {
     maskType: EasyLoadingMaskType.custom,
   );
 }
+
+dismissLoding() {
+  if (EasyLoading.isShow) {
+    EasyLoading.dismiss();
+  }
+}

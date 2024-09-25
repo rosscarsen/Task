@@ -1,25 +1,26 @@
 class Config {
+  ///网络请求地址
   static String baseurl = "https://flutterpos.friendsclub.com/BackgroundPrint";
+
+  //登录
   static String login = "/login";
 
-  ///获取数据
+  //获取数据
   static String getData = "/getTaskData";
 
-  ///修改发票明细为Ｙ
-  //static String editstatus = "/editStatus";
-
-  ///修改二维码栏位值
-  //static String editPrintInvoice = "/editPrintInvoice";
-
-  ///修改上菜单栏位值
-  //static String editBDL = "/editBDL";
-
-  ///修改打印發票栏位值
-  //static String editPrintInvoices = "/editPrintInvoices";
-
-  ///获取所有IP
+  //获取所有IP
   static String getAllLocalIP = "/getAllLocalIP";
 
-  ///打印完成后把发票发送给后台
+  //打印完成后把发票发送给后台
   static String sendInvoices = "/deleteInvoice";
+
+  ///本地存储key
+
+  //本地登录信息
+  static String localStroageloginInfo = "localStroageLoginInfo";
+
+  //登录标识
+  static String localStroagehasLogin = "localStroageHasLogin";
+  //本地语言
+  static String localStroagelanguage = "localStroageLanguage";
 }

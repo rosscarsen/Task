@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // To parse this JSON data, do
 //
 //     final loginModel = loginModelFromJson(jsonString);
@@ -36,32 +37,49 @@ class UserData {
   String? company;
   String? pwd;
   String? userCode;
+  String? station;
+  String? airPrintStation;
+  String? webSit;
   Dsn? frontDsn;
   Dsn? adminDsn;
 
   UserData({
     this.company,
     this.pwd,
+    this.station,
     this.userCode,
     this.frontDsn,
     this.adminDsn,
+    this.airPrintStation,
+    this.webSit,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) => UserData(
         company: json["company"],
+        station: json["station"],
+        airPrintStation: json["airPrintStation"],
         pwd: json["pwd"],
         userCode: json["userCode"],
         frontDsn: json["frontDsn"] == null ? null : Dsn.fromJson(json["frontDsn"]),
         adminDsn: json["adminDsn"] == null ? null : Dsn.fromJson(json["adminDsn"]),
+        webSit: json["webSit"],
       );
 
   Map<String, dynamic> toJson() => {
         "company": company,
+        "station": station,
+        "airPrintStation": airPrintStation,
         "pwd": pwd,
         "userCode": userCode,
         "frontDsn": frontDsn?.toJson(),
         "adminDsn": adminDsn?.toJson(),
+        "webSit": webSit,
       };
+
+  @override
+  String toString() {
+    return 'UserData(company: $company, pwd: $pwd, userCode: $userCode, station: $station, airPrintStation: $airPrintStation, webSit: $webSit, frontDsn: $frontDsn, adminDsn: $adminDsn)';
+  }
 }
 
 class Dsn {

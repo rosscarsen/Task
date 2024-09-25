@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import 'app/config.dart';
 import 'app/routes/app_pages.dart';
 import 'app/service/task_service.dart';
 import 'app/translations/app_translations.dart';
@@ -11,8 +14,9 @@ import 'app/utils/stroage_manage.dart';
 
 Future<Locale> getSavedLocale() async {
   final StorageManage storageManage = StorageManage();
+
   // 从存储中读取保存的语言
-  String localeString = await storageManage.read("localeLang") ?? "zh_HK";
+  String localeString = await storageManage.read(Config.localStroagelanguage) ?? "zh_HK";
 
   List<String> localeParts = localeString.split('_');
   return Locale(localeParts[0], localeParts.length > 1 ? localeParts[1] : '');
@@ -21,13 +25,16 @@ Future<Locale> getSavedLocale() async {
 Future<void> initService() async {
   // 初始化存储
   await GetStorage.init();
-  await initializeService();
+  if (Platform.isAndroid || Platform.isIOS) {
+    await initializeService();
+  }
 }
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final Locale initialLocale = await getSavedLocale();
   await initService();
+  final Locale initialLocale = await getSavedLocale();
+
   runApp(MyApp(initialLocale));
 }
 

@@ -1,4 +1,49 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+import '../../../utils/progresshub.dart';
+import '../controllers/home_controller.dart';
+
+class HomeView extends GetView<HomeController> {
+  const HomeView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      /* appBar: AppBar(
+        leading: IconButton(
+          onPressed: () async {
+            HomeController.to.initUrl();
+          },
+          icon: const Icon(Icons.import_contacts),
+        ),
+      ), */
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Color.fromARGB(255, 63, 32, 245),
+          statusBarIconBrightness: Brightness.light,
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(top: context.mediaQuery.padding.top),
+          child: Obx(
+            () => ProgressHUD(
+              inAsyncCall: controller.isloading.value,
+              opacity: 0.7,
+              child: WebViewWidget(
+                controller: HomeController.to.webViewController,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+ 
+
+/* import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -138,7 +183,7 @@ class HomeView extends GetView<HomeController> {
   }
 }
 
-
+ */
 
 
 

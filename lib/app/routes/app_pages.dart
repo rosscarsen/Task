@@ -1,7 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:task/app/config.dart';
+import 'package:task/app/utils/stroage_manage.dart';
 
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
@@ -14,9 +15,10 @@ part 'app_routes.dart';
 
 class AppPages {
   AppPages._();
-  static final box = GetStorage();
-  static final bool isUserLoggedIn = box.read("hasLogin") ?? false;
-  static final INITIAL = isUserLoggedIn ? Routes.HOME : Routes.LOGIN;
+  static final box = StorageManage();
+  static final INITIAL = (box.hasData(Config.localStroagehasLogin) && box.read(Config.localStroagehasLogin) == true)
+      ? Routes.HOME
+      : Routes.LOGIN;
 
   static final routes = [
     GetPage(
