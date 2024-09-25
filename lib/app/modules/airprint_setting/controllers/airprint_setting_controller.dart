@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
-import 'package:task/app/translations/app_translations.dart';
 
 import '../../../config.dart';
 import '../../../model/login_model.dart';
+import '../../../translations/app_translations.dart';
 import '../../../utils/stroage_manage.dart';
 
 class AirprintSettingController extends GetxController {
