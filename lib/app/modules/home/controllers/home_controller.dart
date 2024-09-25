@@ -94,6 +94,7 @@ class HomeController extends GetxController {
                       CupertinoDialogAction(
                         child: Text('reload'.tr),
                         onPressed: () {
+                          Get.back();
                           webViewController.reload();
                         },
                       ),
