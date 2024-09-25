@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
+import 'package:task/app/translations/app_translations.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../config.dart';
@@ -53,6 +54,7 @@ class HomeController extends GetxController {
     return loadUrl;
   }
 
+  ///初始化weview
   void initWebview() {
     final url = initUrl();
     webViewController = WebViewController()
@@ -65,15 +67,9 @@ class HomeController extends GetxController {
           onPageStarted: (String url) {
             isloading.value = true;
           },
-          onPageFinished: (String url) {
+          onPageFinished: (String url) async {
             isloading.value = false;
-
-            webViewController.runJavaScriptReturningResult('typeof flutterCallJs === "function"').then((value) {
-              bool? result = value as bool;
-              if (result == true) {
-                webViewController.runJavaScript("flutterCallJs('flutter调用JS')");
-              }
-            });
+            await addAirPrintSettingButton(controller: webViewController);
           },
           onWebResourceError: (WebResourceError error) {
             isloading.value = false;
@@ -141,7 +137,7 @@ class HomeController extends GetxController {
                     ? const Locale("zh", "HK")
                     : const Locale("en", "US")
             : const Locale("zh", "HK");
-        print("===>${locale.toString()}");
+
         box.delete(Config.localStroagelanguage);
         box.save(Config.localStroagelanguage, locale.toString());
         Get.updateLocale(locale);
@@ -152,6 +148,7 @@ class HomeController extends GetxController {
       ..loadRequest(Uri.parse(url));
   }
 
+  ///关闭打印服务
   Future closeService() async {
     var ret = await _service.isRunning();
     if (ret) {
@@ -160,6 +157,7 @@ class HomeController extends GetxController {
     }
   }
 
+  ///启动打印服务
   Future startService() async {
     var ret = await _service.isRunning();
     if (!ret) {
@@ -170,5 +168,32 @@ class HomeController extends GetxController {
 
   Future<void> checkServicRuning() async {
     isRunning.value = await _service.isRunning();
+  }
+
+  ///添加airprint网页设置按钮
+  Future<void> addAirPrintSettingButton({required WebViewController controller}) async {
+    String addAirprintDiv = '''
+    function openPrintSetting() {
+        try { 
+            window.openPrinterSetting.postMessage("openAirprintSetting"); 
+            document.querySelector('.setting_content').style.display = 'none';
+            document.querySelector('.menu-bt').click();
+        } catch (e) {
+            document.querySelector('.setting_content').style.display = 'none';
+            document.querySelector('.menu-bt').click();
+        }
+    }
+    var newAnchorHTML = `
+        <a href="javascript:void(0);" 
+           onclick="openAirprintSetting()" 
+           class="i"
+           style=" border: none; background:#3575f0;color:#fff;line-height: 26px;border-radius: 4px;  margin: 20px; padding: 5px 20px;  text-align: center;">
+           ${LocaleKeys.airprintSetting.tr}
+        </a>`;
+    var parentDiv = document.getElementById('setting');
+    parentDiv.appendChild(newAnchorHTML);
+''';
+
+    await controller.runJavaScript(addAirprintDiv);
   }
 }
