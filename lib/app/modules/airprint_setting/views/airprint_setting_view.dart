@@ -16,6 +16,9 @@ class AirprintSettingView extends GetView<AirprintSettingController> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(LocaleKeys.airprintService.tr),
         centerTitle: true,
+        leading: BackButton(
+          onPressed: () => Get.offAndToNamed(Routes.HOME),
+        ),
         actions: [
           IconButton(
             onPressed: () async {

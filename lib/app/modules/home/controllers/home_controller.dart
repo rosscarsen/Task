@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
-import 'package:task/app/translations/app_translations.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../config.dart';
 import '../../../model/login_model.dart';
 import '../../../routes/app_pages.dart';
+import '../../../service/api_client.dart';
+import '../../../translations/app_translations.dart';
+import '../../../utils/easy_loding.dart';
 import '../../../utils/stroage_manage.dart';
 
 class HomeController extends GetxController {
@@ -21,6 +23,7 @@ class HomeController extends GetxController {
   late final WebViewController webViewController;
   RxBool isloading = true.obs;
   final box = StorageManage();
+  final ApiClient apiClient = ApiClient();
 
   @override
   void onInit() {
@@ -116,9 +119,10 @@ class HomeController extends GetxController {
                 ),
                 CupertinoDialogAction(
                   child: Text('confirm'.tr),
-                  onPressed: () {
-                    box.delete(Config.localStroagehasLogin);
-                    Get.offAllNamed(Routes.LOGIN);
+                  onPressed: () async {
+                    await logout();
+                    /* box.delete(Config.localStroagehasLogin);
+                    Get.offAllNamed(Routes.LOGIN); */
                   },
                 ),
               ],
@@ -142,7 +146,7 @@ class HomeController extends GetxController {
         Get.updateLocale(locale);
       })
       ..addJavaScriptChannel("flutterAirprintSetting", onMessageReceived: (JavaScriptMessage message) {
-        Get.toNamed(Routes.AIRPRINT_SETTING);
+        Get.offAndToNamed(Routes.AIRPRINT_SETTING);
       })
       ..setOnConsoleMessage((message) {
         log("控制台消息: ${message.message}");
@@ -196,5 +200,36 @@ class HomeController extends GetxController {
         parentDiv.appendChild(newAnchor);
     ''';
     await controller.runJavaScript(addAirprintDiv);
+  }
+
+  ///退出登录
+  Future<void> logout() async {
+    final UserData? loginUser = getLoginInfo();
+    if (loginUser != null) {
+      String? comapny = loginUser.company;
+      String? station = loginUser.station;
+      try {
+        var response = await apiClient.post(Config.logout, data: {"comapny": comapny, "station": station});
+        if (response.statusCode == 200) {
+          await closeService();
+          box.delete(Config.localStroagehasLogin);
+          Get.offAllNamed(Routes.LOGIN);
+        }
+      } catch (e) {
+        errorLoding(LocaleKeys.logoutFailed.tr);
+      }
+    } else {
+      errorLoding(LocaleKeys.logoutFailed.tr);
+    }
+  }
+
+  ///获取登录信息
+  UserData? getLoginInfo() {
+    var loginUserJson = box.read(Config.localStroageloginInfo);
+    UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
+    if (loginUser != null) {
+      return loginUser;
+    }
+    return null;
   }
 }

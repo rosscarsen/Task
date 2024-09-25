@@ -12,6 +12,14 @@ class IpPingView extends GetView<IpPingController> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text('IP ${LocaleKeys.connectTest.tr}'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await IpPingController.to.getAllIP();
+            },
+            icon: const Icon(Icons.refresh),
+          ),
+        ],
         centerTitle: true,
       ),
       body: SafeArea(

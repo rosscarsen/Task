@@ -4,6 +4,8 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'zh_HK': {
+          "logoutFailed": "登出失敗",
+          "currentStationCannotSetUpAirprintService": "當前收銀機(%s)無法設置列印服務",
           "airprintService": "列印服務",
           "loadException": "加載異常",
           "airprintSetting": "列印設置",
@@ -74,6 +76,8 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未設置手機網站",
         },
         'zh_CN': {
+          "logoutFailed": "登出失败",
+          "currentStationCannotSetUpAirprintService": "当前收银机(%s)无法设置打印服务",
           "airprintService": "打印服务",
           "loadException": "加载异常",
           "airprintSetting": "列印设置",
@@ -144,6 +148,8 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未设置手机网站",
         },
         'en_US': {
+          "logoutFailed": "Logout failed",
+          "currentStationCannotSetUpAirprintService": "Current station (%s) cannot set up airprint service",
           "airprintService": "Airprint service",
           "loadException": "Load exception",
           "airprintSetting": "Airprint setting",
@@ -218,6 +224,8 @@ class AppTranslations extends Translations {
 
 abstract class LocaleKeys {
   LocaleKeys._();
+  static String logoutFailed = "logoutFailed";
+  static String currentStationCannotSetUpAirprintService = "currentStationCannotSetUpAirprintService";
   static String airprintService = "airprintService";
   static String loadException = 'loadException';
   static String airprintSetting = 'airprintSetting';

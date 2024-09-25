@@ -13,6 +13,8 @@ class Config {
 
   //打印完成后把发票发送给后台
   static String sendInvoices = "/deleteInvoice";
+  //退出登录
+  static String logout = "/logout";
 
   ///本地存储key
 

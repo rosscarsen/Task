@@ -13,6 +13,7 @@ import '../../../service/api_client.dart';
 import '../../../utils/easy_loding.dart';
 
 class IpPingController extends GetxController {
+  static IpPingController get to => Get.find();
   final apiCli = ApiClient();
   GetStorage box = GetStorage();
   RxList<IpData> allIp = <IpData>[].obs;
@@ -51,7 +52,7 @@ class IpPingController extends GetxController {
   }
 
   /// ping测试
-  Future<void> testConnection(String host, {int port = 80}) async {
+  Future<void> testConnection(String host, {int port = 9100}) async {
     showLoding("$host ${LocaleKeys.testConnect.tr}...");
     try {
       final socket = await Socket.connect(host, port, timeout: const Duration(seconds: 5));
