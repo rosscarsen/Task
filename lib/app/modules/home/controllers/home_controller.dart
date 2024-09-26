@@ -69,8 +69,14 @@ class HomeController extends GetxController {
           },
           onWebResourceError: (WebResourceError error) {
             isloading.value = false;
-            isloading.value = false;
-            showCupertinoDialog(
+            debugPrint('''
+Page resource error:
+  code: ${error.errorCode}
+  description: ${error.description}
+  errorType: ${error.errorType}
+  isForMainFrame: ${error.isForMainFrame}
+          ''');
+            /* showCupertinoDialog(
                 context: Get.context!,
                 builder: (context) {
                   return CupertinoAlertDialog(
@@ -94,7 +100,7 @@ class HomeController extends GetxController {
                       ),
                     ],
                   );
-                });
+                }); */
           },
           onNavigationRequest: (NavigationRequest request) {
             return NavigationDecision.navigate;
@@ -205,7 +211,9 @@ class HomeController extends GetxController {
         newAnchor.style.padding = '5px 20px';
         newAnchor.style.textAlign = 'center';
         var parentDiv = document.getElementById('setting');
-        parentDiv.appendChild(newAnchor);
+        if (parentDiv) {
+            parentDiv.appendChild(newAnchor);
+        } 
     ''';
     await controller.runJavaScript(addAirprintDiv);
   }
