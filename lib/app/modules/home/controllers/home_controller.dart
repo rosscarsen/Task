@@ -53,6 +53,7 @@ class HomeController extends GetxController {
   ///初始化weview
   void initWebview() {
     final url = initUrl();
+
     webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setUserAgent("flutter")
@@ -69,14 +70,8 @@ class HomeController extends GetxController {
           },
           onWebResourceError: (WebResourceError error) {
             isloading.value = false;
-            debugPrint('''
-Page resource error:
-  code: ${error.errorCode}
-  description: ${error.description}
-  errorType: ${error.errorType}
-  isForMainFrame: ${error.isForMainFrame}
-          ''');
-            /* showCupertinoDialog(
+
+            showCupertinoDialog(
                 context: Get.context!,
                 builder: (context) {
                   return CupertinoAlertDialog(
@@ -100,7 +95,7 @@ Page resource error:
                       ),
                     ],
                   );
-                }); */
+                });
           },
           onNavigationRequest: (NavigationRequest request) {
             return NavigationDecision.navigate;
@@ -158,7 +153,8 @@ Page resource error:
       ..setOnConsoleMessage((message) {
         log("控制台消息: ${message.message}");
       })
-      ..loadRequest(Uri.parse(url));
+      ..clearCache()
+      ..loadRequest(Uri.parse(url.trim()));
   }
 
   ///关闭打印服务
