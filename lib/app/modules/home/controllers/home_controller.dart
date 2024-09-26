@@ -29,14 +29,8 @@ class HomeController extends GetxController {
   void onInit() {
     initUrl();
     initWebview();
+    startService();
     super.onInit();
-  }
-
-  @override
-  void onClose() {
-    closeService();
-
-    super.onClose();
   }
 
   //初始化网址
@@ -171,6 +165,13 @@ class HomeController extends GetxController {
 
   ///启动打印服务
   Future startService() async {
+    UserData? loginUser = getLoginInfo();
+    String? station = loginUser?.station;
+    String? airprintStation = loginUser?.airPrintStation;
+    if (station != airprintStation) {
+      return;
+    }
+
     var ret = await _service.isRunning();
     if (!ret) {
       _service.startService();
