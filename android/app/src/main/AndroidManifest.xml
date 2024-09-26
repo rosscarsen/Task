@@ -12,6 +12,8 @@
         android:icon="@mipmap/launcher_icon">
         <service
             android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:enabled="true"
+            android:exported="false"
             android:foregroundServiceType="location|dataSync"
         />
 
