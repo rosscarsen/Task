@@ -52,7 +52,7 @@ class HomeController extends GetxController {
 
   ///初始化weview
   void initWebview() {
-    final url = initUrl();
+    final String initWebUrl = initUrl();
 
     webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -68,9 +68,11 @@ class HomeController extends GetxController {
             isloading.value = false;
             await addAirPrintSettingButton(controller: webViewController);
           },
-          onWebResourceError: (WebResourceError error) {
+          onWebResourceError: (WebResourceError error) async {
             isloading.value = false;
-
+            if (error.errorCode == -1 || error.errorType == WebResourceErrorType.unknown) {
+              return;
+            }
             showCupertinoDialog(
                 context: Get.context!,
                 builder: (context) {
@@ -80,11 +82,7 @@ class HomeController extends GetxController {
                     actions: <Widget>[
                       CupertinoDialogAction(
                         child: Text('close'.tr),
-                        onPressed: () {
-                          Get.back();
-                          box.delete(Config.localStroagehasLogin);
-                          Get.offAllNamed(Routes.LOGIN);
-                        },
+                        onPressed: () async => await logout(),
                       ),
                       CupertinoDialogAction(
                         child: Text('reload'.tr),
@@ -154,7 +152,11 @@ class HomeController extends GetxController {
         log("控制台消息: ${message.message}");
       })
       ..clearCache()
-      ..loadRequest(Uri.parse(url.trim()));
+      ..loadRequest(Uri.parse(initWebUrl.trim()), headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+        'Access-Control-Allow-Credentials': 'true'
+      });
   }
 
   ///关闭打印服务
