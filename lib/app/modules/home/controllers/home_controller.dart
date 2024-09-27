@@ -70,30 +70,6 @@ class HomeController extends GetxController {
           },
           onWebResourceError: (WebResourceError error) async {
             isloading.value = false;
-            if (error.errorCode == -1 || error.errorType == WebResourceErrorType.unknown) {
-              return;
-            }
-            showCupertinoDialog(
-                context: Get.context!,
-                builder: (context) {
-                  return CupertinoAlertDialog(
-                    title: Text('systemMessages'.tr),
-                    content: Text(LocaleKeys.loadException.tr),
-                    actions: <Widget>[
-                      CupertinoDialogAction(
-                        child: Text('close'.tr),
-                        onPressed: () async => await logout(),
-                      ),
-                      CupertinoDialogAction(
-                        child: Text('reload'.tr),
-                        onPressed: () {
-                          Get.back();
-                          webViewController.reload();
-                        },
-                      ),
-                    ],
-                  );
-                });
           },
           onNavigationRequest: (NavigationRequest request) {
             return NavigationDecision.navigate;
