@@ -2,7 +2,7 @@
 
 ## 使用前准备（一个收银机只能在一个设备上登录）
 
-[APK 下载](http://www.pericles.net/ftp1/APK/Task0927.apk)
+[APK 下载](http://www.pericles.net/ftp1/APK/Task0928.apk)
 
 1. 后台类目二打印机必须设置 IP 地址，并且 IP 地址与电脑在同一网段。
 2. 系统维护->系统设置->发票打印机、上菜单打印机、外卖单打印机设置为 IP 打印机，云打印设置为"N"。
