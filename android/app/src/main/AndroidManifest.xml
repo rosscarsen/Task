@@ -1,5 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" /><!-- 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM " /> -->
@@ -15,10 +14,8 @@
         android:icon="@mipmap/launcher_icon">
         <service
             android:name="id.flutter.flutter_background_service.BackgroundService"
-            android:enabled="true"
-            android:exported="false"
             android:foregroundServiceType="location|dataSync"
-            tools:replace="android:exported" />
+        />
         <activity
             android:name=".MainActivity"
             android:exported="true"

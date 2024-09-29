@@ -42,6 +42,8 @@ class UserData {
   String? webSit;
   Dsn? frontDsn;
   Dsn? adminDsn;
+  String? invoicePrintIP;
+  String? invoicePrintType;
 
   UserData({
     this.company,
@@ -52,6 +54,8 @@ class UserData {
     this.adminDsn,
     this.airPrintStation,
     this.webSit,
+    this.invoicePrintIP,
+    this.invoicePrintType,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) => UserData(
@@ -63,6 +67,8 @@ class UserData {
         frontDsn: json["frontDsn"] == null ? null : Dsn.fromJson(json["frontDsn"]),
         adminDsn: json["adminDsn"] == null ? null : Dsn.fromJson(json["adminDsn"]),
         webSit: json["webSit"],
+        invoicePrintIP: json["invoicePrintIP"],
+        invoicePrintType: json["invoicePrintType"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -74,11 +80,13 @@ class UserData {
         "frontDsn": frontDsn?.toJson(),
         "adminDsn": adminDsn?.toJson(),
         "webSit": webSit,
+        "invoicePrintIP": invoicePrintIP,
+        "invoicePrintType": invoicePrintType,
       };
 
   @override
   String toString() {
-    return 'UserData(company: $company, pwd: $pwd, userCode: $userCode, station: $station, airPrintStation: $airPrintStation, webSit: $webSit, frontDsn: $frontDsn, adminDsn: $adminDsn)';
+    return 'UserData(company: $company, pwd: $pwd, userCode: $userCode, station: $station, airPrintStation: $airPrintStation, webSit: $webSit, frontDsn: $frontDsn, adminDsn: $adminDsn, invoicePrintIP: $invoicePrintIP, invoicePrintType: $invoicePrintType)';
   }
 }
 

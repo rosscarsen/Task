@@ -4,6 +4,12 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
         'zh_HK': {
+          "foodSaleReport": "餐飲銷售報表",
+          "timeSolt": "時段",
+          "printTime": "列印時間",
+          "code": "編號",
+          "printSuccess": "列印成功",
+          "print_does_not_exits": "列印機不存在",
           "reload": "重新加載",
           "close": "關閉",
           "logoutFailed": "登出失敗",
@@ -78,6 +84,12 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未設置手機網站",
         },
         'zh_CN': {
+          "foodSaleReport": "食品销售报表",
+          "timeSolt": "时段",
+          "printTime": "打印时间",
+          "code": "编号",
+          "printSuccess": "列印成功",
+          "print_does_not_exits": "打印机不存在",
           "reload": "重新加载",
           "close": "关闭",
           "logoutFailed": "登出失败",
@@ -152,6 +164,12 @@ class AppTranslations extends Translations {
           'websiteNotExist': "未设置手机网站",
         },
         'en_US': {
+          "foodSaleReport": "Food Sale Report",
+          "timeSolt": "Time Slot",
+          "printTime": "Print Time",
+          'code': "Code",
+          "printSuccess": "Print success",
+          "print_does_not_exits": "Printer does not exist",
           "reload": "Reload",
           "close": "Close",
           "logoutFailed": "Logout failed",
@@ -230,75 +248,81 @@ class AppTranslations extends Translations {
 
 abstract class LocaleKeys {
   LocaleKeys._();
-  static String reload = "reload";
-  static String close = "close";
-  static String logoutFailed = "logoutFailed";
-  static String currentStationCannotSetUpAirprintService = "currentStationCannotSetUpAirprintService";
-  static String airprintService = "airprintService";
-  static String loadException = 'loadException';
-  static String airprintSetting = 'airprintSetting';
-  static String startAirprint = "startAirprint";
-  static String stopAirprint = "stopAirprint";
-  static String confirmLoginOut = "confirmLoginOut";
-  static String websiteNotExist = "websiteNotExist";
-  static String company = "company";
-  static String user = "user";
-  static String password = "password";
-  static String rememberMe = "rememberMe";
-  static String login = "login";
-  static String loggingIn = "loggingIn";
-  static String loginFailed = "loginFailed";
-  static String loginSuccess = "loginSuccess";
-  static String requestFailed = "requestFailed";
-  static String startArirprintService = "startArirprintService";
-  static String logout = "logout";
-  static String airprintServiceIsRunning = "airprintServiceIsRunning";
-  static String airprintServiceIsStopped = "airprintServiceIsStopped";
-  static String connectTest = "connectTest";
-  static String testConnect = "testConnect";
-  static String connectSuccess = "connectSuccess";
-  static String connectFailed = "connectFailed";
-  static String employee = "employee";
-  static String station = "station";
-  static String date = "date";
-  static String peopleNumber = "peopleNumber";
-  static String scanQrCode = "scanQrCode";
-  static String tableNo = "tableNo";
-  static String table = "table";
-  static String orderNo = "orderNo";
-  static String customer = "customer";
-  static String customerRecords = "customerRecords";
-  static String seatingTime = "seatingTime";
-  static String paymentTime = "paymentTime";
-  static String item = "item";
-  static String quantity = "quantity";
-  static String amount = "amount";
-  static String subtotal = "subtotal";
-  static String serviceFee = "serviceFee";
-  static String discount = "discount";
-  static String total = "total";
-  static String paymentAmount = "paymentAmount";
-  static String paymentMethod = "paymentMethod";
-  static String change = "change";
-  static String tips = "tips";
-  static String recepipt = "recepipt";
-  static String takeawayOrder = "takeawayOrder";
-  static String thisFieldIsRequired = "thisFieldIsRequired";
-  static String onTheMenu = "onTheMenu";
-  static String chaseOrder = "chaseOrder";
-  static String changeOrder = "changeOrder";
-  static String deleteOrder = "deleteOrder";
-  static String turntableOrder = "turntableOrder";
-  static String customerSign = "customerSign";
-  static String mobileTakeaway = "mobileTakeaway";
-  static String selfPickUp = "selfPickUp";
-  static String asap = "ASAP";
-  static String foodDlivery = "foodDlivery";
-  static String companyError = "companyError";
-  static String stationDoesNotExist = "stationDoesNotExist";
-  static String useOrPasswordError = "useOrPasswordError";
-  static String stationSiggedIn = "stationSiggedIn";
-  static String systemMessages = "systemMessages";
-  static String confirm = "confirm";
-  static String cancel = "cancel";
+  static const String foodSaleReport = 'foodSaleReport';
+  static const String timeSolt = 'timeSolt';
+  static const String printTime = "printTime";
+  static const String code = 'code';
+  static const String printSuccess = 'printSuccess';
+  static const String printDoesNotExits = "print_does_not_exits";
+  static const String reload = "reload";
+  static const String close = "close";
+  static const String logoutFailed = "logoutFailed";
+  static const String currentStationCannotSetUpAirprintService = "currentStationCannotSetUpAirprintService";
+  static const String airprintService = "airprintService";
+  static const String loadException = 'loadException';
+  static const String airprintSetting = 'airprintSetting';
+  static const String startAirprint = "startAirprint";
+  static const String stopAirprint = "stopAirprint";
+  static const String confirmLoginOut = "confirmLoginOut";
+  static const String websiteNotExist = "websiteNotExist";
+  static const String company = "company";
+  static const String user = "user";
+  static const String password = "password";
+  static const String rememberMe = "rememberMe";
+  static const String login = "login";
+  static const String loggingIn = "loggingIn";
+  static const String loginFailed = "loginFailed";
+  static const String loginSuccess = "loginSuccess";
+  static const String requestFailed = "requestFailed";
+  static const String startArirprintService = "startArirprintService";
+  static const String logout = "logout";
+  static const String airprintServiceIsRunning = "airprintServiceIsRunning";
+  static const String airprintServiceIsStopped = "airprintServiceIsStopped";
+  static const String connectTest = "connectTest";
+  static const String testConnect = "testConnect";
+  static const String connectSuccess = "connectSuccess";
+  static const String connectFailed = "connectFailed";
+  static const String employee = "employee";
+  static const String station = "station";
+  static const String date = "date";
+  static const String peopleNumber = "peopleNumber";
+  static const String scanQrCode = "scanQrCode";
+  static const String tableNo = "tableNo";
+  static const String table = "table";
+  static const String orderNo = "orderNo";
+  static const String customer = "customer";
+  static const String customerRecords = "customerRecords";
+  static const String seatingTime = "seatingTime";
+  static const String paymentTime = "paymentTime";
+  static const String item = "item";
+  static const String quantity = "quantity";
+  static const String amount = "amount";
+  static const String subtotal = "subtotal";
+  static const String serviceFee = "serviceFee";
+  static const String discount = "discount";
+  static const String total = "total";
+  static const String paymentAmount = "paymentAmount";
+  static const String paymentMethod = "paymentMethod";
+  static const String change = "change";
+  static const String tips = "tips";
+  static const String recepipt = "recepipt";
+  static const String takeawayOrder = "takeawayOrder";
+  static const String thisFieldIsRequired = "thisFieldIsRequired";
+  static const String onTheMenu = "onTheMenu";
+  static const String chaseOrder = "chaseOrder";
+  static const String changeOrder = "changeOrder";
+  static const String deleteOrder = "deleteOrder";
+  static const String turntableOrder = "turntableOrder";
+  static const String customerSign = "customerSign";
+  static const String mobileTakeaway = "mobileTakeaway";
+  static const String selfPickUp = "selfPickUp";
+  static const String asap = "ASAP";
+  static const String foodDlivery = "foodDlivery";
+  static const String companyError = "companyError";
+  static const String stationDoesNotExist = "stationDoesNotExist";
+  static const String useOrPasswordError = "useOrPasswordError";
+  static const String stationSiggedIn = "stationSiggedIn";
+  static const String systemMessages = "systemMessages";
+  static const String confirm = "confirm";
+  static const String cancel = "cancel";
 }
