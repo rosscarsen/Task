@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart' hide Response;
 
 import '../../../config.dart';
@@ -23,6 +24,7 @@ class LoginController extends GetxController {
   final TextEditingController pwdController = TextEditingController();
   final ApiClient apiClient = ApiClient();
   final deviceInfoPlugin = DeviceInfoPlugin();
+  final _service = FlutterBackgroundService();
   RxBool isCheck = true.obs;
   Rx<Locale> locale = const Locale("zh", "HK").obs;
   final StorageManage storageManage = StorageManage();
@@ -92,7 +94,9 @@ class LoginController extends GetxController {
             }
             storageManage.save(Config.localStroageloginInfo, ret.data!.toJson());
             storageManage.save(Config.localStroagehasLogin, true);
+            await startService(); // 启动服务
             successLoding(LocaleKeys.loginSuccess.tr);
+
             Future.delayed(const Duration(milliseconds: 1000), () {
               Get.offAllNamed(Routes.HOME);
             });
@@ -174,5 +178,30 @@ class LoginController extends GetxController {
   ///保存语言
   void saveLanguage(Locale locale) {
     storageManage.save(Config.localStroagelanguage, locale.toString());
+  }
+
+  ///启动打印服务
+  Future startService() async {
+    UserData? loginUser = getLocaleLoginInfo();
+    String? station = loginUser?.station;
+    String? airprintStation = loginUser?.airPrintStation;
+    if (station != airprintStation) {
+      return;
+    }
+
+    var ret = await _service.isRunning();
+    if (!ret) {
+      _service.startService();
+    }
+  }
+
+  ///获取本地登录信息
+  UserData? getLocaleLoginInfo() {
+    var loginUserJson = storageManage.read(Config.localStroageloginInfo);
+    UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
+    if (loginUser != null) {
+      return loginUser;
+    }
+    return null;
   }
 }

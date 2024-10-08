@@ -33,7 +33,6 @@ class HomeController extends GetxController {
   late InAppWebViewSettings? settings;
   PullToRefreshController? pullToRefreshController;
   RxBool isloading = true.obs;
-  final box = StorageManage();
   final ApiClient apiClient = ApiClient();
   late String initWebUrl;
 
@@ -41,7 +40,6 @@ class HomeController extends GetxController {
   void onInit() {
     initUrl();
     initWebview();
-    startService();
     super.onInit();
   }
 
@@ -61,90 +59,6 @@ class HomeController extends GetxController {
   }
 
   ///初始化weview
-  /*  void initWebviewBack() {
-    final String initWebUrl = initUrl();
-
-    webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setUserAgent("flutter")
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (int progress) {},
-          onPageStarted: (String url) {
-            isloading.value = true;
-          },
-          onPageFinished: (String url) async {
-            isloading.value = false;
-            await addAirPrintSettingButton(controller: webViewController);
-          },
-          onWebResourceError: (WebResourceError error) async {
-            isloading.value = false;
-          },
-          onNavigationRequest: (NavigationRequest request) {
-            return NavigationDecision.navigate;
-          },
-        ),
-      )
-      ..getScrollPosition().then((value) {
-        log("滚动位置: ${value.dx}//${value.dy}");
-      })
-      ..addJavaScriptChannel("FLUTTER_CHANNEL", onMessageReceived: (JavaScriptMessage message) {
-        showCupertinoDialog(
-          context: Get.context!,
-          builder: (context) {
-            return CupertinoAlertDialog(
-              title: Text('systemMessages'.tr),
-              content: Text('confirmLoginOut'.tr),
-              actions: <Widget>[
-                CupertinoDialogAction(
-                  child: Text('cancel'.tr),
-                  onPressed: () {
-                    Get.back();
-                  },
-                ),
-                CupertinoDialogAction(
-                  child: Text('confirm'.tr),
-                  onPressed: () async {
-                    await logout();
-                    /* box.delete(Config.localStroagehasLogin);
-                    Get.offAllNamed(Routes.LOGIN); */
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      })
-      ..addJavaScriptChannel("setLang", onMessageReceived: (JavaScriptMessage message) {
-        String localLangString = message.message.toString();
-
-        Locale locale = localLangString.isNotEmpty
-            ? localLangString == "zh-cn"
-                ? const Locale("zh", "CN")
-                : localLangString == "zh-tw"
-                    ? const Locale("zh", "HK")
-                    : const Locale("en", "US")
-            : const Locale("zh", "HK");
-
-        box.delete(Config.localStroagelanguage);
-        box.save(Config.localStroagelanguage, locale.toString());
-        Get.updateLocale(locale);
-      })
-      ..addJavaScriptChannel("flutterAirprintSetting", onMessageReceived: (JavaScriptMessage message) {
-        Get.offAndToNamed(Routes.AIRPRINT_SETTING);
-      })
-      ..setOnConsoleMessage((message) {
-        log("控制台消息: ${message.message}");
-      })
-      ..clearCache()
-      ..loadRequest(Uri.parse(initWebUrl.trim()), headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-        'Access-Control-Allow-Credentials': 'true'
-      });
-  }
- */
   void initWebview() {
     settings = InAppWebViewSettings(
       isInspectable: kDebugMode,
@@ -177,21 +91,6 @@ class HomeController extends GetxController {
     var ret = await _service.isRunning();
     if (ret) {
       _service.invoke("stopService");
-    }
-  }
-
-  ///启动打印服务
-  Future startService() async {
-    UserData? loginUser = getLoginInfo();
-    String? station = loginUser?.station;
-    String? airprintStation = loginUser?.airPrintStation;
-    if (station != airprintStation) {
-      return;
-    }
-
-    var ret = await _service.isRunning();
-    if (!ret) {
-      _service.startService();
     }
   }
 
@@ -243,7 +142,7 @@ class HomeController extends GetxController {
         if (response.statusCode == 200) {
           dismissLoding();
           await closeService();
-          box.delete(Config.localStroagehasLogin);
+          storageManage.delete(Config.localStroagehasLogin);
           Get.offAllNamed(Routes.LOGIN);
         }
       } catch (e) {
@@ -256,7 +155,7 @@ class HomeController extends GetxController {
 
   ///获取登录信息
   UserData? getLoginInfo() {
-    var loginUserJson = box.read(Config.localStroageloginInfo);
+    var loginUserJson = storageManage.read(Config.localStroageloginInfo);
     UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
     if (loginUser != null) {
       return loginUser;
@@ -301,8 +200,8 @@ class HomeController extends GetxController {
                 : const Locale("en", "US")
         : const Locale("zh", "HK");
 
-    await box.delete(Config.localStroagelanguage);
-    await box.save(Config.localStroagelanguage, locale.toString());
+    await storageManage.delete(Config.localStroagelanguage);
+    await storageManage.save(Config.localStroagelanguage, locale.toString());
     Get.updateLocale(locale);
   }
 
