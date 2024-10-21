@@ -2,6 +2,10 @@
 
 ## 使用前准备（一个收银机只能在一个设备上登录）
 
+### [window destop 使用说明](# windwos 使用说明)
+
+### [关于 Get](#关于get)
+
 [APK 下载](http://www.pericles.net/ftp1/APK/Task1008.apk)
 
 1. 后台类目二打印机必须设置 IP 地址，并且 IP 地址与电脑在同一网段。
@@ -84,3 +88,34 @@
 
 - 打印机：（食品銷售報表 、日結報表）使用后台系统设置内的发发票 IP 打印机，重印发票跟队列（和结账时收据一样使用发票 IP 打印机）
 - 对于版本小于 1.0.5，先升级到 1.0.5，升级后如果之前登录过且未登出，一定要重新登出再登录，（登录时会再去拿一些信息储存在 app 内）
+
+## 开发使用的包
+
+- [x] characters
+- [x] collection
+- [x] device_info_plus
+- [x] dio
+- [x] flutter_esc_pos_utils
+- [x] flutter_esc_pos_network
+- [x] flutter_background_service
+- [x] flutter_background_service_android
+- [x] flutter_easyloading
+- [x] flutter_inappwebview
+- [x] get
+- [x] get_storage
+- [x] image
+- [x] intl
+- [x] logger
+- [x] path_provider
+- [x] qr_flutter
+- [x] tray_manager
+- [x] win32
+- [x] flutter_staggered_animations
+
+### 安装后 msix 程序后查看位置 Get-AppxPackage -AllUsers | Where-Object { $\_.Name -like "_com.example.myapp_" } | Select-Object PackageFamilyName, InstallLocation
+
+# windwos 使用说明
+
+# 关于 Get
+
+    1. Get.put() 保存数据，Get.find() 获取数据
