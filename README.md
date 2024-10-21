@@ -118,4 +118,25 @@
 
 # 关于 Get
 
-    1. Get.put() 保存数据，Get.find() 获取数据
+- GetX 是 Flutter 上的一个轻量且强大的解决方案：高性能的状态管理、智能的依赖注入和便捷的路由管理。
+
+- GetX 有 3 个基本原则：
+
+  - **性能：** GetX 专注于性能和最小资源消耗。GetX 打包后的 apk 占用大小和运行时的内存占用与其他状态管理插件不相上下。如果你感兴趣，这里有一个[性能测试](https://github.com/jonataslaw/benchmarks)。
+  - **效率：** GetX 的语法非常简捷，并保持了极高的性能，能极大缩短你的开发时长。
+  - **结构：** GetX 可以将界面、逻辑、依赖和路由完全解耦，用起来更清爽，逻辑更清晰，代码更容易维护。
+
+- GetX 并不臃肿，却很轻量。如果你只使用状态管理，只有状态管理模块会被编译，其他没用到的东西都不会被编译到你的代码中。它拥有众多的功能，但这些功能都在独立的容器中，只有在使用后才会启动。
+
+- Getx 有一个庞大的生态系统，能够在 Android、iOS、Web、Mac、Linux、Windows 和你的服务器上用同样的代码运行。
+  **通过[Get Server](https://github.com/jonataslaw/get_server)** 可以在你的后端完全重用你在前端写的代码。
+
+**此外，通过[Get CLI](https://github.com/jonataslaw/get_cli)**，无论是在服务器上还是在前端，整个开发过程都可以完全自动化。
+
+**此外，为了进一步提高您的生产效率，我们还为您准备了一些插件**
+
+- **getx_template**：一键生成每个页面必需的文件夹、文件、模板代码等等
+  - [Android Studio/Intellij 插件](https://plugins.jetbrains.com/plugin/15919-getx)
+- **GetX Snippets**：输入少量字母，自动提示选择后，可生成常用的模板代码
+  - [Android Studio/Intellij 扩展](https://plugins.jetbrains.com/plugin/14975-getx-snippets)
+  - [VSCode 扩展](https://marketplace.visualstudio.com/items?itemName=get-snippets.get-snippets)
