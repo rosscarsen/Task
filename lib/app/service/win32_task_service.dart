@@ -31,6 +31,7 @@ void allowSleep() {
 
 // 定义一个函数，用于启动Windows任务
 Future<void> win32StartTask() async {
+  printStatus = true;
   final bool isRunning = win32TimerIsRunning();
   if (!isRunning) {
     // 阻止系统休眠
@@ -260,6 +261,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
 }
 
 Future<void> win32StopTask() async {
+  printStatus = false;
   final bool isRunning = win32TimerIsRunning(); // 检查timer是否在运行
   if (isRunning) {
     // 允许系统休眠
