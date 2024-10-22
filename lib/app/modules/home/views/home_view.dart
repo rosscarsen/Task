@@ -15,14 +15,6 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /* appBar: AppBar(
-        leading: IconButton(
-          onPressed: () async {
-            HomeController.to.initUrl();
-          },
-          icon: const Icon(Icons.import_contacts),
-        ),
-      ), */
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: const SystemUiOverlayStyle(
           statusBarColor: Color.fromARGB(255, 63, 32, 245),

@@ -1,25 +1,26 @@
-import 'package:esc_pos_printer/esc_pos_printer.dart';
-import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_esc_pos_network/flutter_esc_pos_network.dart';
+import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:task/app/model/daily_report.dart';
-import 'package:task/app/model/sale_model.dart';
 
 import '../../../config.dart';
+import '../../../model/daily_report.dart';
 import '../../../model/login_model.dart';
+import '../../../model/sale_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../service/api_client.dart';
+import '../../../service/win32_task_service.dart';
 import '../../../translations/app_translations.dart';
 import '../../../utils/easy_loding.dart';
 import '../../../utils/esc_helper.dart';
 import '../../../utils/stroage_manage.dart';
-
-final GlobalKey webViewKey = GlobalKey();
 
 class HomeController extends GetxController {
   static HomeController get to => Get.find();
@@ -40,6 +41,7 @@ class HomeController extends GetxController {
   void onInit() {
     initUrl();
     initWebview();
+    startService();
     super.onInit();
   }
 
@@ -86,11 +88,36 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
+  ///启动打印服务
+  Future<void> startService() async {
+    UserData? loginUser = getLoginInfo();
+    String? station = loginUser?.station;
+    String? airprintStation = loginUser?.airPrintStation;
+    if (station != airprintStation) {
+      return;
+    }
+    final bool hasTask = storageManage.read(Config.localStroageStartTask);
+    if (Platform.isAndroid && hasTask) {
+      var ret = await _service.isRunning();
+      if (!ret) {
+        _service.startService();
+      }
+    }
+    if (Platform.isWindows && hasTask) {
+      await win32StartTask();
+    }
+  }
+
   ///关闭打印服务
   Future closeService() async {
-    var ret = await _service.isRunning();
-    if (ret) {
-      _service.invoke("stopService");
+    if (Platform.isAndroid) {
+      var ret = await _service.isRunning();
+      if (ret) {
+        _service.invoke("stopService");
+      }
+    }
+    if (Platform.isWindows) {
+      await win32StopTask();
     }
   }
 
@@ -214,13 +241,9 @@ class HomeController extends GetxController {
         return;
       }
     }
-    const PaperSize paper = PaperSize.mm80;
-    final profile = await CapabilityProfile.load();
-    final printer = NetworkPrinter(paper, profile);
 
     final DailyReportModel dailyReportModel = dailyReportModelFromMap(dailyReportJson);
     await doPrintDayReport(
-      printer: printer,
       printData: dailyReportModel,
       invoicePrintIP: loginUser!.invoicePrintIP!,
       invoicePrintType: loginUser.invoicePrintType!,
@@ -229,56 +252,59 @@ class HomeController extends GetxController {
 
   //执行打印日结报表
   Future<void> doPrintDayReport({
-    required NetworkPrinter printer,
     required DailyReportModel printData,
     required String invoicePrintIP,
     required String invoicePrintType,
   }) async {
     try {
-      final PosPrintResult linkret = await printer.connect(invoicePrintIP, port: 9100);
-      if (linkret == PosPrintResult.success) {
-        printer.text(
+      final printer = PrinterNetworkManager(invoicePrintIP);
+      PosPrintResult connect = await printer.connect();
+      if (connect == PosPrintResult.success) {
+        List<int> bytes = [];
+        final profile = await CapabilityProfile.load();
+        final generator = Generator(PaperSize.mm80, profile);
+        bytes += generator.text(
           EscHelper.alignCenterPrint(width: 24, content: "${printData.dailyReport}"),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        printer.text(
+        bytes += generator.text(
           EscHelper.alignCenterPrint(width: 48, content: "${printData.shop}"),
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        printer.text(
+        bytes += generator.text(
           EscHelper.alignCenterPrint(width: 48, content: "${printData.staff}"),
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        printer.text(
+        bytes += generator.text(
           EscHelper.alignCenterPrint(width: 48, content: "${printData.date}"),
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        printer.rawBytes(EscHelper.setSize().codeUnits);
-        printer.hr();
+        bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+        bytes += generator.hr();
         //销售金額
-        printer.text(
+        bytes += generator.text(
           "${printData.salesAmount}",
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2),
           containsChinese: true,
         );
-        printer.rawBytes(EscHelper.setSize().codeUnits);
-        printer.hr();
-        printer.feed(1);
-        printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+        bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+        bytes += generator.hr();
+        bytes += generator.feed(1);
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         final List<String>? salesAmountTotal = printData.salesAmountTotal;
         if (salesAmountTotal!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: salesAmountTotal[0], width: 24)}${EscHelper.columnMaker(content: salesAmountTotal[1], width: 24, align: 2)}",
             containsChinese: true,
           );
         }
         final List<String>? service = printData.service;
         if (service!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: service[0], width: 24)}${EscHelper.columnMaker(content: service[1], width: 24, align: 2)}",
             containsChinese: true,
           );
@@ -286,7 +312,7 @@ class HomeController extends GetxController {
 
         final List<String>? dis = printData.dis;
         if (dis!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: dis[0], width: 24)}${EscHelper.columnMaker(content: dis[1], width: 24, align: 2)}",
             containsChinese: true,
           );
@@ -294,7 +320,7 @@ class HomeController extends GetxController {
 
         final List<String>? tips = printData.tips;
         if (tips!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: tips[0], width: 24)}${EscHelper.columnMaker(content: tips[1], width: 24, align: 2)}",
             containsChinese: true,
           );
@@ -302,124 +328,124 @@ class HomeController extends GetxController {
 
         final List<String>? balance = printData.balance;
         if (balance!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: balance[0], width: 24)}${EscHelper.columnMaker(content: balance[1], width: 24, align: 2)}",
             containsChinese: true,
           );
         }
-        printer.rawBytes(EscHelper.setSize().codeUnits);
-        printer.hr();
-        printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+        bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+        bytes += generator.hr();
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         final List<String>? netAmt = printData.netAmt;
         if (netAmt!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: netAmt[0], width: 24)}${EscHelper.columnMaker(content: netAmt[1], width: 24, align: 2)}",
             containsChinese: true,
           );
         }
-        printer.feed(invoicePrintType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(invoicePrintType == "EPSON" ? 3 : 1);
         //支付方式
         final List<String>? payTitle = printData.payTitle;
         if (payTitle!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.setBold()}${EscHelper.columnMaker(content: payTitle[0], width: 20)}${EscHelper.columnMaker(content: payTitle[1], width: 16)}${EscHelper.columnMaker(content: payTitle[2], width: 12, align: 2)}",
             containsChinese: true,
           );
         }
-        printer.rawBytes(EscHelper.setSize().codeUnits);
-        printer.hr();
-        printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+        bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+        bytes += generator.hr();
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
 
         final List<List<String>>? payList = printData.payList;
-        printer.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.resetBold().codeUnits);
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.resetBold().codeUnits);
         if (payList!.isNotEmpty) {
           for (var payItem in payList) {
             if (payItem.isNotEmpty) {
-              printer.text(
+              bytes += generator.text(
                 "${EscHelper.columnMaker(content: payItem[0], width: 16)}${EscHelper.columnMaker(content: payItem[1], width: 4)}${EscHelper.columnMaker(content: payItem[2], width: 16)}${EscHelper.columnMaker(content: payItem[3], width: 12, align: 2)}",
                 containsChinese: true,
               );
             }
           }
 
-          printer.rawBytes(EscHelper.setSize().codeUnits);
-          printer.hr();
-          printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+          bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+          bytes += generator.hr();
+          bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         }
 
         final List<String>? payTotalList = printData.payTotalList;
         if (payTotalList!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: payTotalList[0], width: 16)}${EscHelper.columnMaker(content: payTotalList[1], width: 4)}${EscHelper.columnMaker(content: payTotalList[2], width: 16)}${EscHelper.columnMaker(content: payTotalList[3], width: 12, align: 2)}",
             containsChinese: true,
           );
         }
-        printer.feed(invoicePrintType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(invoicePrintType == "EPSON" ? 3 : 1);
         //現金核算
         final String? cashAccounting = printData.cashAccounting;
         if (cashAccounting!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.setBold()}${EscHelper.setSize(size: 3)}$cashAccounting",
             containsChinese: true,
           );
 
-          printer.rawBytes(EscHelper.resetBold().codeUnits);
+          bytes += generator.rawBytes(EscHelper.resetBold().codeUnits);
         }
-        printer.rawBytes(EscHelper.setSize().codeUnits);
-        printer.hr();
-        printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+        bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+        bytes += generator.hr();
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         final List<String>? cashSales = printData.cashSales;
         //现金销售
         if (cashSales!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: cashSales[0], width: 20)}${EscHelper.columnMaker(content: cashSales[1], width: 16)}${EscHelper.columnMaker(content: cashSales[2], width: 12, align: 2)}",
             containsChinese: true,
           );
 
-          printer.rawBytes(EscHelper.setSize().codeUnits);
-          printer.hr();
-          printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+          bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+          bytes += generator.hr();
+          bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         }
         final List<dynamic>? cashAccountingDetailPay = printData.cashAccountingDetailPay;
         //现金会计明细支付
         if (cashAccountingDetailPay!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: cashAccountingDetailPay[0], width: 24)}${EscHelper.columnMaker(content: cashAccountingDetailPay[1], width: 24, align: 2)}",
             containsChinese: true,
           );
 
-          printer.rawBytes(EscHelper.setSize().codeUnits);
-          printer.hr();
-          printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+          bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+          bytes += generator.hr();
+          bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         }
         final List<String>? cashOnHand = printData.cashOnHand;
         //收银柜现金
         if (cashOnHand!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: cashOnHand[0], width: 24)}${EscHelper.columnMaker(content: cashOnHand[1], width: 24, align: 2)}",
             containsChinese: true,
           );
-          printer.rawBytes(EscHelper.setSize().codeUnits);
-          printer.hr();
-          printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+          bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+          bytes += generator.hr();
+          bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         }
 
         //日結分析
         final String? auditTrail = printData.auditTrail;
         if (auditTrail!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.setSize(size: 3)}$auditTrail",
             containsChinese: true,
           );
 
-          printer.rawBytes(EscHelper.setSize().codeUnits);
-          printer.hr();
-          printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+          bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+          bytes += generator.hr();
+          bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         }
         //作废修改
         final List<String>? voidModify = printData.voidModify;
         if (voidModify!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: voidModify[0], width: 20)}${EscHelper.columnMaker(content: voidModify[1], width: 16)}${EscHelper.columnMaker(content: voidModify[2], width: 12, align: 2)}",
             containsChinese: true,
           );
@@ -427,7 +453,7 @@ class HomeController extends GetxController {
         //退单
         final List<String>? refund = printData.refund;
         if (refund!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: refund[0], width: 20)}${EscHelper.columnMaker(content: refund[1], width: 16)}${EscHelper.columnMaker(content: refund[2], width: 12, align: 2)}",
             containsChinese: true,
           );
@@ -435,7 +461,7 @@ class HomeController extends GetxController {
         //签送
         final List<String>? waive = printData.waive;
         if (waive!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: waive[0], width: 20)}${EscHelper.columnMaker(content: waive[1], width: 16)}${EscHelper.columnMaker(content: waive[2], width: 12, align: 2)}",
             containsChinese: true,
           );
@@ -443,7 +469,7 @@ class HomeController extends GetxController {
         //平均金额
         final List<String>? averageBill = printData.averageBill;
         if (averageBill!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: averageBill[0], width: 20)}${EscHelper.columnMaker(content: averageBill[1], width: 16)}${EscHelper.columnMaker(content: averageBill[2], width: 12, align: 2)}",
             containsChinese: true,
           );
@@ -451,18 +477,21 @@ class HomeController extends GetxController {
         //人均消费
         final List<String>? averageGuest = printData.averageGuest;
         if (averageGuest!.isNotEmpty) {
-          printer.text(
+          bytes += generator.text(
             "${EscHelper.columnMaker(content: averageGuest[0], width: 20)}${EscHelper.columnMaker(content: averageGuest[1], width: 16)}${EscHelper.columnMaker(content: averageGuest[2], width: 12, align: 2)}",
             containsChinese: true,
           );
         }
-        printer.rawBytes(EscHelper.setSize().codeUnits);
-        printer.hr();
-        printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
-        printer.feed(invoicePrintType == "EPSON" ? 3 : 1);
-        printer.cut();
+        bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
+        bytes += generator.hr();
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+        bytes += generator.feed(invoicePrintType == "EPSON" ? 3 : 1);
+        bytes += generator.cut();
+        PosPrintResult printing = await printer.printTicket(bytes);
         printer.disconnect();
-        successLoding(LocaleKeys.printSuccess.tr);
+        if (printing.msg == "Success") {
+          successLoding(LocaleKeys.printSuccess.tr);
+        }
       } else {
         errorLoding("打印機$invoicePrintIP連接失敗");
       }
@@ -480,12 +509,9 @@ class HomeController extends GetxController {
         return;
       }
     }
-    const PaperSize paper = PaperSize.mm80;
-    final profile = await CapabilityProfile.load();
-    final printer = NetworkPrinter(paper, profile);
+
     final SaleModel saleModel = saleModelFromMap(salesReportJson);
     await _printSalesReport(
-      printer: printer,
       printData: saleModel,
       invoicePrintIP: loginUser!.invoicePrintIP!,
       invoicePrintType: loginUser.invoicePrintType!,
@@ -494,31 +520,34 @@ class HomeController extends GetxController {
 
   //执行打印销售报表
   Future<void> _printSalesReport({
-    required NetworkPrinter printer,
     required SaleModel printData,
     required String invoicePrintIP,
     required String invoicePrintType,
   }) async {
     try {
-      final PosPrintResult linkret = await printer.connect(invoicePrintIP, port: 9100);
-      if (linkret == PosPrintResult.success) {
-        printer.text(
+      final printer = PrinterNetworkManager(invoicePrintIP);
+      PosPrintResult connect = await printer.connect();
+      if (connect == PosPrintResult.success) {
+        List<int> bytes = [];
+        final profile = await CapabilityProfile.load();
+        final generator = Generator(PaperSize.mm80, profile);
+        bytes += generator.text(
           EscHelper.alignCenterPrint(width: 24, content: "${printData.reportCompany}"),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        printer.text(
+        bytes += generator.text(
           EscHelper.alignCenterPrint(width: 24, content: LocaleKeys.foodSaleReport.tr),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        printer.feed(invoicePrintType == "EPSON" ? 5 : 1);
-        printer.text(
+        bytes += generator.feed(invoicePrintType == "EPSON" ? 5 : 1);
+        bytes += generator.text(
           EscHelper.alignCenterPrint(width: 48, content: "${LocaleKeys.timeSolt.tr}：${printData.timerFrame}"),
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        printer.text(
+        bytes += generator.text(
           EscHelper.alignCenterPrint(
               width: 48,
               content: "${LocaleKeys.printTime.tr}：${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}"),
@@ -526,49 +555,52 @@ class HomeController extends GetxController {
           containsChinese: true,
         );
 
-        printer.text(
+        bytes += generator.text(
           EscHelper.alignCenterPrint(width: 48, content: "${LocaleKeys.station.tr}：${printData.station}"),
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        printer.feed(invoicePrintType == "EPSON" ? 5 : 1);
+        bytes += generator.feed(invoicePrintType == "EPSON" ? 5 : 1);
         //列表头
-        printer.text(
+        bytes += generator.text(
           "${EscHelper.setBold()}${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: LocaleKeys.code.tr, width: 16)}${EscHelper.columnMaker(content: LocaleKeys.quantity.tr, width: 16, align: 1)}${EscHelper.columnMaker(content: LocaleKeys.amount.tr, width: 16, align: 2)}",
           containsChinese: true,
         );
-        printer.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.resetBold().codeUnits);
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.resetBold().codeUnits);
         //列表内容
         final List<SaleReportList> saleReportList = printData.saleReportList!;
         if (saleReportList.isNotEmpty) {
           double total = 0.0;
           for (var i = 0; i < saleReportList.length; i++) {
             total += double.tryParse(saleReportList[i].mAmount!) ?? 0.00;
-            printer.rawBytes(EscHelper.setSize().codeUnits + EscHelper.resetBold().codeUnits);
-            printer.hr();
-            printer.rawBytes(EscHelper.setSize(size: 1).codeUnits);
-            printer.text(
+            bytes += generator.rawBytes(EscHelper.setSize().codeUnits + EscHelper.resetBold().codeUnits);
+            bytes += generator.hr();
+            bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
+            bytes += generator.text(
               "${EscHelper.columnMaker(content: "${saleReportList[i].mCode}", width: 16)}${EscHelper.columnMaker(content: "${double.parse(saleReportList[i].mQty!).toInt()}", width: 16, align: 1)}${EscHelper.columnMaker(content: "${double.tryParse(saleReportList[i].mAmount!)?.toStringAsFixed(2)}", width: 16, align: 2)}",
               containsChinese: true,
             );
-            printer.text(
+            bytes += generator.text(
               "${saleReportList[i].mDesc1}",
               containsChinese: true,
             );
           }
-          printer.rawBytes(EscHelper.setSize().codeUnits + EscHelper.resetBold().codeUnits);
-          printer.hr();
-          printer.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.setBold().codeUnits);
-          printer.text(
+          bytes += generator.rawBytes(EscHelper.setSize().codeUnits + EscHelper.resetBold().codeUnits);
+          bytes += generator.hr();
+          bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.setBold().codeUnits);
+          bytes += generator.text(
             EscHelper.columnMaker(content: "${LocaleKeys.total.tr}: ${total.toStringAsFixed(2)}", width: 48, align: 2),
             containsChinese: true,
           );
         }
 
-        printer.feed(invoicePrintType == "EPSON" ? 5 : 1);
-        printer.cut();
+        bytes += generator.feed(invoicePrintType == "EPSON" ? 5 : 1);
+        bytes += generator.cut();
+        PosPrintResult printing = await printer.printTicket(bytes);
         printer.disconnect();
-        successLoding(LocaleKeys.printSuccess.tr);
+        if (printing.msg == "Success") {
+          successLoding(LocaleKeys.printSuccess.tr);
+        }
       } else {
         errorLoding("打印機$invoicePrintIP連接失敗");
       }

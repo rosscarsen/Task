@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 
 import '../../../translations/app_translations.dart';
@@ -35,6 +36,7 @@ class LoginView extends GetView<LoginController> {
                   ],
                 ),
               ),
+              const PopupMenuDivider(),
               PopupMenuItem(
                 value: "zh_HK",
                 onTap: () {
@@ -77,98 +79,111 @@ class LoginView extends GetView<LoginController> {
       ),
       body: SafeArea(
         child: Container(
-          margin: const EdgeInsets.all(20),
+          margin: EdgeInsets.all(Get.context!.width * 0.02),
           child: Form(
             key: LoginController.to.formKey,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                //公司
-                TextInput(
-                  prefixIcon: Icons.apartment,
-                  inputController: LoginController.to.companyController,
-                  lableText: LocaleKeys.company.tr,
-                ),
-                const SizedBox(height: 15),
-                //收银机
-                TextInput(
-                  prefixIcon: Icons.price_change,
-                  inputController: LoginController.to.stationController,
-                  lableText: LocaleKeys.station.tr,
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 15),
-                //用戶
-                TextInput(
-                  prefixIcon: Icons.person,
-                  inputController: LoginController.to.userController,
-                  keyboardType: TextInputType.visiblePassword,
-                  lableText: LocaleKeys.user.tr,
-                ),
-                const SizedBox(height: 15),
-                //密碼
-                Obx(() {
-                  return TextInput(
-                    prefixIcon: Icons.verified_user,
-                    inputController: LoginController.to.pwdController,
-                    lableText: LocaleKeys.password.tr,
-                    keyboardType: TextInputType.visiblePassword,
-                    textInputAction: TextInputAction.done,
-                    obscureText: !LoginController.to.visibility.value,
-                    suffixIcon: LoginController.to.visibility.value ? Icons.visibility : Icons.visibility_off,
-                    onTap: () => LoginController.to.visibility.value = !LoginController.to.visibility.value,
-                  );
-                }),
-
-                const SizedBox(height: 15),
-                Obx(() {
-                  return CheckboxListTile(
-                    controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: Colors.green,
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      LocaleKeys.rememberMe.tr,
-                      style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            child: SingleChildScrollView(
+              child: AnimationLimiter(
+                child: Column(
+                  children: AnimationConfiguration.toStaggeredList(
+                    duration: const Duration(milliseconds: 375),
+                    childAnimationBuilder: (widget) => SlideAnimation(
+                      horizontalOffset: MediaQuery.of(context).size.width / 2,
+                      child: FadeInAnimation(child: widget),
                     ),
-                    value: LoginController.to.isCheck.value,
-                    onChanged: ((value) {
-                      LoginController.to.isCheck.value = value!;
-                    }),
-                  );
-                }),
+                    children: [
+                      //公司
+                      TextInput(
+                        prefixIcon: Icons.apartment,
+                        inputController: LoginController.to.companyController,
+                        lableText: LocaleKeys.company.tr,
+                      ),
+                      const SizedBox(height: 15),
+                      //收银机
+                      TextInput(
+                        prefixIcon: Icons.price_change,
+                        inputController: LoginController.to.stationController,
+                        lableText: LocaleKeys.station.tr,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 15),
+                      //用戶
+                      TextInput(
+                        prefixIcon: Icons.person,
+                        inputController: LoginController.to.userController,
+                        keyboardType: TextInputType.visiblePassword,
+                        lableText: LocaleKeys.user.tr,
+                      ),
+                      const SizedBox(height: 15),
+                      //密碼
+                      Obx(() {
+                        return TextInput(
+                          prefixIcon: Icons.verified_user,
+                          inputController: LoginController.to.pwdController,
+                          lableText: LocaleKeys.password.tr,
+                          keyboardType: TextInputType.visiblePassword,
+                          textInputAction: TextInputAction.done,
+                          obscureText: !LoginController.to.visibility.value,
+                          suffixIcon: LoginController.to.visibility.value ? Icons.visibility : Icons.visibility_off,
+                          onTap: () => LoginController.to.visibility.value = !LoginController.to.visibility.value,
+                        );
+                      }),
 
-                const SizedBox(height: 20),
+                      const SizedBox(height: 15),
+                      Obx(() {
+                        return CheckboxListTile(
+                          controlAffinity: ListTileControlAffinity.leading,
+                          activeColor: Colors.green,
+                          contentPadding: EdgeInsets.zero,
+                          title: Text(
+                            LocaleKeys.rememberMe.tr,
+                            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                          ),
+                          value: LoginController.to.isCheck.value,
+                          onChanged: ((value) {
+                            LoginController.to.isCheck.value = value!;
+                          }),
+                        );
+                      }),
 
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.pressed)) {
-                        return const Color.fromARGB(66, 30, 29, 29);
-                      }
-                      return const Color.fromARGB(255, 59, 137, 62);
-                    }),
-                    foregroundColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.pressed)) {
-                        return Colors.white54;
-                      }
-                      return Colors.white;
-                    }),
-                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-                    padding: WidgetStateProperty.all(
-                      const EdgeInsets.symmetric(horizontal: 60, vertical: 10),
-                    ),
-                  ),
-                  onPressed: () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    LoginController.to.login();
-                  },
-                  child: Text(
-                    LocaleKeys.login.tr,
-                    style: const TextStyle(fontSize: 18),
+                      const SizedBox(height: 20),
+
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.pressed)) {
+                                return const Color.fromARGB(66, 30, 29, 29);
+                              }
+                              return const Color.fromARGB(255, 59, 137, 62);
+                            }),
+                            foregroundColor: WidgetStateProperty.resolveWith((states) {
+                              if (states.contains(WidgetState.pressed)) {
+                                return Colors.white54;
+                              }
+                              return Colors.white;
+                            }),
+                            shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+                            padding: WidgetStateProperty.all(
+                              const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
+                            ),
+                          ),
+                          onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                            LoginController.to.login();
+                          },
+                          child: Text(
+                            LocaleKeys.login.tr,
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),

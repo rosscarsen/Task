@@ -6,31 +6,61 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
+  #字符串处理
+  characters: ^1.3.0
+  #数据处理
+  collection: ^1.18.0
   cupertino_icons: ^1.0.8
-  get: 4.6.6
+  #设备信息
+  device_info_plus: ^11.1.0
+  #网络请求
+  dio: ^5.7.0
+  #escpos工具
+  flutter_esc_pos_utils: ^1.0.1
+  #escposl连接
+  flutter_esc_pos_network: ^1.0.3
   flutter:
     sdk: flutter
+  #移动端后台服务
+  flutter_background_service: ^5.0.10
+  #Android后台服务
+  flutter_background_service_android: ^6.2.7
+  #对话提示工具
   flutter_easyloading: ^3.0.5
-  get_storage: ^2.1.1
-  intl: ^0.19.0
-  dio: ^5.6.0
-  characters: ^1.3.0
-  logger: ^2.4.0
+  #webview
+  flutter_inappwebview: ^6.1.5
+  #本地化
   flutter_localizations:
     sdk: flutter
-  esc_pos_printer: ^4.1.0
-  esc_pos_utils: ^1.1.0
-  image: ^3.3.0
-  collection: ^1.18.0
-  qr_flutter: ^4.1.0
+  #状态管理
+  get: ^4.6.6
+  #本地存储
+  get_storage: ^2.1.1
+  #图片处理
+  image: ^4.3.0
+  #国际化
+  intl: ^0.19.0
+  #日志
+  logger: ^2.4.0
+  #路径
   path_provider: ^2.1.4
-  flutter_launcher_icons: ^0.11.0
-  flutter_native_splash: ^2.2.16
-  flutter_background_service: ^5.0.10
-  flutter_background_service_android: ^6.2.7
-  device_info_plus: ^10.1.2
-  flutter_inappwebview: ^6.1.2
+  #二维码
+  qr_flutter: ^4.1.0
+  #托盘
+  tray_manager: ^0.2.4
+  #windows
+  win32: ^5.6.0
+  #交错动画
+  flutter_staggered_animations: ^1.1.1
+dev_dependencies:
+  flutter_launcher_icons: ^0.14.1
+  flutter_lints: ^5.0.0
+  flutter_native_splash: ^2.4.1
+  flutter_test:
+    sdk: flutter
+  msix: ^3.16.8
 
+#启动图标配置
 flutter_icons:
   android: "launcher_icon"
   ios: true
@@ -45,6 +75,7 @@ flutter_icons:
   adaptive_icon_foreground: "assets/icon.png"
   remove_alpha_ios: true
 
+#启动图配置
 flutter_native_splash:
   android: true
   ios: true
@@ -60,22 +91,20 @@ flutter_native_splash:
     color_dark: "#6A3DE8"
   android_gravity: center
   ios_content_mode: center
+
+#msix配置
 msix_config:
   display_name: Task
+  identity_name: net.pericles.task
   msix_version: 1.0.0.0
-  certificate_path: C:/flutter_windows_cer/CERTIFICATE.pfx
+  certificate_path: C:\certificate\certificate.pfx
   certificate_password: 123456
-  logo_path: E:/Project/FlutterProject/task/assets/icon.png
-  build_path: build/windows/x64/runner/Release
-
-assets:
-  - assets/
-
-dev_dependencies:
-  flutter_lints: ^5.0.0
-  flutter_test:
-    sdk: flutter
-  msix: ^3.7.0
+  capabilities: internetClient,Escpos
+  logo_path: F:\project\FlutterProject\task\windows\runner\resources\app_icon.ico
+  execution_alias: task
+  enable_at_startup: true
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/

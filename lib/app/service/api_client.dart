@@ -16,6 +16,8 @@ class ApiClient {
       baseUrl: Config.baseurl,
       contentType: "application/x-www-form-urlencoded",
       responseType: ResponseType.json,
+      connectTimeout: Duration(minutes: 2),
+      receiveTimeout: Duration(minutes: 2),
       validateStatus: (status) {
         return status != null;
       },

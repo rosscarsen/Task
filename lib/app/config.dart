@@ -25,4 +25,6 @@ class Config {
   static String localStroagehasLogin = "localStroageHasLogin";
   //本地语言
   static String localStroagelanguage = "localStroageLanguage";
+  //本地启动任务
+  static String localStroageStartTask = "localStroageStartTask";
 }

@@ -134,8 +134,9 @@ class EscHelper {
   static String setAlign({int align = 0}) {
     StringBuffer buffer = StringBuffer();
     // 根据对齐类型选择相应的控制字符
+    //"\x1B\x61\x01" 居中对齐 "\x1B\x61\x02" 右对齐 "\x1B\x61\x00" 左对齐
     switch (align) {
-      case 1:
+      case 1: //"\x1B\x61\x01"
         buffer.writeCharCode(27); // ASCII 27 (Escape)
         buffer.writeCharCode(97); // ASCII 97 (a) 作为对齐控制字符
         buffer.writeCharCode(1); // 对齐模式 1

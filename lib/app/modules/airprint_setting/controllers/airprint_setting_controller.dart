@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:get/get.dart';
 
 import '../../../config.dart';
 import '../../../model/login_model.dart';
+import '../../../service/win32_task_service.dart';
 import '../../../translations/app_translations.dart';
 import '../../../utils/stroage_manage.dart';
 
@@ -22,11 +25,18 @@ class AirprintSettingController extends GetxController {
 
   ///关闭打印服务
   Future closeService() async {
-    var ret = await _service.isRunning();
-    if (ret) {
-      _service.invoke("stopService");
-      isRunning.value = false;
+    if (Platform.isAndroid) {
+      var ret = await _service.isRunning();
+      if (ret) {
+        _service.invoke("stopService");
+        isRunning.value = false;
+      }
     }
+    if (Platform.isWindows) {
+      await win32StopTask();
+      await checkServicRuning();
+    }
+    storageManage.save(Config.localStroageStartTask, false);
   }
 
   ///启动打印服务
@@ -47,15 +57,27 @@ class AirprintSettingController extends GetxController {
       return;
     }
 
-    var ret = await _service.isRunning();
-    if (!ret) {
-      _service.startService();
-      isRunning.value = true;
+    if (Platform.isAndroid) {
+      var ret = await _service.isRunning();
+      if (!ret) {
+        _service.startService();
+        isRunning.value = true;
+      }
     }
+    if (Platform.isWindows) {
+      await win32StartTask();
+      await checkServicRuning();
+    }
+    storageManage.save(Config.localStroageStartTask, true);
   }
 
   Future<void> checkServicRuning() async {
-    isRunning.value = await _service.isRunning();
+    if (Platform.isAndroid) {
+      isRunning.value = await _service.isRunning();
+    }
+    if (Platform.isWindows) {
+      isRunning.value = win32TimerIsRunning();
+    }
   }
 
   ///获取登录信息

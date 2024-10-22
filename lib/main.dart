@@ -8,13 +8,15 @@ import 'package:get_storage/get_storage.dart';
 
 import 'app/config.dart';
 import 'app/routes/app_pages.dart';
-import 'app/service/task_service.dart';
+import 'app/service/mobile_task_service.dart';
 import 'app/translations/app_translations.dart';
 import 'app/utils/stroage_manage.dart';
 
 Future<Locale> getSavedLocale() async {
   final StorageManage storageManage = StorageManage();
-
+  if (!storageManage.hasData(Config.localStroageStartTask)) {
+    storageManage.save(Config.localStroageStartTask, true);
+  }
   // 从存储中读取保存的语言
   String localeString = await storageManage.read(Config.localStroagelanguage) ?? "zh_HK";
 
