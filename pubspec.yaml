@@ -17,7 +17,7 @@ dependencies:
   dio: ^5.7.0
   #escpos工具
   flutter_esc_pos_utils: ^1.0.1
-  #escposl连接
+  #escpos连接
   flutter_esc_pos_network: ^1.0.3
   flutter:
     sdk: flutter

@@ -138,7 +138,7 @@
 
 #### 安装说明
 
-- 安装包解压后(此时直接双击“安装”按钮是灰色不可点击)，右键“task.msix”，选择“属性”。
+- 安装包下载后(此时直接双击“安装”按钮是灰色不可点击)，右键“task.msix”，选择“属性”。
 - 切换到“数字签名”，选择详细 ![alt text](markdown-images/image.png)
 - 常规选项卡，点击“查看证书”。![alt text](markdown-images/image-1.png)
 - 常规选项卡安装证书，点击“安装证书”。![alt text](markdown-images/image-2.png)
@@ -159,7 +159,7 @@
   - 选择"高级" ![alt text](markdown-images/image-7.png)
   - "立即查找"，点选"administrators"![alt text](markdown-images/image-8.png)
   - 点击“确定”关闭所有弹出框,此时就可以进入 WindowsApps 目录了
-  - 进入后输入“task”搜索，点开红框，打开后请勿删除里边任何内容![alt text](markdown-images/image-9.png)
+  - 进入后输入“task”搜索，点开红框，打开后请勿删除里边任何内容![alt text](markdown-images/image-14.png)
   - 右键“task”选择“发送到”->“桌面快捷方式”![alt text](markdown-images/image-10.png)
 
 #### 查看服务是否启动
@@ -198,7 +198,7 @@ device_info_plus: ^11.1.0
 dio: ^5.7.0
 #escpos工具
 flutter_esc_pos_utils: ^1.0.1
-#escposl连接
+#escpos连接
 flutter_esc_pos_network: ^1.0.3
 flutter:
   sdk: flutter
