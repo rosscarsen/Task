@@ -153,7 +153,8 @@
 
 #### 快速打开应用
 
-使用 <kbd>Win</kbd>+<kbd>X</kbd>弹出后按键盘<kbd>A</kbd>打开 power shell，输入'task'回车打开 ![alt text](markdown-images/image-15.png)
+使用 <kbd>Win</kbd>+<kbd>X</kbd>弹出后按键盘<kbd>A</kbd>打开 power shell，输入'task'回车打开  
+![alt text](markdown-images/image-15.png)
 
 #### 创建桌面快捷方式
 
@@ -168,16 +169,16 @@
   - "立即查找"，点选"administrators"
     ![alt text](markdown-images/image-8.png)
   - 点击“确定”关闭所有弹出框,此时就可以进入 WindowsApps 目录了
-  - 进入后输入“task”搜索，点开红框，打开后请勿删除里边任何内容
+  - 进入后输入“task”搜索，点开红框，打开后请勿删除里边任何内容  
     ![alt text](markdown-images/image-14.png)
-  - 右键“task”选择“发送到”->“桌面快捷方式”
+  - 右键“task”选择“发送到”->“桌面快捷方式”  
     ![alt text](markdown-images/image-10.png)
 
 #### 查看服务是否启动
 
-- 任务柆托盘内是否有打印图标（鼠标放上去显示“Take Airprint Running”），有图标表示服务启动，没有则表示服务未启动
+- 任务柆托盘内是否有打印图标（鼠标放上去显示“Take Airprint Running”），有图标表示服务启动，没有则表示服务未启动  
   ![alt text](markdown-images/image-11.png)
-- 如果在隐藏的状态，可按住拖动到隐藏图标<kbd>^</kbd>的右边，以方便以后查看打印服务启动状态
+- 如果在隐藏的状态，可按住拖动到隐藏图标<kbd>^</kbd>的右边，以方便以后查看打印服务启动状态  
   ![alt text](markdown-images/image-12.png)
 - 服务一旦启动，windows 系统将不会进入休眠状态与黑屏，手动让系统进入睡眠状态，打印服务也不会终止
 
