@@ -148,24 +148,24 @@
 
 #### 快速打开应用
 
-使用 <kbd>Win</kbd>+<kbd>X</kbd>弹出后按键盘<kbd>A</kbd>打开 power shell，输入'task'回车打开
+使用 <kbd>Win</kbd>+<kbd>X</kbd>弹出后按键盘<kbd>A</kbd>打开 power shell，输入'task'回车打开 ![alt text](markdown-images/image-15.png)
 
 #### 创建桌面快捷方式
 
 - task.msix 是以系统应用方式安装的，所以没有桌面快捷方式，可以手动创建一个，步骤如下：
   - 安装路径：C:\Program Files\WindowsApps
-  - WindowsApps 进入都会提示没有权限，不让打开，此时需要以管理员身份运行，右键“WindowsApps”选择“属性”，切换到“安全”选项卡，点击“高级”![alt text](markdown-images/image-5.png)
-  - 所有者后边“更改”按钮![alt text](markdown-images/image-6.png)
+  - WindowsApps 进入都会提示没有权限，不让打开，此时需要以管理员身份运行，右键“WindowsApps”选择“属性”，切换到“安全”选项卡，点击“高级” ![alt text](markdown-images/image-5.png)
+  - 所有者后边“更改”按钮 ![alt text](markdown-images/image-6.png)
   - 选择"高级" ![alt text](markdown-images/image-7.png)
-  - "立即查找"，点选"administrators"![alt text](markdown-images/image-8.png)
+  - "立即查找"，点选"administrators" ![alt text](markdown-images/image-8.png)
   - 点击“确定”关闭所有弹出框,此时就可以进入 WindowsApps 目录了
   - 进入后输入“task”搜索，点开红框，打开后请勿删除里边任何内容![alt text](markdown-images/image-14.png)
   - 右键“task”选择“发送到”->“桌面快捷方式”![alt text](markdown-images/image-10.png)
 
 #### 查看服务是否启动
 
-- 任务柆托盘内是否有打印图标（鼠标放上去显示“Take Airprint Running”），有图标表示服务启动，没有则表示服务未启动![alt text](markdown-images/image-11.png)
-- 如果在隐藏的状态，可按住拖动到隐藏图标<kbd>^</kbd>的右边，以方便以后查看打印服务启动状态![alt text](markdown-images/image-12.png)
+- 任务柆托盘内是否有打印图标（鼠标放上去显示“Take Airprint Running”），有图标表示服务启动，没有则表示服务未启动 ![alt text](markdown-images/image-11.png)
+- 如果在隐藏的状态，可按住拖动到隐藏图标<kbd>^</kbd>的右边，以方便以后查看打印服务启动状态 ![alt text](markdown-images/image-12.png)
 
 #### 解除安装
 
