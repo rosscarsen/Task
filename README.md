@@ -16,14 +16,18 @@
   - [食品銷售報表-日結報表](#食品銷售報表-日結報表)
 - [安装](#安装)
   - [Android 平台](#android-平台)
-  - [windows 桌面平台（当前测试系统 win11）](#windows-桌面平台当前测试系统-win11)
+    - [安装包下载 task.apk](#安装包下载-taskapk)
+    - [下载后无需多的设定，直接安装即可使用](#下载后无需多的设定直接安装即可使用)
+  - [windows 桌面平台（已测试 win11、win10 系统,win7 不支持，可能是 Dart 从 22 年就不支持在 win7 上开发的缘故）](#windows-桌面平台已测试-win11win10-系统win7-不支持可能是-dart-从-22-年就不支持在-win7-上开发的缘故)
     - [使用安装包内的数据签名安装](#使用安装包内的数据签名安装)
-      - [安装包下载](#安装包下载)
+      - [安装包下载 task.msix](#安装包下载-taskmsix)
       - [安装说明](#安装说明)
       - [快速打开应用](#快速打开应用)
       - [创建桌面快捷方式](#创建桌面快捷方式)
       - [查看服务是否启动](#查看服务是否启动)
       - [解除安装](#解除安装)
+    - [使用先安装证书后安装应用方式安装](#使用先安装证书后安装应用方式安装)
+      - [证书下载 certificate.pfx](#证书下载-certificatepfx)
 - [开发环境](#开发环境)
 
 # 使用前准备
@@ -122,14 +126,15 @@
 
 ## Android 平台
 
-- 安装包下载 task.msix
-- 下载后无需多的设定，直接安装即可使用。
+### [安装包下载 task.apk](https://github.com/rosscarsen/Task/releases/download/1.0.0/task.apk)
 
-## windows 桌面平台（当前测试系统 win11）
+### 下载后无需多的设定，直接安装即可使用
+
+## windows 桌面平台（已测试 win11、win10 系统,win7 不支持，可能是 Dart 从 22 年就不支持在 win7 上开发的缘故）
 
 ### 使用安装包内的数据签名安装
 
-#### 安装包下载
+#### [安装包下载 task.msix](https://github.com/rosscarsen/Task/releases/download/1.0.0/task.msix)
 
 #### 安装说明
 
@@ -166,6 +171,18 @@
 
 - <kbd>Win</kbd>+<kbd>X</kbd>弹出后按<kbd>N</kbd>
 - 应用->安装的应用 ![alt text](markdown-images/image-13.png)
+
+### 使用先安装证书后安装应用方式安装
+
+#### [证书下载 certificate.pfx](https://github.com/rosscarsen/Task/releases/download/1.0.0/certificate.pfx)
+
+- 双击证书
+- 本地计算机
+- 输入密码 123456
+- 勾选“标记此密钥可导出的密钥（M）”
+- 勾选“将所有证书放入以下存储”
+- 选择"受信任的根证书颁发机构"
+- 双击下载好的 task.msix
 
 # 开发环境
 
