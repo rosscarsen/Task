@@ -266,4 +266,23 @@ flutter_launcher_icons: ^0.14.1
 flutter_native_splash: ^2.4.1
 ```
 
-<a href="#top" style="text-decoration:none"><div style="width: 60px;height: 60px;position:fixed;right: 30px;bottom: 50px;text-align: center;background: rebeccapurple;border-radius: 60px;line-height: 60px;color: #fff">TOP</div></a>
+<style>
+  #back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    text-decoration: none;
+    color: #333;
+  }
+
+  #back-to-top:hover {
+    background-color: #e0e0e0;
+  }
+</style>
+
+<a id="back-to-top" href="#top">🔝</a>
