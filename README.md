@@ -1,4 +1,4 @@
-<h1 id=top>Dart 定时打印热敏票据</h1>
+<h1>Dart 定时打印热敏票据</h1>
 
 - [使用前准备](#使用前准备)
   - [后台设置](#后台设置)
@@ -265,5 +265,3 @@ flutter_launcher_icons: ^0.14.1
 #启动图
 flutter_native_splash: ^2.4.1
 ```
-
-<a id="back-to-top" style='position: fixed; bottom: 20px; right: 20px; background-color: #f0f0f0; border: 1px solid #ccc; padding: 10px; border-radius: 5px; z-index: 1000; text-decoration: none; color: #333;' href="#top">🔝</a>
