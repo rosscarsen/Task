@@ -14,7 +14,7 @@ import 'api_client.dart';
 import 'print_method.dart';
 
 Timer? _windowsTimer;
-bool printStatus = true;
+bool winPrintStatus = true;
 final ApiClient apiClient = ApiClient();
 // 防止电脑进入睡眠状态
 void preventSleep() {
@@ -31,7 +31,7 @@ void allowSleep() {
 
 // 定义一个函数，用于启动Windows任务
 Future<void> win32StartTask() async {
-  printStatus = true;
+  winPrintStatus = true;
   final bool isRunning = win32TimerIsRunning();
   if (!isRunning) {
     // 阻止系统休眠
@@ -43,8 +43,8 @@ Future<void> win32StartTask() async {
       UserData? loginUser = await getLoginInfo();
 
       if (loginUser != null) {
-        debugPrint("打印状态：$printStatus");
-        if (printStatus) {
+        debugPrint("打印状态：$winPrintStatus");
+        if (winPrintStatus) {
           getPrintData(queryData: loginUser.toJson());
         }
       } else {
@@ -54,8 +54,8 @@ Future<void> win32StartTask() async {
     /*  UserData? loginUser = await getLoginInfo();
 
     if (loginUser != null) {
-      debugPrint("打印状态：$printStatus");
-      if (printStatus) {
+      debugPrint("打印状态：$winPrintStatus");
+      if (winPrintStatus) {
         getPrintData(queryData: loginUser.toJson());
       }
     } else {
@@ -68,7 +68,7 @@ Future<void> win32StartTask() async {
 Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
   //定义一个list接收已经打印的单号
   List queueIDs = [];
-  printStatus = false;
+  winPrintStatus = false;
   try {
     var response = await apiClient.post(Config.getData, data: {"loginUserInfo": jsonEncode(queryData)});
     //logger.d("打印数据：${response.data}");
@@ -84,7 +84,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
             ret.customerRecord == null &&
             ret.openDrawer == null &&
             ret.takeaway == null) {
-          printStatus = true;
+          winPrintStatus = true;
           return;
         }
 
@@ -243,25 +243,25 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
         if (queueIDs.isNotEmpty) {
           bool delRet = await deleteQueue(queryData!, queueIDs);
           if (delRet) {
-            printStatus = true;
+            winPrintStatus = true;
           }
         } else {
-          printStatus = true;
+          winPrintStatus = true;
         }
       } else {
-        printStatus = true;
+        winPrintStatus = true;
       }
     } else {
-      printStatus = true;
+      winPrintStatus = true;
     }
   } catch (e) {
-    printStatus = true;
+    winPrintStatus = true;
     debugPrint(e.toString());
   }
 }
 
 Future<void> win32StopTask() async {
-  printStatus = false;
+  winPrintStatus = false;
   final bool isRunning = win32TimerIsRunning(); // 检查timer是否在运行
   if (isRunning) {
     // 允许系统休眠
