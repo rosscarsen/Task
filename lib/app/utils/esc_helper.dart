@@ -130,29 +130,31 @@ class EscHelper {
     return strList;
   }
 
-  /// algin 对齐方式 0左对齐 1居中 2右对齐
+  /// 对齐方式 algin 对齐方式 0左对齐 1居中 2右对齐
+  /// Format <p>
+  /// ASCII    :  ESC   a      n
+  /// HEX      :  0x1B  0x61   n
+  /// Decimal  :  27    97     n
+  /// Range 0 <= n <= 2  or 48 <= n <= 50
   static String setAlign({int align = 0}) {
     StringBuffer buffer = StringBuffer();
-    // 根据对齐类型选择相应的控制字符
-    //"\x1B\x61\x01" 居中对齐 "\x1B\x61\x02" 右对齐 "\x1B\x61\x00" 左对齐
     switch (align) {
-      case 1: //"\x1B\x61\x01"
-        buffer.writeCharCode(27); // ASCII 27 (Escape)
-        buffer.writeCharCode(97); // ASCII 97 (a) 作为对齐控制字符
-        buffer.writeCharCode(1); // 对齐模式 1
+      case 1:
+        buffer.writeCharCode(27);
+        buffer.writeCharCode(97);
+        buffer.writeCharCode(1);
         break;
       case 2:
-        buffer.writeCharCode(27); // ASCII 27 (Escape)
-        buffer.writeCharCode(97); // ASCII 97 (a) 作为对齐控制字符
-        buffer.writeCharCode(2); // 对齐模式 2
+        buffer.writeCharCode(27);
+        buffer.writeCharCode(97);
+        buffer.writeCharCode(2);
         break;
       default:
-        buffer.writeCharCode(27); // ASCII 27 (Escape)
-        buffer.writeCharCode(97); // ASCII 97 (a) 作为对齐控制字符
-        buffer.writeCharCode(0); // 默认对齐模式 0
+        buffer.writeCharCode(27);
+        buffer.writeCharCode(97);
+        buffer.writeCharCode(0);
         break;
     }
-
     return buffer.toString();
   }
 
@@ -161,7 +163,6 @@ class EscHelper {
   static String setSize({int size = 0}) {
     // 使用 StringBuffer 进行字符串拼接
     StringBuffer buffer = StringBuffer();
-
     // 固定的 ESC (ASCII 27) 和 GS (ASCII 29) 控制符
     buffer.writeCharCode(29); // ASCII 29 (Group Separator) 对应 "\x1D"
     buffer.writeCharCode(33); // ASCII 33 ("!" 的代码点) 对应 "\x21"
@@ -210,13 +211,21 @@ class EscHelper {
   }
 
   ///设置走纸行数
+  /// <p>
+  /// Prints the data in the print buffer and feeds n lines .
+  /// <p>
+  /// Format <p>
+  /// ASCII    :  ESC   d      n
+  /// HEX      :  0x1B  0x64   n
+  /// Decimal  :  27    100    n
+  /// <p>
+  /// Range 0 <= n <= 255 <p>
+  /// Default n = 1 <p>
   static String setLineSpace({required int line}) {
     StringBuffer buffer = StringBuffer();
-
-    // 添加控制字符 ESC (ASCII 27) 和 D (ASCII 100) 以及行数
-    buffer.writeCharCode(27); // ASCII 27 (Escape)
-    buffer.writeCharCode(100); // ASCII 100 ('d')
-    buffer.writeCharCode(line); // 行数作为字符
+    buffer.writeCharCode(27);
+    buffer.writeCharCode(100);
+    buffer.writeCharCode(line);
     return buffer.toString();
   }
 
@@ -232,23 +241,26 @@ class EscHelper {
   }
 
   /// 设置加粗
+  /// ASCII    :  ESC   E      n
+  /// HEX      :  0x1B  0x45   n
+  /// Decimal  :  27    69     n
   static String setBold() {
-    //\x1B\x01 \x1B\X45\x01
     StringBuffer buffer = StringBuffer();
-    buffer.writeCharCode(27); // ASCII 27 (Escape)
-    buffer.writeCharCode(69); // ASCII 69 ('E')
-    buffer.writeCharCode(1); // ASCII 1
-
+    buffer.writeCharCode(27);
+    buffer.writeCharCode(69);
+    buffer.writeCharCode(1);
     return buffer.toString();
   }
 
   /// 取消加粗
+  /// ASCII    :  ESC   E      n
+  /// HEX      :  0x1B  0x45   n
+  /// Decimal  :  27    69     n
   static String resetBold() {
-    //\x1BE\x00 \x1B\X45\x00
     StringBuffer buffer = StringBuffer();
-    buffer.writeCharCode(27); // ASCII 27 (Escape)
-    buffer.writeCharCode(69); // ASCII 69 ('E')
-    buffer.writeCharCode(0); // ASCII 0 (Null)
+    buffer.writeCharCode(27);
+    buffer.writeCharCode(69);
+    buffer.writeCharCode(0);
     return buffer.toString();
   }
 
@@ -286,5 +298,22 @@ class EscHelper {
 
     // 返回分割后的字符串列表
     return segments;
+  }
+
+  ///设置针机颜色
+  /// ASCII    :  ESC   r      n
+  /// HEX      :  0x1B  0x72   n
+  /// Decimal  :  27    114    n
+  /// <p>
+  /// Range
+  /// n = 0,1,48,49 <br>
+
+  static String setPrinterColor(bool color) {
+    //[0x1B, 0x72, 1]
+    StringBuffer buffer = StringBuffer();
+    buffer.writeCharCode(27);
+    buffer.writeCharCode(114);
+    buffer.writeCharCode(color ? 1 : 0);
+    return buffer.toString();
   }
 }
