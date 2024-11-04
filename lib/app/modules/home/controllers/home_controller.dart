@@ -22,7 +22,7 @@ import '../../../utils/easy_loding.dart';
 import '../../../utils/esc_helper.dart';
 import '../../../utils/stroage_manage.dart';
 
-class HomeController extends GetxController {
+class HomeController extends GetxController with WidgetsBindingObserver {
   static HomeController get to => Get.find();
   final GlobalKey webViewKey = GlobalKey();
   //存储类
@@ -39,10 +39,25 @@ class HomeController extends GetxController {
 
   @override
   void onInit() {
+    WidgetsBinding.instance.addObserver(this);
     initUrl();
     initWebview();
     startService();
     super.onInit();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.detached) {
+      await closeService();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
   }
 
   //初始化网址
