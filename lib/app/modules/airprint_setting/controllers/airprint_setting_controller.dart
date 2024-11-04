@@ -10,7 +10,7 @@ import '../../../service/win32_task_service.dart';
 import '../../../translations/app_translations.dart';
 import '../../../utils/stroage_manage.dart';
 
-class AirprintSettingController extends GetxController {
+class AirprintSettingController extends GetxController with WidgetsBindingObserver {
   static AirprintSettingController get to => Get.find();
   final _service = FlutterBackgroundService();
   final StorageManage storageManage = StorageManage();
@@ -19,8 +19,23 @@ class AirprintSettingController extends GetxController {
   final box = StorageManage();
   @override
   void onInit() {
+    WidgetsBinding.instance.addObserver(this);
     checkServicRuning();
     super.onInit();
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.onClose();
+  }
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.detached) {
+      await closeService();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 
   ///关闭打印服务
