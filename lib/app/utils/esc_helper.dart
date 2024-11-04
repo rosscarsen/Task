@@ -159,6 +159,10 @@ class EscHelper {
   }
 
   /// content 内容
+  /// [Format]
+  /// ASCII GS !  n
+  /// HEX   1D 21 n
+  /// DEC   29 33 n
   /// size 默认正常大小 1:两倍高 2:两倍宽 3:两倍大小 4:三倍高 5:三倍宽 6:三倍大小 7:四倍高 8:四倍宽 9:四倍大小 10:五倍高 11:五倍宽 12:五倍大小
   static String setSize({int size = 0}) {
     // 使用 StringBuffer 进行字符串拼接
