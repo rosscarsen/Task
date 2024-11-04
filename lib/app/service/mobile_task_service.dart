@@ -14,6 +14,7 @@ import 'print_method.dart';
 
 bool printStatus = true;
 final ApiClient apiClient = ApiClient();
+Timer? timer;
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
@@ -22,6 +23,7 @@ Future<void> initializeService() async {
       onStart: onStart,
       autoStart: false,
       isForegroundMode: true,
+      autoStartOnBoot: false,
     ),
     iosConfiguration: IosConfiguration(),
   );
@@ -42,10 +44,20 @@ void onStart(ServiceInstance service) async {
   }
 
   service.on('stopService').listen((event) {
+    if (timer != null && timer!.isActive) {
+      timer!.cancel();
+    }
     service.stopSelf();
   });
 
-  Timer.periodic(const Duration(seconds: 5), (timer) async {
+  timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+    final UserData? loginUser = await getLoginInfo();
+    final String? station = loginUser?.station;
+    final String? airprintStation = loginUser?.airPrintStation;
+    if (loginUser == null && station == null && airprintStation == null && station == airprintStation) {
+      debugPrint("本地信息为空或打印机信息不一致");
+      return;
+    }
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
         service.setForegroundNotificationInfo(
@@ -54,15 +66,10 @@ void onStart(ServiceInstance service) async {
         );
       }
     }
-    UserData? loginUser = await getLoginInfo();
 
-    if (loginUser != null) {
-      debugPrint("打印状态：$printStatus");
-      if (printStatus) {
-        getPrintData(queryData: loginUser.toJson());
-      }
-    } else {
-      debugPrint("本地信息为空");
+    debugPrint("打印状态：$printStatus");
+    if (printStatus) {
+      getPrintData(queryData: loginUser!.toJson());
     }
   });
 }
