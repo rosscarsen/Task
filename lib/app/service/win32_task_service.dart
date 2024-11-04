@@ -40,15 +40,16 @@ Future<void> win32StartTask() async {
     await showIcon();
     // 创建一个定时器，每隔5秒运行一次任务
     _windowsTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-      UserData? loginUser = await getLoginInfo();
-
-      if (loginUser != null) {
-        debugPrint("打印状态：$winPrintStatus");
-        if (winPrintStatus) {
-          getPrintData(queryData: loginUser.toJson());
-        }
-      } else {
-        debugPrint("本地信息为空");
+      final UserData? loginUser = await getLoginInfo();
+      final String? station = loginUser?.station;
+      final String? airprintStation = loginUser?.airPrintStation;
+      if (loginUser == null && station == null && airprintStation == null && station == airprintStation) {
+        debugPrint("本地信息为空或打印机信息不一致");
+        return;
+      }
+      debugPrint("打印状态：$winPrintStatus");
+      if (winPrintStatus) {
+        getPrintData(queryData: loginUser!.toJson());
       }
     });
     /*  UserData? loginUser = await getLoginInfo();
@@ -271,7 +272,9 @@ Future<void> win32StopTask() async {
     await closeIcon();
 
     // 停止定时器
-    _windowsTimer?.cancel();
+    if (_windowsTimer != null && _windowsTimer!.isActive) {
+      _windowsTimer?.cancel();
+    }
   }
 }
 
