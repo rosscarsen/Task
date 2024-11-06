@@ -489,7 +489,7 @@ Future<List<String>> printBDL(
                 List<int> bytes = [];
                 //上菜单
                 bytes += generator.text(
-                  EscHelper.alignCenterPrint(width: 16, content: "上菜單"),
+                  EscHelper.alignCenterPrint(width: 16, content: "出菜單"),
                   linesAfter: 1,
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
@@ -630,7 +630,7 @@ Future<List<String>> printBDL(
               List<int> bytes = [];
               //上菜单
               bytes += generator.text(
-                EscHelper.alignCenterPrint(width: 16, content: "上菜單"),
+                EscHelper.alignCenterPrint(width: 16, content: "出菜單"),
                 linesAfter: 1,
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
@@ -978,7 +978,7 @@ Future<List<String>> printOnTheMeun({
           //上菜单
 
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 16, content: "上菜單"),
+            EscHelper.alignCenterPrint(width: 16, content: "點餐記錄"),
             styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
             containsChinese: true,
           );
@@ -1040,16 +1040,28 @@ Future<List<String>> printOnTheMeun({
                 styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
               );
             }
-
-            queueID.add(upper.queueID.toString());
+            if (upper.queueID != null) {
+              queueID.add(upper.queueID.toString());
+            }
           }
 
           bytes += generator.hr();
-          bytes += generator.text(
-            EscHelper.columnMaker(content: upperGroupValue.first.mAmount ?? "0.0", width: 48, align: 2),
-            styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
-            containsChinese: true,
-          );
+          if (upperGroupValue.first.queueID != null) {
+            bytes += generator.text(
+              EscHelper.columnMaker(content: upperGroupValue.first.mAmount ?? "0.0", width: 48, align: 2),
+              styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+              containsChinese: true,
+            );
+          } else {
+            if (upperGroupValue.first.hasFirstPrint != null && upperGroupValue.first.hasFirstPrint == "Y") {
+              bytes += generator.text(
+                EscHelper.columnMaker(content: upperGroupValue.first.mAmount ?? "0.0", width: 48, align: 2),
+                styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                containsChinese: true,
+              );
+            }
+          }
+
           bytes += generator.feed(2);
 
           bytes += generator.barcode(
@@ -1121,7 +1133,7 @@ Future<List<String>> printCustomerRecord({
         bytes += generator.feed(1);
         bytes += generator.hr();
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: "顧客記錄"),
+          EscHelper.alignCenterPrint(width: 24, content: "客戶記錄"),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );

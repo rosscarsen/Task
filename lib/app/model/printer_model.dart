@@ -132,6 +132,7 @@ class UpperMenuData {
   int? mInvoiceDetailID;
   String? mPrice;
   String? mAmount;
+  String? hasFirstPrint;
 
   UpperMenuData(
       {this.queueID,
@@ -149,7 +150,8 @@ class UpperMenuData {
       this.mBarcodeName,
       this.mInvoiceDetailID,
       this.mAmount,
-      this.mPrice});
+      this.mPrice,
+      this.hasFirstPrint});
 
   UpperMenuData.fromJson(Map<String, dynamic> json) {
     queueID = json['queueID'];
@@ -168,6 +170,7 @@ class UpperMenuData {
     mBarcodeName = json['mBarcode_Name'];
     mInvoiceDetailID = json['mInvoice_Detail_ID'];
     mPrice = json['mPrice'];
+    hasFirstPrint = json['hasFirstPrint'];
   }
 
   Map<String, dynamic> toJson() {
@@ -188,12 +191,13 @@ class UpperMenuData {
     data['mBarcode_Name'] = mBarcodeName;
     data['mInvoice_Detail_ID'] = mInvoiceDetailID;
     data['mPrice'] = mPrice;
+    data['hasFirstPrint'] = hasFirstPrint;
     return data;
   }
 
   @override
   String toString() {
-    return 'UpperMenuData(queueID: $queueID, invoiceNo: $invoiceNo, mSalesmanCode: $mSalesmanCode, mStationCode: $mStationCode, mPnum: $mPnum, mTableNo: $mTableNo, mInvoiceNo: $mInvoiceNo, invoiceDate: $invoiceDate, invoiceTime: $invoiceTime, mQty: $mQty, mtime: $mtime, mRemarks: $mRemarks, mBarcodeName: $mBarcodeName, mInvoiceDetailID: $mInvoiceDetailID, mPrice: $mPrice, mAmount: $mAmount)';
+    return 'UpperMenuData(queueID: $queueID, invoiceNo: $invoiceNo, mSalesmanCode: $mSalesmanCode, mStationCode: $mStationCode, mPnum: $mPnum, mTableNo: $mTableNo, mInvoiceNo: $mInvoiceNo, invoiceDate: $invoiceDate, invoiceTime: $invoiceTime, mQty: $mQty, mtime: $mtime, mRemarks: $mRemarks, mBarcodeName: $mBarcodeName, mInvoiceDetailID: $mInvoiceDetailID, mPrice: $mPrice, mAmount: $mAmount, hasFirstPrint: $hasFirstPrint)';
   }
 }
 

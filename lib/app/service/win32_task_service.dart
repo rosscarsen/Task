@@ -78,6 +78,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
         PrinterModel ret = PrinterModel.fromJson(response.data);
         final profile = await CapabilityProfile.load();
         final generator = Generator(PaperSize.mm80, profile);
+        generator.setGlobalCodeTable('CP1252');
         if (ret.qrCodeData == null &&
             ret.kitchen == null &&
             ret.upperMenu == null &&

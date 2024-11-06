@@ -623,4 +623,56 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       errorLoding("打印过程中出现错误: $e");
     }
   }
+  /*  Future<void> testPrint() async {
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm72, profile);
+    final printer = PrinterNetworkManager("192.168.0.235");
+    PosPrintResult connect = await printer.connect();
+    if (connect == PosPrintResult.success) {
+      debugPrint("打印机连接成功");
+      List<int> bytes = [];
+      /*  bytes += generator.rawBytes(EscHelper.setBold().codeUnits +
+          EscHelper.setAlign(align: 1).codeUnits +
+          EscHelper.setPrinterColor(true).codeUnits +
+          [0x1D, 0x21, 0x22]); */
+      bytes += generator.text(
+        "\x1D\x21\x33 TEST",
+        //containsChinese: true,
+      );
+      bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits +
+          EscHelper.setPrinterColor(false).codeUnits +
+          EscHelper.resetBold().codeUnits);
+      bytes += generator.text(
+        "打印机连接成功",
+        containsChinese: true,
+      );
+      // bytes += generator.reset();
+      bytes += generator.hr();
+
+      /* try {
+        final String qrData = "https://www.google.com";
+        const double qrSize = 300;
+        final uiImg = await QrPainter(
+          data: qrData,
+          version: QrVersions.auto,
+          gapless: false,
+        ).toImageData(qrSize);
+        final dir = await getTemporaryDirectory();
+        final pathName = '${dir.path}/qr_tmp.png';
+        final qrFile = File(pathName);
+        final imgFile = await qrFile.writeAsBytes(uiImg!.buffer.asUint8List());
+        final img = decodeImage(imgFile.readAsBytesSync());
+
+        bytes += generator.image(img!);
+      } catch (e) {
+        debugPrint("二维码生成失败: $e");
+      } */
+      bytes += generator.cut();
+      PosPrintResult printing = await printer.printTicket(bytes);
+      if (printing.msg == "Success") {}
+      printer.disconnect();
+    } else {
+      debugPrint("打印机连接失败");
+    }
+  } */
 }
