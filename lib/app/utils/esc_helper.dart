@@ -304,7 +304,7 @@ class EscHelper {
     return segments;
   }
 
-  ///设置针机颜色
+  /// 设置针机颜色
   /// ASCII    :  ESC   r      n
   /// HEX      :  0x1B  0x72   n
   /// Decimal  :  27    114    n
@@ -318,6 +318,53 @@ class EscHelper {
     buffer.writeCharCode(27);
     buffer.writeCharCode(114);
     buffer.writeCharCode(color ? 1 : 0);
+    return buffer.toString();
+  }
+
+  /// 设置字符集为中文
+  /// ASCII    :  ESC   R      n
+  /// HEX      :  0x1B  0x52   n
+  /// Decimal  :  27    82     n
+  /// <p>
+  /// Range 0 <= n <= 255 <p>
+  /// Default n = 0 <p>
+  /// <p>
+  /// 0: USA <p>
+  /// 1: France <p>
+  /// 2: Germany <p>
+  /// 3: UK <p>
+  /// 4: Denmark <p>
+  /// 5: Sweden <p>
+  /// 6: Italy <p>
+  /// 7: Spain <p>
+  /// 8: Japan <p>
+  /// 9: Norway <p>
+  /// 10: Denmark2 <p>
+  /// 11: Spain2 <p>
+  /// 12: Latin America <p>
+  /// 13: Korea <p>
+  /// 14: Simplified Chinese <p>
+  /// 15: Traditional Chinese <p>
+  /// 16: Thailand <p>
+  /// 17: Vietnam
+  /// 18: Malay
+  /// 19: Indonisia
+  /// 20: Greek
+  /// 21: Turkish
+  /// 22: Hebrew
+  /// 23: Arabic
+  /// 24: Russian
+  /// 25: Finnish
+  /// 26: Ukraine
+  /// 27: Czech
+  /// 28: Polish
+  /// 29: Hindi
+  /// 30: Russian2
+  static String setChineseCharSet({bool isChinese = true}) {
+    StringBuffer buffer = StringBuffer();
+    buffer.writeCharCode(27);
+    buffer.writeCharCode(82);
+    buffer.writeCharCode(isChinese ? 15 : 3);
     return buffer.toString();
   }
 }
