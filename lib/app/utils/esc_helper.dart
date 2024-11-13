@@ -61,7 +61,7 @@ class EscHelper {
     // 遍历字符串中的每个字符
     for (var char in text.characters) {
       // 如果字符是汉字，宽度加2，否则加1
-      width += (RegExp(r'[\u4E00-\u9FFF]').hasMatch(char)) ? 2 : 1;
+      width += (RegExp(r'[\u4E00-\u9FFF\u3000-\u303F\uFF00-\uFFEF]').hasMatch(char)) ? 2 : 1;
     }
     // 返回计算出的宽度
     return width;

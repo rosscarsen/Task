@@ -194,7 +194,6 @@ Future<List<String>> printkichen(
                 //台号
                 bytes += generator.text(
                   EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[i].mTableNo}"),
-                  linesAfter: 1,
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -259,14 +258,12 @@ Future<List<String>> printkichen(
                       bytes += generator.text(
                           EscHelper.columnMaker(content: '${kitchens[i].mQty}', width: 4) +
                               EscHelper.columnMaker(content: printName[j], width: 20),
-                          linesAfter: 0,
                           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                           containsChinese: true);
                     } else if (printName[j].isNotEmpty) {
                       bytes += generator.text(
                           EscHelper.columnMaker(content: '', width: 4) +
                               EscHelper.columnMaker(content: printName[j], width: 20),
-                          linesAfter: 0,
                           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                           containsChinese: true);
                     }
@@ -279,7 +276,6 @@ Future<List<String>> printkichen(
                     for (int k = 0; k < printRemarks.length; k++) {
                       bytes += generator.text(
                         '${EscHelper.columnMaker(content: '', width: 4)}${EscHelper.columnMaker(content: printRemarks[k], width: 20)}',
-                        linesAfter: 0,
                         styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                         containsChinese: true,
                       );
@@ -306,7 +302,6 @@ Future<List<String>> printkichen(
                 //台号
                 bytes += generator.text(
                   EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[i].mTableNo}"),
-                  linesAfter: 0,
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -328,7 +323,6 @@ Future<List<String>> printkichen(
               //台号
               bytes += generator.text(
                 EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[0].mTableNo}"),
-                linesAfter: 1,
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -393,14 +387,12 @@ Future<List<String>> printkichen(
                       bytes += generator.text(
                           EscHelper.columnMaker(content: "${kitchens[i].mQty}", width: 4) +
                               EscHelper.columnMaker(content: printName[j], width: 20),
-                          linesAfter: 0,
                           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                           containsChinese: true);
                     } else if (printName[j].isNotEmpty) {
                       bytes += generator.text(
                           EscHelper.columnMaker(content: "", width: 4) +
                               EscHelper.columnMaker(content: printName[j], width: 20),
-                          linesAfter: 0,
                           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                           containsChinese: true);
                     }
@@ -413,7 +405,6 @@ Future<List<String>> printkichen(
                     for (int k = 0; k < printRemarks.length; k++) {
                       bytes += generator.text(
                         '${EscHelper.columnMaker(content: '', width: 4)}${EscHelper.columnMaker(content: printRemarks[k], width: 20)}',
-                        linesAfter: 0,
                         styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                         containsChinese: true,
                       );
@@ -437,7 +428,6 @@ Future<List<String>> printkichen(
               //台号
               bytes += generator.text(
                 EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens.first.mTableNo}"),
-                linesAfter: 1,
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -490,7 +480,6 @@ Future<List<String>> printBDL(
                 //上菜单
                 bytes += generator.text(
                   EscHelper.alignCenterPrint(width: 16, content: "出菜單"),
-                  linesAfter: 1,
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -498,7 +487,6 @@ Future<List<String>> printBDL(
                 //台号
                 bytes += generator.text(
                   EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[i].mTableNo}"),
-                  linesAfter: 1,
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -563,14 +551,12 @@ Future<List<String>> printBDL(
                       bytes += generator.text(
                           EscHelper.columnMaker(content: '${kitchens[i].mQty}', width: 4) +
                               EscHelper.columnMaker(content: printName[j], width: 20),
-                          linesAfter: 0,
                           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                           containsChinese: true);
                     } else if (printName[j].isNotEmpty) {
                       bytes += generator.text(
                           EscHelper.columnMaker(content: '', width: 4) +
                               EscHelper.columnMaker(content: printName[j], width: 20),
-                          linesAfter: 0,
                           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                           containsChinese: true);
                     }
@@ -583,7 +569,6 @@ Future<List<String>> printBDL(
                     for (int k = 0; k < printRemarks.length; k++) {
                       bytes += generator.text(
                         '${EscHelper.columnMaker(content: '', width: 4)}${EscHelper.columnMaker(content: printRemarks[k], width: 20)}',
-                        linesAfter: 0,
                         styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                         containsChinese: true,
                       );
@@ -610,7 +595,6 @@ Future<List<String>> printBDL(
                 //台号
                 bytes += generator.text(
                   EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[i].mTableNo}"),
-                  linesAfter: 0,
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -631,7 +615,6 @@ Future<List<String>> printBDL(
               //上菜单
               bytes += generator.text(
                 EscHelper.alignCenterPrint(width: 16, content: "出菜單"),
-                linesAfter: 1,
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -639,7 +622,6 @@ Future<List<String>> printBDL(
               //台号
               bytes += generator.text(
                 EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[0].mTableNo}"),
-                linesAfter: 1,
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -704,14 +686,12 @@ Future<List<String>> printBDL(
                       bytes += generator.text(
                           EscHelper.columnMaker(content: "${kitchens[i].mQty}", width: 4) +
                               EscHelper.columnMaker(content: printName[j], width: 20),
-                          linesAfter: 0,
                           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                           containsChinese: true);
                     } else if (printName[j].isNotEmpty) {
                       bytes += generator.text(
                           EscHelper.columnMaker(content: "", width: 4) +
                               EscHelper.columnMaker(content: printName[j], width: 20),
-                          linesAfter: 0,
                           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                           containsChinese: true);
                     }
@@ -724,7 +704,6 @@ Future<List<String>> printBDL(
                     for (int k = 0; k < printRemarks.length; k++) {
                       bytes += generator.text(
                         '${EscHelper.columnMaker(content: '', width: 4)}${EscHelper.columnMaker(content: printRemarks[k], width: 20)}',
-                        linesAfter: 0,
                         styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                         containsChinese: true,
                       );
@@ -748,7 +727,6 @@ Future<List<String>> printBDL(
               //台号
               bytes += generator.text(
                 EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens.first.mTableNo}"),
-                linesAfter: 1,
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -802,7 +780,6 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
       }
       bytes += generator.text(
         EscHelper.alignCenterPrint(width: 16, content: content),
-        linesAfter: 1,
         styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
         containsChinese: true,
       );
@@ -810,7 +787,6 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
       //台号
       bytes += generator.text(
         EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens.mTableNo}"),
-        linesAfter: 1,
         styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
         containsChinese: true,
       );
@@ -874,13 +850,11 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
             bytes += generator.text(
                 EscHelper.columnMaker(content: '${kitchens.mQty}', width: 4) +
                     EscHelper.columnMaker(content: printName[j], width: 20),
-                linesAfter: 0,
                 styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                 containsChinese: true);
           } else if (printName[j].isNotEmpty) {
             bytes += generator.text(
                 EscHelper.columnMaker(content: '', width: 4) + EscHelper.columnMaker(content: printName[j], width: 20),
-                linesAfter: 0,
                 styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
                 containsChinese: true);
           }
@@ -893,7 +867,6 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
           for (int k = 0; k < printRemarks.length; k++) {
             bytes += generator.text(
               '${EscHelper.columnMaker(content: '', width: 4)}${EscHelper.columnMaker(content: printRemarks[k], width: 20)}',
-              linesAfter: 0,
               styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
               containsChinese: true,
             );
@@ -920,7 +893,6 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
       //台号
       bytes += generator.text(
         EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens.mTableNo}"),
-        linesAfter: 0,
         styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
         containsChinese: true,
       );
@@ -988,7 +960,6 @@ Future<List<String>> printOnTheMeun({
             EscHelper.alignCenterPrint(width: 16, content: "檯:${upperGroupValue.first.mTableNo}"),
             styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
             containsChinese: true,
-            linesAfter: 0,
           );
 
           bytes += generator.feed(1);
