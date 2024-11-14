@@ -1365,7 +1365,7 @@ Future<List<String>> printRecipt({
         //支付方式
         bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "支付方式", width: 34)}${EscHelper.columnMaker(content: "金額", width: 6)}${EscHelper.columnMaker(content: "小費", width: 8, align: 2)}",
+          "${EscHelper.columnMaker(content: "支付方式", width: 30)}${EscHelper.columnMaker(content: "金額", width: 10)}${EscHelper.columnMaker(content: "小費", width: 8, align: 2)}",
           containsChinese: true,
         );
         //分割線
@@ -1376,7 +1376,7 @@ Future<List<String>> printRecipt({
           for (int i = 0; i < payType.length; i++) {
             bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
             bytes += generator.text(
-              "${EscHelper.columnMaker(content: "${payType[i].mPaytype}", width: 34)}${EscHelper.columnMaker(content: "${payType[i].mAmount}", width: 6)}${EscHelper.columnMaker(content: "${payType[i].mTips}", width: 8, align: 2)}",
+              "${EscHelper.columnMaker(content: "${payType[i].mPaytype}", width: 30)}${EscHelper.columnMaker(content: "${payType[i].mAmount}", width: 10)}${EscHelper.columnMaker(content: "${payType[i].mTips}", width: 8, align: 2)}",
               containsChinese: true,
             );
           }
