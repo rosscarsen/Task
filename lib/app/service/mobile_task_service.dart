@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +10,8 @@ import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import '../config.dart';
 import '../model/login_model.dart';
 import '../model/printer_model.dart';
-import 'api_client.dart';
 import 'print_method.dart';
-
-bool printStatus = true;
-final ApiClient apiClient = ApiClient();
-Timer? timer;
+import 'service_globals.dart';
 
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
@@ -31,46 +28,88 @@ Future<void> initializeService() async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
+  printStatus = true;
+  debugPrint("开始服务:$printStatus");
   WidgetsFlutterBinding.ensureInitialized();
-  //DartPluginRegistrant.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+
+  UserData? cachedLoginUser;
+
+  Future<void> updateCachedData() async {
+    try {
+      cachedLoginUser = await getLoginInfo();
+      debugPrint("缓存数据更新完成: ${cachedLoginUser?.toJson()}");
+    } catch (e) {
+      debugPrint("更新缓存数据失败: $e");
+    }
+  }
+
+  // 初始化缓存数据
+  await updateCachedData();
+
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
+      debugPrint("设置前台服务");
       service.setAsForegroundService();
     });
 
     service.on('setAsBackground').listen((event) {
+      debugPrint("设置后台服务");
       service.setAsBackgroundService();
     });
   }
 
   service.on('stopService').listen((event) {
-    if (timer != null && timer!.isActive) {
+    printStatus = false;
+    debugPrint("停止服务:$printStatus");
+    if (timer?.isActive == true) {
       timer!.cancel();
     }
     service.stopSelf();
   });
 
-  timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-    final UserData? loginUser = await getLoginInfo();
-    final String? station = loginUser?.station;
-    final String? airprintStation = loginUser?.airPrintStation;
-    if (loginUser == null && station == null && airprintStation == null && station == airprintStation) {
-      debugPrint("本地信息为空或打印机信息不一致");
-      return;
-    }
-    if (service is AndroidServiceInstance) {
-      if (await service.isForegroundService()) {
-        service.setForegroundNotificationInfo(
-          title: "Printer Service running",
-          content: "Updated at ${DateTime.now()}",
-        );
+  timer = Timer.periodic(const Duration(seconds: 5), (_) async {
+    try {
+      // 如果缓存数据为空，尝试重新获取
+      if (cachedLoginUser == null) {
+        await updateCachedData();
+        if (cachedLoginUser == null) {
+          debugPrint("无法获取登录信息，跳过本次任务");
+          return;
+        }
       }
-    }
 
-    debugPrint("打印状态：$printStatus");
-    if (printStatus) {
-      getPrintData(queryData: loginUser!.toJson());
+      final station = cachedLoginUser?.station;
+      final airprintStation = cachedLoginUser?.airPrintStation;
+
+      // 检查数据一致性
+      if (station == null || airprintStation == null || station != airprintStation) {
+        debugPrint("本地信息为空或打印机信息不一致");
+        return;
+      }
+
+      if (service is AndroidServiceInstance) {
+        if (await service.isForegroundService()) {
+          service.setForegroundNotificationInfo(
+            title: "Printer Service running",
+            content: "Updated at ${DateTime.now()}",
+          );
+        }
+      }
+
+      debugPrint("打印状态：$printStatus");
+      if (printStatus) {
+        printStatus = false;
+        getPrintData(queryData: cachedLoginUser!.toJson());
+      }
+    } catch (e) {
+      debugPrint("后台任务异常: $e");
     }
+  });
+
+  // 定期刷新缓存数据
+  Timer.periodic(const Duration(minutes: 1), (_) async {
+    await updateCachedData();
   });
 }
 
