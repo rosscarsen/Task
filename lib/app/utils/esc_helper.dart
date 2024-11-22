@@ -2,369 +2,121 @@ import 'package:characters/characters.dart';
 
 class EscHelper {
   /// 居中打印
+  /// 根据宽度 `width` 居中对齐 `content`
   static String alignCenterPrint({required int width, required String content}) {
-    String str = content.toString();
-    int strLength = calculateWidth(str);
-    int halfWidth = ((width - strLength) ~/ 2);
-    StringBuffer buffer = StringBuffer();
-
-    // 添加空格
-    buffer.write(' ' * halfWidth);
-    // 添加内容
-    buffer.write(content);
-    // 添加空格
-    buffer.write(' ' * (width - strLength - halfWidth));
-
-    return buffer.toString();
+    final strLength = calculateWidth(content);
+    final halfWidth = ((width - strLength) ~/ 2);
+    return ' ' * halfWidth + content + ' ' * (width - strLength - halfWidth);
   }
 
-  /// 列表打印 原本48 最大46 边距2
-  /// content 内容
-  /// width 宽度
-  /// algin 对齐方式 0左对齐 1居中 2右对齐
-  static String columnMaker({required String content, required int width, int align = 0}) {
-    int contentWidth = calculateWidth(content);
-    int spaceWidth = width - contentWidth;
+  /// 列表打印
+  /// 根据对齐方式生成列内容
+  /// [ASCII] ESC a n | [HEX] 0x1B 0x61 n | [DEC] 27 97 n
+  /// `align` 对齐方式：0 左对齐 | 1 居中 | 2 右对齐
+  static String columnMaker({
+    required String content,
+    required int width,
+    int align = 0,
+  }) {
+    final contentWidth = calculateWidth(content);
+    final spaceWidth = width - contentWidth;
 
-    // 使用 StringBuffer 进行拼接
-    StringBuffer buffer = StringBuffer();
-
-    if (align == 0) {
-      // 左对齐
-      buffer.write(content);
-      buffer.write(' ' * spaceWidth);
-    } else if (align == 1) {
-      // 居中对齐
-      int halfWidth = spaceWidth ~/ 2;
-      buffer.write(' ' * halfWidth);
-      buffer.write(content);
-      buffer.write(' ' * (spaceWidth - halfWidth));
-    } else {
-      // 右对齐
-      buffer.write(' ' * spaceWidth);
-      buffer.write(content);
-    }
-
-    return buffer.toString();
-  }
-
-  // 静态方法，用于生成指定长度的横线
-  static String fillHr({required int length, String ch = '-'}) {
-    // 直接通过 String * 操作符生成指定长度的字符串
-    return ch * length;
-  }
-
-  // 计算字符串的宽度
-  static int calculateWidth(String text) {
-    // 初始化宽度为0
-    int width = 0;
-    // 遍历字符串中的每个字符
-    for (var char in text.characters) {
-      // 如果字符是汉字，宽度加2，否则加1
-      width += (RegExp(r'[\u4E00-\u9FFF\u3000-\u303F\uFF00-\uFFEF]').hasMatch(char)) ? 2 : 1;
-    }
-    // 返回计算出的宽度
-    return width;
-  }
-
-  ///字符串转列表，按照每行的长度进行分割
-  static List<String> strToList({required String str, required int splitLength}) {
-    String content = str.trim();
-    int strLength = content.length;
-
-    int startIndex = 0;
-    List<String> strList = [];
-
-    while (startIndex < strLength) {
-      int endIndex = startIndex + splitLength;
-      if (endIndex >= strLength) {
-        endIndex = strLength;
-      }
-
-      var subStr = content.substring(startIndex, endIndex);
-
-      while (calculateWidth(subStr) > splitLength && endIndex > startIndex) {
-        endIndex--;
-        subStr = content.substring(startIndex, endIndex);
-      }
-
-      strList.add(subStr.trim());
-      startIndex = endIndex;
-    }
-
-    return strList;
-  }
-
-  static List<String> strToList2({required String str, required int splitLength}) {
-    List<String> strList = [];
-
-    // 先按照换行符分割字符串
-    List<String> lines = str.split('\n');
-
-    // 对每一行应用分割逻辑
-    for (String line in lines) {
-      String content = line.trim();
-      int strLength = content.length;
-
-      int startIndex = 0;
-
-      while (startIndex < strLength) {
-        int endIndex = startIndex + splitLength;
-        if (endIndex >= strLength) {
-          endIndex = strLength;
-        }
-
-        var subStr = content.substring(startIndex, endIndex);
-
-        // 确保分割的子字符串宽度不超过 splitLength
-        while (calculateWidth(subStr) > splitLength && endIndex > startIndex) {
-          endIndex--;
-          subStr = content.substring(startIndex, endIndex);
-        }
-
-        strList.add(subStr.trim());
-        startIndex = endIndex;
-      }
-    }
-
-    return strList;
-  }
-
-  /// 对齐方式 algin 对齐方式 0左对齐 1居中 2右对齐
-  /// Format <p>
-  /// ASCII    :  ESC   a      n
-  /// HEX      :  0x1B  0x61   n
-  /// Decimal  :  27    97     n
-  /// Range 0 <= n <= 2  or 48 <= n <= 50
-  static String setAlign({int align = 0}) {
-    StringBuffer buffer = StringBuffer();
     switch (align) {
       case 1:
-        buffer.writeCharCode(27);
-        buffer.writeCharCode(97);
-        buffer.writeCharCode(1);
-        break;
+        final halfWidth = spaceWidth ~/ 2;
+        return ' ' * halfWidth + content + ' ' * (spaceWidth - halfWidth);
       case 2:
-        buffer.writeCharCode(27);
-        buffer.writeCharCode(97);
-        buffer.writeCharCode(2);
-        break;
+        return ' ' * spaceWidth + content;
       default:
-        buffer.writeCharCode(27);
-        buffer.writeCharCode(97);
-        buffer.writeCharCode(0);
-        break;
+        return content + ' ' * spaceWidth;
     }
-    return buffer.toString();
   }
 
-  /// content 内容
-  /// [Format]
-  /// ASCII GS !  n
-  /// HEX   1D 21 n
-  /// DEC   29 33 n
-  /// size 默认正常大小 1:两倍高 2:两倍宽 3:两倍大小 4:三倍高 5:三倍宽 6:三倍大小 7:四倍高 8:四倍宽 9:四倍大小 10:五倍高 11:五倍宽 12:五倍大小
+  /// 生成指定长度的分隔线
+  static String fillHr({required int length, String ch = '-'}) => ch * length;
+
+  /// 计算字符串宽度（汉字按宽度 2 计算）
+  static int calculateWidth(String text) {
+    return text.characters.fold(
+        0, (width, char) => width + (RegExp(r'[\u4E00-\u9FFF\u3000-\u303F\uFF00-\uFFEF]').hasMatch(char) ? 2 : 1));
+  }
+
+  /// 分割字符串为指定宽度的列表
+  /// 优先按换行符 `\n` 拆分，然后对每段内容按照指定宽度进行分割
+  static List<String> splitString({required String str, required int splitLength}) {
+    List<String> result = [];
+
+    // 按换行符拆分字符串
+    List<String> lines = str.split('\n');
+
+    // 对每行字符串进行分割
+    for (var line in lines) {
+      Characters chars = line.trim().characters;
+      while (chars.isNotEmpty) {
+        String segment = chars.take(splitLength).toString();
+        while (calculateWidth(segment) > splitLength && chars.length > 1) {
+          chars = chars.skip(1);
+          segment = chars.take(splitLength).toString();
+        }
+        result.add(segment);
+        chars = chars.skip(segment.length);
+      }
+    }
+
+    return result;
+  }
+
+  /// 设置对齐方式
+  /// [ASCII] ESC a n | [HEX] 0x1B 0x61 n | [DEC] 27 97 n
+  static String setAlign({int align = 0}) {
+    return String.fromCharCodes([27, 97, align.clamp(0, 2)]);
+  }
+
+  /// 设置字符大小
+  /// [ASCII] GS ! n | [HEX] 0x1D 0x21 n | [DEC] 29 33 n
+  /// size 默认正常大小
+  /// 1: 两倍高 | 2: 两倍宽 | 3: 两倍大小
+  /// 4: 三倍高 | 5: 三倍宽 | 6: 三倍大小
+  /// 7: 四倍高 | 8: 四倍宽 | 9: 四倍大小
+  /// 10: 五倍高 | 11: 五倍宽 | 12: 五倍大小
   static String setSize({int size = 0}) {
-    // 使用 StringBuffer 进行字符串拼接
-    StringBuffer buffer = StringBuffer();
-    // 固定的 ESC (ASCII 27) 和 GS (ASCII 29) 控制符
-    buffer.writeCharCode(29); // ASCII 29 (Group Separator) 对应 "\x1D"
-    buffer.writeCharCode(33); // ASCII 33 ("!" 的代码点) 对应 "\x21"
-
-    // 根据 size 选择相应的控制字符
-    switch (size) {
-      case 1:
-        buffer.writeCharCode(1); // "\x01"
-        break;
-      case 2:
-        buffer.writeCharCode(16); // "\x10"
-        break;
-      case 3:
-        buffer.writeCharCode(17); // "\x11"
-        break;
-      case 4:
-        buffer.writeCharCode(2); // "\x02"
-        break;
-      case 5:
-        buffer.writeCharCode(32); // "\x20"
-        break;
-      case 6:
-        buffer.writeCharCode(34); // "\x22"
-        break;
-      case 7:
-        buffer.writeCharCode(3); // "\x03"
-        break;
-      case 8:
-        buffer.writeCharCode(48); // "\x30"
-        break;
-      case 9:
-        buffer.writeCharCode(51); // "\x33"
-        break;
-      case 11:
-        buffer.writeCharCode(4); // "\x04"
-        break;
-      case 12:
-        buffer.writeCharCode(64); // "\x40"
-        break;
-      default:
-        buffer.writeCharCode(0); // "\x00"
-        break;
-    }
-
-    return buffer.toString();
+    const sizes = [0, 1, 16, 17, 2, 32, 34, 3, 48, 51, 4, 64];
+    return String.fromCharCodes([29, 33, sizes[size.clamp(0, sizes.length - 1)]]);
   }
 
-  ///设置走纸行数
-  /// <p>
-  /// Prints the data in the print buffer and feeds n lines .
-  /// <p>
-  /// Format <p>
-  /// ASCII    :  ESC   d      n
-  /// HEX      :  0x1B  0x64   n
-  /// Decimal  :  27    100    n
-  /// <p>
-  /// Range 0 <= n <= 255 <p>
-  /// Default n = 1 <p>
+  /// 设置走纸行数
+  /// [ASCII] ESC d n | [HEX] 0x1B 0x64 n | [DEC] 27 100 n
   static String setLineSpace({required int line}) {
-    StringBuffer buffer = StringBuffer();
-    buffer.writeCharCode(27);
-    buffer.writeCharCode(100);
-    buffer.writeCharCode(line);
-    return buffer.toString();
+    return String.fromCharCodes([27, 100, line.clamp(0, 255)]);
   }
 
-  ///切纸
-  static String cutPaper() {
-    StringBuffer buffer = StringBuffer();
-
-    // 添加控制字符 ESC (ASCII 27) 和 m (ASCII 109)
-    buffer.writeCharCode(27); // ASCII 27 (Escape)
-    buffer.writeCharCode(109); // ASCII 109 ('m')
-
-    return buffer.toString();
-  }
+  /// 切纸
+  /// [ASCII] ESC m | [HEX] 0x1B 0x6D | [DEC] 27 109
+  static String cutPaper() => String.fromCharCodes([27, 109]);
 
   /// 设置加粗
-  /// ASCII    :  ESC   E      n
-  /// HEX      :  0x1B  0x45   n
-  /// Decimal  :  27    69     n
-  static String setBold() {
-    StringBuffer buffer = StringBuffer();
-    buffer.writeCharCode(27);
-    buffer.writeCharCode(69);
-    buffer.writeCharCode(1);
-    return buffer.toString();
-  }
-
-  /// 取消加粗
-  /// ASCII    :  ESC   E      n
-  /// HEX      :  0x1B  0x45   n
-  /// Decimal  :  27    69     n
-  static String resetBold() {
-    StringBuffer buffer = StringBuffer();
-    buffer.writeCharCode(27);
-    buffer.writeCharCode(69);
-    buffer.writeCharCode(0);
-    return buffer.toString();
-  }
+  /// [ASCII] ESC E n | [HEX] 0x1B 0x45 n | [DEC] 27 69 n
+  static String setBold({bool bold = true}) => String.fromCharCodes([27, 69, bold ? 1 : 0]);
 
   /// 打开钱箱
-  static String openCashDrawer() {
-    //return "\x1B\x70\x00\x19\xFA"; // ESC p m t1 t2 -> 打开钱箱
+  /// [ASCII] ESC p m t1 t2 | [HEX] 0x1B 0x70 0 60 255 | [DEC] 27 112 0 60 255
+  static String openCashDrawer() => String.fromCharCodes([27, 112, 0, 60, 255]);
 
-    StringBuffer buffer = StringBuffer();
-    // 添加控制字符 ESC (ASCII 27), p (ASCII 112), 0 (ASCII 0), < (ASCII 60), 和 ￿ (ASCII 255)
-    buffer.writeCharCode(27); // ASCII 27 (Escape)
-    buffer.writeCharCode(112); // ASCII 112 ('p')
-    buffer.writeCharCode(0); // ASCII 0 (Null)
-    buffer.writeCharCode(60); // ASCII 60 ('<')
-    buffer.writeCharCode(255); // ASCII 255 (ÿ)
+  /// 设置打印机颜色
+  /// [ASCII] ESC r n | [HEX] 0x1B 0x72 n | [DEC] 27 114 n
+  static String setPrinterColor({bool color = false}) => String.fromCharCodes([27, 114, color ? 1 : 0]);
 
-    return buffer.toString();
-  }
+  /// 设置字符集
+  /// [ASCII] ESC R n | [HEX] 0x1B 0x52 n | [DEC] 27 82 n
+  static String setCharSet({bool isChinese = true}) => String.fromCharCodes([27, 82, isChinese ? 15 : 0]);
 
-  ///分割字符串
-  static List<String> splitString(String input, int lengthPerSegment) {
-    // 定义一个空列表，用于存储分割后的字符串
-    List<String> segments = [];
-    // 将输入字符串转换为Characters对象
-    Characters characters = input.characters;
+  /// 打印空行
+  /// [ASCII] GS ! n | [HEX] 0x1D 0x21 n | [DEC] 29 33 n
+  static String printLine({int pageWidth = 48, int lines = 1}) =>
+      "${String.fromCharCodes([29, 33, 0])}${' ' * pageWidth * lines}\n";
 
-    // 当Characters对象不为空时，循环执行以下操作
-    while (characters.isNotEmpty) {
-      // 从Characters对象中取出指定长度的字符串
-      String segment = characters.take(lengthPerSegment).toString();
-      // 将取出的字符串添加到segments列表中
-      segments.add(segment);
-      // 将Characters对象跳过指定长度的字符串
-      characters = characters.skip(lengthPerSegment);
-    }
+  ///设置行间距
+  /// [ASCII] ESC 3 n | [HEX] 0x1B 0x33 n | [DEC] 27 51 n
 
-    // 返回分割后的字符串列表
-    return segments;
-  }
-
-  /// 设置针机颜色
-  /// ASCII    :  ESC   r      n
-  /// HEX      :  0x1B  0x72   n
-  /// Decimal  :  27    114    n
-  /// <p>
-  /// Range
-  /// n = 0,1,48,49 <br>
-
-  static String setPrinterColor(bool color) {
-    //[0x1B, 0x72, 1]
-    StringBuffer buffer = StringBuffer();
-    buffer.writeCharCode(27);
-    buffer.writeCharCode(114);
-    buffer.writeCharCode(color ? 1 : 0);
-    return buffer.toString();
-  }
-
-  /// 设置字符集为中文
-  /// ASCII    :  ESC   R      n
-  /// HEX      :  0x1B  0x52   n
-  /// Decimal  :  27    82     n
-  /// <p>
-  /// Range 0 <= n <= 255 <p>
-  /// Default n = 0 <p>
-  /// <p>
-  /// 0: USA <p>
-  /// 1: France <p>
-  /// 2: Germany <p>
-  /// 3: UK <p>
-  /// 4: Denmark <p>
-  /// 5: Sweden <p>
-  /// 6: Italy <p>
-  /// 7: Spain <p>
-  /// 8: Japan <p>
-  /// 9: Norway <p>
-  /// 10: Denmark2 <p>
-  /// 11: Spain2 <p>
-  /// 12: Latin America <p>
-  /// 13: Korea <p>
-  /// 14: Simplified Chinese <p>
-  /// 15: Traditional Chinese <p>
-  /// 16: Thailand <p>
-  /// 17: Vietnam
-  /// 18: Malay
-  /// 19: Indonisia
-  /// 20: Greek
-  /// 21: Turkish
-  /// 22: Hebrew
-  /// 23: Arabic
-  /// 24: Russian
-  /// 25: Finnish
-  /// 26: Ukraine
-  /// 27: Czech
-  /// 28: Polish
-  /// 29: Hindi
-  /// 30: Russian2
-  static String setChineseCharSet({bool isChinese = true}) {
-    StringBuffer buffer = StringBuffer();
-    buffer.writeCharCode(27);
-    buffer.writeCharCode(82);
-    buffer.writeCharCode(isChinese ? 15 : 3);
-    return buffer.toString();
-  }
+  static List<int> setLineHeight({int height = 3}) => [27, 51, height.clamp(0, 255)];
 }
