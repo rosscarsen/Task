@@ -1,11 +1,11 @@
 import 'dart:io';
 
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_esc_pos_network/flutter_esc_pos_network.dart';
-import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -278,26 +278,28 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         List<int> bytes = [];
         final profile = await CapabilityProfile.load();
         final generator = Generator(PaperSize.mm80, profile);
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: "${printData.dailyReport}"),
+          "${printData.dailyReport}",
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 48, content: "${printData.shop}"),
+          "${printData.shop}",
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 48, content: "${printData.staff}"),
+          "${printData.staff}",
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 48, content: "${printData.date}"),
+          "${printData.date}",
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
+        bytes += generator.rawBytes(EscHelper.setAlign().codeUnits);
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.hr();
         //销售金額
@@ -358,7 +360,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
             containsChinese: true,
           );
         }
-        bytes += generator.feed(invoicePrintType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(1);
         //支付方式
         final List<String>? payTitle = printData.payTitle;
         if (payTitle!.isNotEmpty) {
@@ -372,7 +374,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
 
         final List<List<String>>? payList = printData.payList;
-        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.resetBold().codeUnits);
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.setBold(bold: false).codeUnits);
         if (payList!.isNotEmpty) {
           for (var payItem in payList) {
             if (payItem.isNotEmpty) {
@@ -395,7 +397,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
             containsChinese: true,
           );
         }
-        bytes += generator.feed(invoicePrintType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(1);
         //現金核算
         final String? cashAccounting = printData.cashAccounting;
         if (cashAccounting!.isNotEmpty) {
@@ -404,7 +406,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
             containsChinese: true,
           );
 
-          bytes += generator.rawBytes(EscHelper.resetBold().codeUnits);
+          bytes += generator.rawBytes(EscHelper.setBold(bold: false).codeUnits);
         }
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.hr();
@@ -500,7 +502,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.hr();
         bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
-        bytes += generator.feed(invoicePrintType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(1);
         bytes += generator.cut();
         PosPrintResult printing = await printer.printTicket(bytes);
         printer.disconnect();
@@ -546,49 +548,49 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         List<int> bytes = [];
         final profile = await CapabilityProfile.load();
         final generator = Generator(PaperSize.mm80, profile);
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: "${printData.reportCompany}"),
+          "${printData.reportCompany}",
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: LocaleKeys.foodSaleReport.tr),
+          LocaleKeys.foodSaleReport.tr,
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        bytes += generator.feed(invoicePrintType == "EPSON" ? 5 : 1);
+        bytes += generator.feed(1);
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 48, content: "${LocaleKeys.timeSolt.tr}：${printData.timerFrame}"),
+          "${LocaleKeys.timeSolt.tr}：${printData.timerFrame}",
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         bytes += generator.text(
-          EscHelper.alignCenterPrint(
-              width: 48,
-              content: "${LocaleKeys.printTime.tr}：${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}"),
+          "${LocaleKeys.printTime.tr}：${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}",
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
 
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 48, content: "${LocaleKeys.station.tr}：${printData.station}"),
+          "${LocaleKeys.station.tr}：${printData.station}",
           styles: const PosStyles(height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        bytes += generator.feed(invoicePrintType == "EPSON" ? 5 : 1);
+        bytes += generator.feed(1);
+        bytes += generator.rawBytes(EscHelper.setAlign().codeUnits);
         //列表头
         bytes += generator.text(
           "${EscHelper.setBold()}${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: LocaleKeys.code.tr, width: 16)}${EscHelper.columnMaker(content: LocaleKeys.quantity.tr, width: 16, align: 1)}${EscHelper.columnMaker(content: LocaleKeys.amount.tr, width: 16, align: 2)}",
           containsChinese: true,
         );
-        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.resetBold().codeUnits);
+        bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.setBold(bold: false).codeUnits);
         //列表内容
         final List<SaleReportList> saleReportList = printData.saleReportList!;
         if (saleReportList.isNotEmpty) {
           double total = 0.0;
           for (var i = 0; i < saleReportList.length; i++) {
             total += double.tryParse(saleReportList[i].mAmount!) ?? 0.00;
-            bytes += generator.rawBytes(EscHelper.setSize().codeUnits + EscHelper.resetBold().codeUnits);
+            bytes += generator.rawBytes(EscHelper.setSize().codeUnits + EscHelper.setBold(bold: false).codeUnits);
             bytes += generator.hr();
             bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
             bytes += generator.text(
@@ -600,7 +602,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
               containsChinese: true,
             );
           }
-          bytes += generator.rawBytes(EscHelper.setSize().codeUnits + EscHelper.resetBold().codeUnits);
+          bytes += generator.rawBytes(EscHelper.setSize().codeUnits + EscHelper.setBold(bold: false).codeUnits);
           bytes += generator.hr();
           bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits + EscHelper.setBold().codeUnits);
           bytes += generator.text(
@@ -609,8 +611,9 @@ class HomeController extends GetxController with WidgetsBindingObserver {
           );
         }
 
-        bytes += generator.feed(invoicePrintType == "EPSON" ? 5 : 1);
+        bytes += generator.feed(1);
         bytes += generator.cut();
+        bytes += generator.reset();
         PosPrintResult printing = await printer.printTicket(bytes);
         printer.disconnect();
         if (printing.msg == "Success") {
@@ -623,10 +626,11 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       errorLoding("打印过程中出现错误: $e");
     }
   }
+
   /*  Future<void> testPrint() async {
-    final profile = await CapabilityProfile.load();
+    final profile = await CapabilityProfile.load(name: "TM-U220");
     final generator = Generator(PaperSize.mm72, profile);
-    final printer = PrinterNetworkManager("192.168.0.235");
+    final printer = PrinterNetworkManager("192.168.1.235");
     PosPrintResult connect = await printer.connect();
     if (connect == PosPrintResult.success) {
       debugPrint("打印机连接成功");
@@ -635,18 +639,19 @@ class HomeController extends GetxController with WidgetsBindingObserver {
           EscHelper.setAlign(align: 1).codeUnits +
           EscHelper.setPrinterColor(true).codeUnits +
           [0x1D, 0x21, 0x22]); */
+      //bytes += generator.setGlobalCodeTable("CP437");
+      bytes += generator.rawBytes([27, 33, 56]);
       bytes += generator.text(
-        "\x1D\x21\x33 TEST",
-        //containsChinese: true,
+        "TEST",
       );
-      bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits +
-          EscHelper.setPrinterColor(false).codeUnits +
-          EscHelper.resetBold().codeUnits);
+      bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+      bytes += generator.rawBytes([27, 33, 56] + [27, 82, 15] + [29, 33, 17]);
       bytes += generator.text(
         "打印机连接成功",
         containsChinese: true,
       );
       // bytes += generator.reset();
+      bytes += generator.rawBytes([27, 33, 0]);
       bytes += generator.hr();
 
       /* try {
@@ -674,5 +679,6 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     } else {
       debugPrint("打印机连接失败");
     }
-  } */
+  }
+ */
 }
