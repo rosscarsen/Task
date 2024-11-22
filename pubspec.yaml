@@ -1,5 +1,5 @@
 name: task
-version: 1.1.0+10
+version: 1.1.1+11
 publish_to: none
 description: A new Flutter project.
 environment:
@@ -16,7 +16,7 @@ dependencies:
   #网络请求
   dio: ^5.7.0
   #escpos工具
-  flutter_esc_pos_utils: ^1.0.1
+  esc_pos_utils_plus: ^2.0.4
   #escpos连接
   flutter_esc_pos_network: ^1.0.3
   flutter:
@@ -96,7 +96,7 @@ flutter_native_splash:
 msix_config:
   display_name: Task
   identity_name: net.pericles.task
-  msix_version: 1.0.0.1
+  msix_version: 1.0.0.2
   certificate_path: C:\certificate\certificate.pfx
   certificate_password: 123456
   capabilities: internetClient,Escpos
