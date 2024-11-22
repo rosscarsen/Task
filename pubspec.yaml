@@ -100,7 +100,7 @@ msix_config:
   certificate_path: C:\certificate\certificate.pfx
   certificate_password: 123456
   capabilities: internetClient,Escpos
-  logo_path: F:\project\FlutterProject\task\windows\runner\resources\app_icon.ico
+  logo_path: D:\project\FlutterProject\task\windows\runner\resources\app_icon.ico
   execution_alias: task
   enable_at_startup: true
 
