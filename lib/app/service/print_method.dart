@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_esc_pos_network/flutter_esc_pos_network.dart';
-import 'package:flutter_esc_pos_utils/flutter_esc_pos_utils.dart';
 import 'package:image/image.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -16,7 +16,7 @@ import '../model/login_model.dart';
 import '../model/printer_model.dart';
 import '../utils/esc_helper.dart';
 import '../utils/stroage_manage.dart';
-import 'mobile_task_service.dart';
+import 'service_globals.dart';
 
 final Logger logger = Logger();
 
@@ -51,10 +51,7 @@ Future<UserData?> getLoginInfo() async {
 }
 
 ///执行打印二维码
-Future<List<String>> printQrCode({
-  required Generator generator,
-  required List<QrCodeData> printData,
-}) async {
+Future<List<String>> printQrCode({required List<QrCodeData> printData}) async {
   List<String> queueID = [];
   try {
     for (var element in printData) {
@@ -63,46 +60,50 @@ Future<List<String>> printQrCode({
       if (connect == PosPrintResult.success) {
         debugPrint("打印机连接成功:${element.ip}");
         List<int> bytes = [];
-        //中文名
+        final profile = await CapabilityProfile.load();
+        final generator = Generator(PaperSize.mm80, profile);
+
         if (element.mNameChinese != null && element.mNameChinese!.isNotEmpty) {
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 24, content: "${element.mNameChinese}"),
+            "${element.mNameChinese}",
             styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2),
             containsChinese: true,
           );
-          bytes += generator.feed(element.mPrinterType == "EPSON" ? 3 : 1);
         }
         //英文名
         if (element.mNameEnglish != null && element.mNameEnglish!.isNotEmpty) {
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 24, content: "${element.mNameEnglish}"),
+            "${element.mNameEnglish}",
             styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2),
             containsChinese: true,
           );
-          bytes += generator.feed(element.mPrinterType == "EPSON" ? 3 : 1);
         }
-
         //地址
         if (element.mAddress != null && element.mAddress!.isNotEmpty) {
-          List<String> addressList = EscHelper.strToList(str: element.mAddress!, splitLength: 24);
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+          List<String> addressList = EscHelper.splitString(str: element.mAddress!, splitLength: 24);
           for (var address in addressList) {
             bytes += generator.text(
-              EscHelper.alignCenterPrint(width: 24, content: address),
+              address,
               styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2),
               containsChinese: true,
             );
-            bytes += generator.feed(element.mPrinterType == "EPSON" ? 3 : 1);
           }
         }
+
+        bytes += generator.feed(1);
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         //台名单号
         bytes += generator.text(
-          EscHelper.alignCenterPrint(
-              width: 24,
-              content: "檯號/單號: ${element.mTableNo} / ${element.mInvoiceNo!.substring(element.mInvoiceNo!.length - 4)}"),
+          "檯號/單號: ${element.mTableNo} / ${element.mInvoiceNo!.substring(element.mInvoiceNo!.length - 4)}",
           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2),
           containsChinese: true,
         );
-        bytes += generator.feed(element.mPrinterType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(1);
+        //设置左边对齐
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
 
         bytes += generator.text(
           "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "員工", width: 6)}:${EscHelper.columnMaker(content: "${element.mSalesmanCode}", width: 22)}${EscHelper.columnMaker(content: "收銀機", width: 6)}:${EscHelper.columnMaker(content: "${element.mSalesmanCode}", width: 12)}",
@@ -114,8 +115,7 @@ Future<List<String>> printQrCode({
           containsChinese: true,
         );
 
-        bytes += generator.feed(element.mPrinterType == "EPSON" ? 3 : 1);
-
+        bytes += generator.emptyLines(1);
         try {
           final String qrData = element.url!;
           const double qrSize = 300;
@@ -129,15 +129,15 @@ Future<List<String>> printQrCode({
           final qrFile = File(pathName);
           final imgFile = await qrFile.writeAsBytes(uiImg!.buffer.asUint8List());
           final img = decodeImage(imgFile.readAsBytesSync());
-
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.image(img!);
         } catch (e) {
           debugPrint("二维码生成失败: $e");
         }
-
-        bytes += generator.feed(element.mPrinterType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(1);
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: "請掃描上面二維碼自助點餐"),
+          "請掃描上面二維碼自助點餐",
           styles: const PosStyles(
             bold: true,
             width: PosTextSize.size2,
@@ -145,8 +145,9 @@ Future<List<String>> printQrCode({
           ),
           containsChinese: true,
         );
-        bytes += generator.feed(element.mPrinterType == "EPSON" ? 25 : 2);
+        bytes += generator.feed(2);
         bytes += generator.cut();
+        bytes += generator.reset();
         PosPrintResult printing = await printer.printTicket(bytes);
         if (printing.msg == "Success") {
           if (element.mInvoiceNo.toString() != "") {
@@ -165,8 +166,7 @@ Future<List<String>> printQrCode({
 }
 
 ///开始打印厨房单
-Future<List<String>> printkichen(
-    Generator generator, Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
+Future<List<String>> printkichen(Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
   List<String> queueIDs = [];
   // 遍历第一级 Map，即 mLanIP
   for (var entry in printData.entries) {
@@ -191,16 +191,17 @@ Future<List<String>> printkichen(
               ///不连续打印
               for (int i = 0; i < kitchens.length; i++) {
                 List<int> bytes = [];
+                final profile = await CapabilityProfile.load();
+                final generator = Generator(PaperSize.mm80, profile);
+
                 //台号
+                bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
                 bytes += generator.text(
-                  EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[i].mTableNo}"),
+                  "檯:${kitchens[i].mTableNo}",
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
-
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(4);
-                }
+                bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
                 //单号
                 bytes += generator.row([
                   PosColumn(
@@ -244,13 +245,11 @@ Future<List<String>> printkichen(
                       styles:
                           const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
                 ]);
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(2);
-                } else {
-                  bytes += generator.feed(1);
-                }
+
+                bytes += generator.feed(1);
+
                 //名称
-                var printName = EscHelper.strToList(str: kitchens[i].mBarcodeName!, splitLength: 20);
+                var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName!, splitLength: 20);
 
                 if (printName.isNotEmpty) {
                   for (int j = 0; j < printName.length; j++) {
@@ -271,7 +270,7 @@ Future<List<String>> printkichen(
                 }
                 //备注
                 if (kitchens[i].mRemarks != '') {
-                  var printRemarks = EscHelper.strToList(str: kitchens[i].mRemarks ?? "", splitLength: 20);
+                  var printRemarks = EscHelper.splitString(str: kitchens[i].mRemarks ?? "", splitLength: 20);
                   if (printRemarks.isNotEmpty) {
                     for (int k = 0; k < printRemarks.length; k++) {
                       bytes += generator.text(
@@ -294,23 +293,21 @@ Future<List<String>> printkichen(
                     ),
                   );
                 }
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(5);
-                } else {
-                  bytes += generator.feed(1);
-                }
+
+                bytes += generator.feed(1);
+
                 //台号
+                bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
                 bytes += generator.text(
-                  EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[i].mTableNo}"),
+                  "檯:${kitchens[i].mTableNo}",
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(18);
-                } else {
-                  bytes += generator.feed(1);
-                }
+                bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
+                bytes += generator.feed(1);
+
                 bytes += generator.cut();
+                bytes += generator.reset();
                 PosPrintResult printing = await printer.printTicket(bytes);
                 if (printing.msg == "Success") {
                   queueIDs.add("${kitchens[i].queueID}");
@@ -320,16 +317,17 @@ Future<List<String>> printkichen(
               ///连续打印
 
               List<int> bytes = [];
+              final profile = await CapabilityProfile.load();
+              final generator = Generator(PaperSize.mm80, profile);
+
               //台号
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
               bytes += generator.text(
-                EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[0].mTableNo}"),
+                "檯:${kitchens[0].mTableNo}",
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
-
-              if (kitchens.first.mPrinterType != "" && kitchens.first.mPrinterType == "EPSON") {
-                bytes += generator.feed(4);
-              }
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
               //单号
               bytes += generator.row([
                 PosColumn(
@@ -371,15 +369,13 @@ Future<List<String>> printkichen(
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
               ]);
-              if (kitchens.first.mPrinterType != "" && kitchens.first.mPrinterType == "EPSON") {
-                bytes += generator.feed(2);
-              } else {
-                bytes += generator.feed(1);
-              }
+
+              bytes += generator.feed(1);
+
               for (int i = 0; i < kitchens.length; i++) {
                 queueIDs.add("${kitchens[i].queueID}");
                 //名称
-                var printName = EscHelper.strToList(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
+                var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
 
                 if (printName.isNotEmpty) {
                   for (int j = 0; j < printName.length; j++) {
@@ -400,7 +396,7 @@ Future<List<String>> printkichen(
                 }
                 //备注
                 if (kitchens[i].mRemarks != '') {
-                  var printRemarks = EscHelper.strToList(str: kitchens[i].mRemarks ?? "", splitLength: 20);
+                  var printRemarks = EscHelper.splitString(str: kitchens[i].mRemarks ?? "", splitLength: 20);
                   if (printRemarks.isNotEmpty) {
                     for (int k = 0; k < printRemarks.length; k++) {
                       bytes += generator.text(
@@ -419,23 +415,19 @@ Future<List<String>> printkichen(
                     styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
                   );
                 }
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(5);
-                } else {
-                  bytes += generator.feed(1);
-                }
+
+                bytes += generator.feed(1);
               }
               //台号
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
               bytes += generator.text(
-                EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens.first.mTableNo}"),
+                "檯:${kitchens.first.mTableNo}",
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
-
-              if (kitchens.first.mPrinterType != "" && kitchens.first.mPrinterType == "EPSON") {
-                bytes += generator.feed(18);
-              }
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
               bytes += generator.cut();
+              bytes += generator.reset();
               await printer.printTicket(bytes);
             }
           }
@@ -451,8 +443,7 @@ Future<List<String>> printkichen(
 }
 
 //打印BDL单
-Future<List<String>> printBDL(
-    Generator generator, Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
+Future<List<String>> printBDL(Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
   List<String> queueIDs = [];
   // 遍历第一级 Map，即 mLanIP
   for (var entry in printData.entries) {
@@ -477,23 +468,25 @@ Future<List<String>> printBDL(
               ///不连续打印
               for (int i = 0; i < kitchens.length; i++) {
                 List<int> bytes = [];
-                //上菜单
-                bytes += generator.text(
-                  EscHelper.alignCenterPrint(width: 16, content: "出菜單"),
-                  styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
-                  containsChinese: true,
-                );
-                bytes += generator.feed(kitchens.first.bDLPrinterType == "EPSON" ? 3 : 1);
-                //台号
-                bytes += generator.text(
-                  EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[i].mTableNo}"),
-                  styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
-                  containsChinese: true,
-                );
+                final profile = await CapabilityProfile.load();
+                final generator = Generator(PaperSize.mm80, profile);
 
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(4);
-                }
+                //上菜单
+                bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+                bytes += generator.text(
+                  "出菜單",
+                  styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
+                  containsChinese: true,
+                );
+                bytes += generator.feed(1);
+                //台号
+                bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+                bytes += generator.text(
+                  "檯:${kitchens[i].mTableNo}",
+                  styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
+                  containsChinese: true,
+                );
+                bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
                 //单号
                 bytes += generator.row([
                   PosColumn(
@@ -537,13 +530,11 @@ Future<List<String>> printBDL(
                       styles:
                           const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
                 ]);
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(2);
-                } else {
-                  bytes += generator.feed(1);
-                }
+
+                bytes += generator.feed(1);
+
                 //名称
-                var printName = EscHelper.strToList(str: kitchens[i].mBarcodeName!, splitLength: 20);
+                var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName!, splitLength: 20);
 
                 if (printName.isNotEmpty) {
                   for (int j = 0; j < printName.length; j++) {
@@ -564,7 +555,7 @@ Future<List<String>> printBDL(
                 }
                 //备注
                 if (kitchens[i].mRemarks != '') {
-                  var printRemarks = EscHelper.strToList(str: kitchens[i].mRemarks ?? "", splitLength: 20);
+                  var printRemarks = EscHelper.splitString(str: kitchens[i].mRemarks ?? "", splitLength: 20);
                   if (printRemarks.isNotEmpty) {
                     for (int k = 0; k < printRemarks.length; k++) {
                       bytes += generator.text(
@@ -587,23 +578,21 @@ Future<List<String>> printBDL(
                     ),
                   );
                 }
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(5);
-                } else {
-                  bytes += generator.feed(1);
-                }
+
+                bytes += generator.feed(1);
+
                 //台号
+                bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
                 bytes += generator.text(
-                  EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[i].mTableNo}"),
+                  "檯:${kitchens[i].mTableNo}",
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(18);
-                } else {
-                  bytes += generator.feed(1);
-                }
+
+                bytes += generator.feed(1);
+
                 bytes += generator.cut();
+                bytes += generator.reset();
                 PosPrintResult printing = await printer.printTicket(bytes);
                 if (printing.msg == "Success") {
                   queueIDs.add("${kitchens[i].queueID}");
@@ -612,23 +601,25 @@ Future<List<String>> printBDL(
             } else {
               ///连续打印
               List<int> bytes = [];
-              //上菜单
-              bytes += generator.text(
-                EscHelper.alignCenterPrint(width: 16, content: "出菜單"),
-                styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
-                containsChinese: true,
-              );
-              bytes += generator.feed(kitchens.first.bDLPrinterType == "EPSON" ? 3 : 1);
-              //台号
-              bytes += generator.text(
-                EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens[0].mTableNo}"),
-                styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
-                containsChinese: true,
-              );
+              final profile = await CapabilityProfile.load();
+              final generator = Generator(PaperSize.mm80, profile);
 
-              if (kitchens.first.mPrinterType != "" && kitchens.first.mPrinterType == "EPSON") {
-                bytes += generator.feed(4);
-              }
+              //上菜单
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+              bytes += generator.text(
+                "出菜單",
+                styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
+                containsChinese: true,
+              );
+              bytes += generator.feed(1);
+              //台号
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+              bytes += generator.text(
+                "檯:${kitchens[0].mTableNo}",
+                styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
+                containsChinese: true,
+              );
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
               //单号
               bytes += generator.row([
                 PosColumn(
@@ -670,15 +661,13 @@ Future<List<String>> printBDL(
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
               ]);
-              if (kitchens.first.mPrinterType != "" && kitchens.first.mPrinterType == "EPSON") {
-                bytes += generator.feed(2);
-              } else {
-                bytes += generator.feed(1);
-              }
+
+              bytes += generator.feed(1);
+
               for (int i = 0; i < kitchens.length; i++) {
                 queueIDs.add("${kitchens[i].queueID}");
                 //名称
-                var printName = EscHelper.strToList(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
+                var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
 
                 if (printName.isNotEmpty) {
                   for (int j = 0; j < printName.length; j++) {
@@ -699,7 +688,7 @@ Future<List<String>> printBDL(
                 }
                 //备注
                 if (kitchens[i].mRemarks != '') {
-                  var printRemarks = EscHelper.strToList(str: kitchens[i].mRemarks ?? "", splitLength: 20);
+                  var printRemarks = EscHelper.splitString(str: kitchens[i].mRemarks ?? "", splitLength: 20);
                   if (printRemarks.isNotEmpty) {
                     for (int k = 0; k < printRemarks.length; k++) {
                       bytes += generator.text(
@@ -718,23 +707,19 @@ Future<List<String>> printBDL(
                     styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
                   );
                 }
-                if (kitchens[i].mPrinterType != "" && kitchens[i].mPrinterType == "EPSON") {
-                  bytes += generator.feed(5);
-                } else {
-                  bytes += generator.feed(1);
-                }
+
+                bytes += generator.feed(1);
               }
               //台号
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
               bytes += generator.text(
-                EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens.first.mTableNo}"),
+                "檯:${kitchens.first.mTableNo}",
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
-
-              if (kitchens.first.mPrinterType != "" && kitchens.first.mPrinterType == "EPSON") {
-                bytes += generator.feed(18);
-              }
+              bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
               bytes += generator.cut();
+              bytes += generator.reset();
               if (bytes.isNotEmpty) {
                 await printer.printTicket(bytes);
               }
@@ -753,8 +738,7 @@ Future<List<String>> printBDL(
 
 ///开始打印其它厨房单
 ///d.mIsPrint P正常 PF 追单 PM 改单 PD  删单 PT  转台单 (pd改为D,其它改为Y)
-Future<List<Map<String, dynamic>>> printOtherkichen(
-    Generator generator, List<Kitchen> printData, int isPrintPrice) async {
+Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int isPrintPrice) async {
   List<Map<String, dynamic>> resultList = [];
   Map<String, Set<int>> resultMap = {};
   for (var kitchens in printData) {
@@ -763,6 +747,9 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
 
     if (connect == PosPrintResult.success) {
       List<int> bytes = [];
+      final profile = await CapabilityProfile.load();
+      final generator = Generator(PaperSize.mm80, profile);
+
       String content = "";
       switch (kitchens.mIsPrint) {
         case "PF":
@@ -778,22 +765,21 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
         default:
           content = "";
       }
+      bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
       bytes += generator.text(
-        EscHelper.alignCenterPrint(width: 16, content: content),
+        content,
         styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
         containsChinese: true,
       );
 
       //台号
+      bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
       bytes += generator.text(
-        EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens.mTableNo}"),
+        "檯:${kitchens.mTableNo}",
         styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
         containsChinese: true,
       );
-
-      if (kitchens.mPrinterType != "" && kitchens.mPrinterType == "EPSON") {
-        bytes += generator.feed(4);
-      }
+      bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
       //单号
       bytes += generator.row([
         PosColumn(
@@ -836,13 +822,11 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
             containsChinese: true,
             styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
       ]);
-      if (kitchens.mPrinterType != "" && kitchens.mPrinterType == "EPSON") {
-        bytes += generator.feed(2);
-      } else {
-        bytes += generator.feed(1);
-      }
+
+      bytes += generator.feed(1);
+
       //名称
-      var printName = EscHelper.strToList(str: kitchens.mBarcodeName!, splitLength: 20);
+      var printName = EscHelper.splitString(str: kitchens.mBarcodeName!, splitLength: 20);
 
       if (printName.isNotEmpty) {
         for (int j = 0; j < printName.length; j++) {
@@ -862,7 +846,7 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
       }
       //备注
       if (kitchens.mRemarks != '') {
-        var printRemarks = EscHelper.strToList(str: kitchens.mRemarks ?? "", splitLength: 20);
+        var printRemarks = EscHelper.splitString(str: kitchens.mRemarks ?? "", splitLength: 20);
         if (printRemarks.isNotEmpty) {
           for (int k = 0; k < printRemarks.length; k++) {
             bytes += generator.text(
@@ -885,24 +869,21 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
           ),
         );
       }
-      if (kitchens.mPrinterType != "" && kitchens.mPrinterType == "EPSON") {
-        bytes += generator.feed(5);
-      } else {
-        bytes += generator.feed(1);
-      }
+
+      bytes += generator.feed(1);
+
       //台号
+      bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
       bytes += generator.text(
-        EscHelper.alignCenterPrint(width: 16, content: "檯:${kitchens.mTableNo}"),
+        "檯:${kitchens.mTableNo}",
         styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
         containsChinese: true,
       );
-      if (kitchens.mPrinterType != "" && kitchens.mPrinterType == "EPSON") {
-        bytes += generator.feed(18);
-      } else {
-        bytes += generator.feed(1);
-      }
+
+      bytes += generator.feed(1);
 
       bytes += generator.cut();
+      bytes += generator.reset();
       PosPrintResult printing = await printer.printTicket(bytes);
       if (printing.msg == "Success") {
         String mIsPrint = kitchens.mIsPrint!;
@@ -931,10 +912,7 @@ Future<List<Map<String, dynamic>>> printOtherkichen(
 }
 
 ///执行打印上菜单
-Future<List<String>> printOnTheMeun({
-  required Generator generator,
-  required UpperMenu printdata,
-}) async {
+Future<List<String>> printOnTheMeun({required UpperMenu printdata}) async {
   Set<String> queueID = {};
   try {
     List<UpperMenuData> upperMenuData = printdata.upperMenuData!;
@@ -946,18 +924,22 @@ Future<List<String>> printOnTheMeun({
       if (connect == PosPrintResult.success) {
         for (var item in upperGroup.entries) {
           List<int> bytes = [];
+          final profile = await CapabilityProfile.load();
+          final generator = Generator(PaperSize.mm80, profile);
+
           List<UpperMenuData> upperGroupValue = item.value;
           //上菜单
-
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 16, content: "點餐記錄"),
+            "點餐記錄",
             styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
             containsChinese: true,
           );
           bytes += generator.feed(1);
           //台号
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 16, content: "檯:${upperGroupValue.first.mTableNo}"),
+            "檯:${upperGroupValue.first.mTableNo}",
             styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
             containsChinese: true,
           );
@@ -992,7 +974,7 @@ Future<List<String>> printOnTheMeun({
           bytes += generator.hr();
           for (var upper in upperGroupValue) {
             //名稱
-            final printName = EscHelper.strToList(str: upper.mBarcodeName ?? "", splitLength: 30);
+            final printName = EscHelper.splitString(str: upper.mBarcodeName ?? "", splitLength: 30);
             if (printName.isNotEmpty) {
               for (int i = 0; i < printName.length; i++) {
                 bytes += generator.text(
@@ -1003,7 +985,7 @@ Future<List<String>> printOnTheMeun({
               }
             }
             //備註
-            final printRemaks = EscHelper.strToList(str: upper.mRemarks ?? "", splitLength: 29);
+            final printRemaks = EscHelper.splitString(str: upper.mRemarks ?? "", splitLength: 29);
             for (int k = 0; k < printRemaks.length; k++) {
               bytes += generator.text(
                 "${EscHelper.columnMaker(content: "", width: 10)}${EscHelper.columnMaker(content: printRemaks[k], width: 38)}",
@@ -1039,10 +1021,11 @@ Future<List<String>> printOnTheMeun({
               Barcode.code39(
                 "${upperGroupValue.first.mInvoiceNo}".split(""),
               ),
-              height: printdata.mPrinterType == "EPSON" ? 220 : 60);
+              height: 60);
 
-          bytes += generator.feed(printdata.mPrinterType == "EPSON" ? 20 : 1);
+          bytes += generator.feed(1);
           bytes += generator.cut();
+          bytes += generator.reset();
           await printer.printTicket(bytes);
         }
         printer.disconnect();
@@ -1057,10 +1040,7 @@ Future<List<String>> printOnTheMeun({
 }
 
 ///执行打印客户记录
-Future<List<String>> printCustomerRecord({
-  required Generator generator,
-  required List<Receipt> printdata,
-}) async {
+Future<List<String>> printCustomerRecord({required List<Receipt> printdata}) async {
   Set<String> queueID = {};
 
   try {
@@ -1070,41 +1050,48 @@ Future<List<String>> printCustomerRecord({
     if (connect == PosPrintResult.success) {
       for (var item in printdata) {
         List<int> bytes = [];
+        final profile = await CapabilityProfile.load();
+        final generator = Generator(PaperSize.mm80, profile);
+
         //中文名称
         if (item.mNameChinese != null && item.mNameChinese!.isNotEmpty) {
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 24, content: "${item.mNameChinese}"),
+            "${item.mNameChinese}",
             styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
             containsChinese: true,
           );
-          bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+          bytes += generator.feed(1);
         }
         //英文名称
         if (item.mNameEnglish != null && item.mNameEnglish!.isNotEmpty) {
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 24, content: "${item.mNameEnglish}"),
+            "${item.mNameEnglish}",
             styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
             containsChinese: true,
           );
-          bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+          bytes += generator.feed(1);
         }
         //地址
         if (item.mAddress != null && item.mAddress!.isNotEmpty) {
-          List<String> addressList = EscHelper.strToList(str: item.mAddress!, splitLength: 24);
+          List<String> addressList = EscHelper.splitString(str: item.mAddress!, splitLength: 24);
           for (var address in addressList) {
+            bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
             bytes += generator.text(
-              EscHelper.alignCenterPrint(width: 24, content: address),
+              address,
               styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2),
               containsChinese: true,
             );
-            bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+            bytes += generator.feed(1);
           }
         }
-
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
         bytes += generator.feed(1);
         bytes += generator.hr();
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: "客戶記錄"),
+          "客戶記錄",
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
@@ -1145,7 +1132,7 @@ Future<List<String>> printCustomerRecord({
         if (detail.isNotEmpty) {
           bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
           for (int i = 0; i < detail.length; i++) {
-            var printName = EscHelper.strToList(str: detail[i].mPrintName ?? "", splitLength: 34);
+            var printName = EscHelper.splitString(str: detail[i].mPrintName ?? "", splitLength: 34);
             for (int j = 0; j < printName.length; j++) {
               if (j == 0) {
                 bytes += generator.text(
@@ -1200,10 +1187,11 @@ Future<List<String>> printCustomerRecord({
             Barcode.code39(
               item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split(""),
             ),
-            height: item.mPrinterType == "EPSON" ? 220 : 60);
+            height: 60);
 
-        bytes += generator.feed(item.mPrinterType == "EPSON" ? 20 : 1);
+        bytes += generator.feed(1);
         bytes += generator.cut();
+        bytes += generator.reset();
         PosPrintResult printing = await printer.printTicket(bytes);
         if (printing.msg == "Success") {
           queueID.add("${item.queueID}");
@@ -1220,10 +1208,7 @@ Future<List<String>> printCustomerRecord({
 }
 
 ///执行打印收据记录
-Future<List<String>> printRecipt({
-  required Generator generator,
-  required List<Receipt> printdata,
-}) async {
+Future<List<String>> printRecipt({required List<Receipt> printdata}) async {
   Set<String> queueID = {};
 
   try {
@@ -1233,41 +1218,47 @@ Future<List<String>> printRecipt({
     if (connect == PosPrintResult.success) {
       for (var item in printdata) {
         List<int> bytes = [];
+        final profile = await CapabilityProfile.load();
+        final generator = Generator(PaperSize.mm80, profile);
+
         //中文名称
         if (item.mNameChinese != null && item.mNameChinese!.isNotEmpty) {
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 24, content: "${item.mNameChinese}"),
+            "${item.mNameChinese}",
             styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
             containsChinese: true,
           );
-          bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+          bytes += generator.feed(1);
         }
         //英文名称
         if (item.mNameEnglish != null && item.mNameEnglish!.isNotEmpty) {
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 24, content: "${item.mNameEnglish}"),
+            "${item.mNameEnglish}",
             styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
             containsChinese: true,
           );
-          bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+          bytes += generator.feed(1);
         }
         //地址
         if (item.mAddress != null && item.mAddress!.isNotEmpty) {
-          List<String> addressList = EscHelper.strToList(str: item.mAddress!, splitLength: 24);
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+          List<String> addressList = EscHelper.splitString(str: item.mAddress!, splitLength: 24);
           for (var address in addressList) {
             bytes += generator.text(
-              EscHelper.alignCenterPrint(width: 24, content: address),
+              address,
               styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2),
               containsChinese: true,
             );
-            bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+            bytes += generator.feed(1);
           }
         }
 
         bytes += generator.feed(1);
         bytes += generator.hr();
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: "收據"),
+          "收據",
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
@@ -1308,7 +1299,7 @@ Future<List<String>> printRecipt({
         if (detail.isNotEmpty) {
           bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
           for (int i = 0; i < detail.length; i++) {
-            var printName = EscHelper.strToList(str: detail[i].mPrintName ?? "", splitLength: 34);
+            var printName = EscHelper.splitString(str: detail[i].mPrintName ?? "", splitLength: 34);
             for (int j = 0; j < printName.length; j++) {
               if (j == 0) {
                 bytes += generator.text(
@@ -1391,10 +1382,11 @@ Future<List<String>> printRecipt({
             Barcode.code39(
               item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split(""),
             ),
-            height: item.mPrinterType == "EPSON" ? 220 : 60);
+            height: 60);
 
-        bytes += generator.feed(item.mPrinterType == "EPSON" ? 20 : 1);
+        bytes += generator.feed(1);
         bytes += generator.cut();
+        bytes += generator.reset();
         PosPrintResult printing = await printer.printTicket(bytes);
         if (printing.msg == "Success") {
           queueID.add("${item.queueID}");
@@ -1411,7 +1403,7 @@ Future<List<String>> printRecipt({
 }
 
 ///执行弹框
-Future<bool> openDrawer({required Generator generator, required OpenDrawer printData}) async {
+Future<bool> openDrawer({required OpenDrawer printData}) async {
   try {
     final printer = PrinterNetworkManager(printData.iP!);
     PosPrintResult connect = await printer.connect();
@@ -1422,7 +1414,11 @@ Future<bool> openDrawer({required Generator generator, required OpenDrawer print
 
       if (queueID.isNotEmpty) {
         List<int> bytes = [];
+        final profile = await CapabilityProfile.load();
+        final generator = Generator(PaperSize.mm80, profile);
+
         bytes += generator.rawBytes(EscHelper.openCashDrawer().codeUnits);
+        bytes += generator.reset();
         await printer.printTicket(bytes);
       }
       printer.disconnect();
@@ -1438,10 +1434,7 @@ Future<bool> openDrawer({required Generator generator, required OpenDrawer print
 }
 
 ///执行打印外卖
-Future<List<String>> printTakeaway({
-  required Generator generator,
-  required List<Takeaway> printdata,
-}) async {
+Future<List<String>> printTakeaway({required List<Takeaway> printdata}) async {
   Set<String> queueID = {};
 
   try {
@@ -1452,24 +1445,25 @@ Future<List<String>> printTakeaway({
       for (var item in printdata) {
         logger.i("打印开始:${item.toJson()}");
         List<int> bytes = [];
+        final profile = await CapabilityProfile.load();
+        final generator = Generator(PaperSize.mm80, profile);
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         //手机外卖
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: "外賣訂單"),
+          "外賣訂單",
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(1);
 
         //单号
 
         bytes += generator.text(
-          EscHelper.alignCenterPrint(
-              width: 24,
-              content: "#${item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4, item.mInvoiceNo!.length)}"),
+          "#${item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4, item.mInvoiceNo!.length)}",
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
-        bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+        bytes += generator.feed(1);
 
         //mCustTel(0自取1送餐) mCustFax(0儘快1預約時間)
         String method = "";
@@ -1498,8 +1492,9 @@ Future<List<String>> printTakeaway({
         }
 
         if (method != "" && method.isNotEmpty) {
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            EscHelper.alignCenterPrint(width: 24, content: method),
+            method,
             styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
             containsChinese: true,
           );
@@ -1507,27 +1502,29 @@ Future<List<String>> printTakeaway({
 
         //地址
         if (address != "" && address.isNotEmpty) {
-          bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
-          List<String> addressList = EscHelper.strToList2(str: address, splitLength: 48);
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+          bytes += generator.feed(1);
+          List<String> addressList = EscHelper.splitString(str: address, splitLength: 48);
           logger.i("打印地址:$addressList");
           for (var addressItem in addressList) {
             bytes += generator.text(
-              EscHelper.alignCenterPrint(width: 48, content: addressItem),
+              addressItem,
               styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size1),
               containsChinese: true,
             );
           }
-          bytes += generator.feed(item.mPrinterType == "EPSON" ? 3 : 1);
+          bytes += generator.feed(1);
         }
+        bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         //时间
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: DateFormat('yyyy-MM-dd HH:mm:ss').format(item.mInvoiceDate!)),
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(item.mInvoiceDate!),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         //电话
         bytes += generator.text(
-          EscHelper.alignCenterPrint(width: 24, content: item.mCustomerCode!.replaceFirst("+852", "+852 ")),
+          item.mCustomerCode!.replaceFirst("+852", "+852 "),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
@@ -1541,7 +1538,7 @@ Future<List<String>> printTakeaway({
           for (var detail in details) {
             for (var li in detail.entries) {
               //父商品名称
-              final List mPrintNameList = EscHelper.strToList(str: li.value.mBarcodeName ?? "", splitLength: 32);
+              final List mPrintNameList = EscHelper.splitString(str: li.value.mBarcodeName ?? "", splitLength: 32);
               if (mPrintNameList.isNotEmpty) {
                 for (var i = 0; i < mPrintNameList.length; i++) {
                   bytes += generator.text(
@@ -1554,7 +1551,7 @@ Future<List<String>> printTakeaway({
               List<InvoiceDetail>? child = li.value.children;
               if (child != null && child.isNotEmpty) {
                 for (var childItem in child) {
-                  final List mPrintNameList = EscHelper.strToList(str: childItem.mBarcodeName ?? "", splitLength: 32);
+                  final List mPrintNameList = EscHelper.splitString(str: childItem.mBarcodeName ?? "", splitLength: 32);
                   if (mPrintNameList.isNotEmpty) {
                     for (var i = 0; i < mPrintNameList.length; i++) {
                       //套餐商品名称
@@ -1565,7 +1562,7 @@ Future<List<String>> printTakeaway({
                       //套餐商品备注
                       final mRemarks = childItem.mRemarks;
                       if (mRemarks != null && mRemarks.isNotEmpty) {
-                        final List mPrintRemarksList = EscHelper.strToList(str: childItem.mRemarks!, splitLength: 36);
+                        final List mPrintRemarksList = EscHelper.splitString(str: childItem.mRemarks!, splitLength: 36);
                         for (var remarksItem in mPrintRemarksList) {
                           bytes += generator.text(
                             "${EscHelper.columnMaker(content: "", width: 6)}${EscHelper.columnMaker(content: "$remarksItem", width: 36)}${EscHelper.columnMaker(content: "", width: 6, align: 2)}",
@@ -1589,9 +1586,10 @@ Future<List<String>> printTakeaway({
             Barcode.code39(
               item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split(""),
             ),
-            height: item.mPrinterType == "EPSON" ? 220 : 60);
-        bytes += generator.feed(item.mPrinterType == "EPSON" ? 20 : 1);
+            height: 60);
+        bytes += generator.feed(1);
         bytes += generator.cut();
+        bytes += generator.reset();
         PosPrintResult printing = await printer.printTicket(bytes);
         if (printing.msg == "Success") {
           queueID.add("${item.queueId}");
