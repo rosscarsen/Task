@@ -41,7 +41,7 @@ dependencies:
   #国际化
   intl: ^0.19.0
   #日志
-  logger: ^2.4.0
+  logger: ^2.5.0
   #路径
   path_provider: ^2.1.4
   #二维码

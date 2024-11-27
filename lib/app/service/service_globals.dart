@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
 
 import '../config.dart';
 import '../model/printer_model.dart';
@@ -20,6 +21,7 @@ Timer? cacheTimer;
 
 /// 定义一个ApiClient类型的变量，用于调用API
 final ApiClient apiClient = ApiClient();
+final Logger logger = Logger();
 
 /// 获取打印数据
 Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
@@ -66,6 +68,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           ///打印不是正常单位的厨房单据
           if (otherKitchen.isNotEmpty) {
             List<Map<String, dynamic>> tempOtherIDs = await printOtherkichen(otherKitchen, ret.isPrintPrice!);
+
             if (tempOtherIDs.isNotEmpty) {
               printedKitchen.addAll(tempOtherIDs);
             }
@@ -114,28 +117,31 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           });
           bDLData.removeWhere((key, value) => key.isEmpty);
 
-          List<String> kitchenInvocie = [];
+          List<String> printedQueueIDS = [];
+          List<String> printerDetailIDS = [];
 
           ///打印厨房
           if (kitchenData.isNotEmpty) {
-            List<String> tempKitchenInvoice = await printkichen(kitchenData, ret.isPrintPrice!);
+            Map<String, List<String>> tempKitchenInvoice = await printkichen(kitchenData, ret.isPrintPrice!);
             if (tempKitchenInvoice.isNotEmpty) {
-              kitchenInvocie.addAll(tempKitchenInvoice);
+              printedQueueIDS.addAll(tempKitchenInvoice["queueID"]!);
+              printerDetailIDS.addAll(tempKitchenInvoice["detailID"]!);
             }
           }
 
           ///打印班地尼
           if (bDLData.isNotEmpty) {
-            List<String> tempBDLInvoice = await printBDL(bDLData, ret.isPrintPrice!);
+            Map<String, List<String>> tempBDLInvoice = await printBDL(bDLData, ret.isPrintPrice!);
             if (tempBDLInvoice.isNotEmpty) {
-              kitchenInvocie.addAll(tempBDLInvoice);
+              printedQueueIDS.addAll(tempBDLInvoice["queueID"]!);
+              printerDetailIDS.addAll(tempBDLInvoice["detailID"]!);
             }
           }
 
-          List<String> uniqueKitchenInvoice = kitchenInvocie.toSet().toList();
-
-          if (uniqueKitchenInvoice.isNotEmpty) {
-            printedKitchen.add({"queueID": uniqueKitchenInvoice, "mIsPrint": "P"});
+          List<String> uniqueQueueIDS = printedQueueIDS.toSet().toList();
+          List<String> uniqueDetailIDS = printerDetailIDS.toSet().toList();
+          if (uniqueQueueIDS.isNotEmpty) {
+            printedKitchen.add({"queueID": uniqueQueueIDS, "mIsPrint": "P", "detailID": uniqueDetailIDS});
           }
           if (printedKitchen.isNotEmpty) {
             queueIDs.addAll([
@@ -191,7 +197,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           }
         }
 
-        //logger.f(jsonEncode(queueIDs));
+        logger.f(jsonEncode(queueIDs));
 
         ///发票号码发送给后端
         if (queueIDs.isNotEmpty) {

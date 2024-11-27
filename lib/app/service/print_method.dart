@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_esc_pos_network/flutter_esc_pos_network.dart';
 import 'package:image/image.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -17,8 +16,6 @@ import '../model/printer_model.dart';
 import '../utils/esc_helper.dart';
 import '../utils/stroage_manage.dart';
 import 'service_globals.dart';
-
-final Logger logger = Logger();
 
 ///发送已打印队列ids到后端
 Future<bool> deleteQueue(Map<String, dynamic> queryData, List queueIDs) async {
@@ -166,8 +163,10 @@ Future<List<String>> printQrCode({required List<QrCodeData> printData}) async {
 }
 
 ///开始打印厨房单
-Future<List<String>> printkichen(Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
-  List<String> queueIDs = [];
+Future<Map<String, List<String>>> printkichen(
+    Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
+  List<String> queueID = [];
+  List<String> detailID = [];
   // 遍历第一级 Map，即 mLanIP
   for (var entry in printData.entries) {
     final ip = entry.key;
@@ -310,7 +309,8 @@ Future<List<String>> printkichen(Map<String, Map<String, Map<int, List<Kitchen>>
                 bytes += generator.reset();
                 PosPrintResult printing = await printer.printTicket(bytes);
                 if (printing.msg == "Success") {
-                  queueIDs.add("${kitchens[i].queueID}");
+                  queueID.add("${kitchens[i].queueID}");
+                  detailID.add("${kitchens[i].mInvoiceDetailID}");
                 }
               }
             } else {
@@ -373,7 +373,6 @@ Future<List<String>> printkichen(Map<String, Map<String, Map<int, List<Kitchen>>
               bytes += generator.feed(1);
 
               for (int i = 0; i < kitchens.length; i++) {
-                queueIDs.add("${kitchens[i].queueID}");
                 //名称
                 var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
 
@@ -428,7 +427,11 @@ Future<List<String>> printkichen(Map<String, Map<String, Map<int, List<Kitchen>>
               bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
               bytes += generator.cut();
               bytes += generator.reset();
-              await printer.printTicket(bytes);
+              PosPrintResult printing = await printer.printTicket(bytes);
+              if (printing.msg == "Success") {
+                queueID.addAll(kitchens.map((kitchen) => kitchen.queueID.toString()).toList());
+                detailID.addAll(kitchens.map((kitchen) => kitchen.mInvoiceDetailID.toString()).toList());
+              }
             }
           }
         }
@@ -439,12 +442,14 @@ Future<List<String>> printkichen(Map<String, Map<String, Map<int, List<Kitchen>>
       }
     }
   }
-  return queueIDs.toSet().toList();
+  return {"queueID": queueID.toSet().toList(), "detailID": detailID.toSet().toList()};
 }
 
 //打印BDL单
-Future<List<String>> printBDL(Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
-  List<String> queueIDs = [];
+Future<Map<String, List<String>>> printBDL(
+    Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
+  List<String> queueID = [];
+  List<String> detailID = [];
   // 遍历第一级 Map，即 mLanIP
   for (var entry in printData.entries) {
     final ip = entry.key;
@@ -595,7 +600,8 @@ Future<List<String>> printBDL(Map<String, Map<String, Map<int, List<Kitchen>>>> 
                 bytes += generator.reset();
                 PosPrintResult printing = await printer.printTicket(bytes);
                 if (printing.msg == "Success") {
-                  queueIDs.add("${kitchens[i].queueID}");
+                  queueID.add("${kitchens[i].queueID}");
+                  detailID.add("${kitchens[i].mInvoiceDetailID}");
                 }
               }
             } else {
@@ -665,7 +671,6 @@ Future<List<String>> printBDL(Map<String, Map<String, Map<int, List<Kitchen>>>> 
               bytes += generator.feed(1);
 
               for (int i = 0; i < kitchens.length; i++) {
-                queueIDs.add("${kitchens[i].queueID}");
                 //名称
                 var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
 
@@ -721,7 +726,11 @@ Future<List<String>> printBDL(Map<String, Map<String, Map<int, List<Kitchen>>>> 
               bytes += generator.cut();
               bytes += generator.reset();
               if (bytes.isNotEmpty) {
-                await printer.printTicket(bytes);
+                PosPrintResult printing = await printer.printTicket(bytes);
+                if (printing.msg == "Success") {
+                  queueID.addAll(kitchens.map((kitchen) => kitchen.queueID.toString()).toList());
+                  detailID.addAll(kitchens.map((kitchen) => kitchen.mInvoiceDetailID.toString()).toList());
+                }
               }
             }
           }
@@ -733,14 +742,13 @@ Future<List<String>> printBDL(Map<String, Map<String, Map<int, List<Kitchen>>>> 
       }
     }
   }
-  return queueIDs.toSet().toList();
+  return {"queueID": queueID.toSet().toList(), "detailID": detailID.toSet().toList()};
 }
 
 ///开始打印其它厨房单
 ///d.mIsPrint P正常 PF 追单 PM 改单 PD  删单 PT  转台单 (pd改为D,其它改为Y)
 Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int isPrintPrice) async {
   List<Map<String, dynamic>> resultList = [];
-  Map<String, Set<int>> resultMap = {};
   for (var kitchens in printData) {
     final printer = PrinterNetworkManager(kitchens.mLanIP!);
     PosPrintResult connect = await printer.connect();
@@ -888,26 +896,17 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
       if (printing.msg == "Success") {
         String mIsPrint = kitchens.mIsPrint!;
         int queueID = kitchens.queueID!;
-
-        if (!resultMap.containsKey(mIsPrint)) {
-          resultMap[mIsPrint] = {};
-        }
-        if (resultMap.containsKey(mIsPrint)) {
-          resultMap[mIsPrint]!.add(queueID);
-        } else {
-          resultMap[mIsPrint] = {queueID};
-        }
+        int detailID = kitchens.mInvoiceDetailID!;
+        resultList.add({
+          "mIsPrint": mIsPrint,
+          "queueID": [queueID],
+          "detailID": [detailID],
+        });
       }
       printer.disconnect();
     }
   }
 
-  for (var entry in resultMap.entries) {
-    resultList.add({
-      "mIsPrint": entry.key, // entry.key 是 mIsPrint
-      "queueID": entry.value.toList() // entry.value 是 Set<int>，转换为 List<int>
-    });
-  }
   return resultList;
 }
 

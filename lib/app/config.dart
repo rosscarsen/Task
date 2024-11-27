@@ -1,6 +1,6 @@
 class Config {
   ///网络请求地址
-  static String baseurl = "https://flutterpos.friendsclub.com/BackgroundPrint";
+  static String baseurl = "https://flutterpos.friendsclub.com/Task";
 
   //登录
   static String login = "/login";
