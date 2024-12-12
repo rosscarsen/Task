@@ -129,7 +129,7 @@
 
 ### Android 安装包下载
 
-[**Android task.apk 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.1/Task1122.apk)
+[**Android task.apk 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.2/Task1127.apk)
 
 ### 下载后无需多的设定，直接安装即可使用
 
@@ -141,7 +141,7 @@
 
 #### windows 安装包下载
 
-[**Windows task.msix 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.1/task.msix)
+[**Windows task.msix 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.2/Task1127.apk)
 
 #### 安装说明
 
