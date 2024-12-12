@@ -64,6 +64,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   void initUrl() {
     var loginUserJson = storageManage.read(Config.localStroageloginInfo);
     String localeString = storageManage.read(Config.localStroagelanguage) ?? "zh_HK";
+
     String webLang = localeString == "zh_CN"
         ? "zh-cn"
         : localeString == "en_US"
@@ -71,8 +72,16 @@ class HomeController extends GetxController with WidgetsBindingObserver {
             : 'zh-tw';
 
     final UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
+    print(loginUser!.webSit!);
     initWebUrl =
-        "${loginUser!.webSit}/?l=$webLang&cashier=${loginUser.station}&user=${loginUser.userCode}&pwd=${loginUser.pwd}";
+        "${ensureHttps(loginUser!.webSit!)}/?l=$webLang&cashier=${loginUser.station}&user=${loginUser.userCode}&pwd=${loginUser.pwd}";
+  }
+
+  /// 确保URL以https开头
+  String ensureHttps(String url) {
+    final uri = Uri.parse(url);
+    final updatedUri = uri.scheme == 'http' ? uri.replace(scheme: 'https') : uri;
+    return updatedUri.toString();
   }
 
   ///初始化weview
