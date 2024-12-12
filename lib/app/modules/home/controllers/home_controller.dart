@@ -72,7 +72,6 @@ class HomeController extends GetxController with WidgetsBindingObserver {
             : 'zh-tw';
 
     final UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
-    print(loginUser!.webSit!);
     initWebUrl =
         "${ensureHttps(loginUser!.webSit!)}/?l=$webLang&cashier=${loginUser.station}&user=${loginUser.userCode}&pwd=${loginUser.pwd}";
   }
