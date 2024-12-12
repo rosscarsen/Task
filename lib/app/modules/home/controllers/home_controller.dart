@@ -120,7 +120,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       return;
     }
     final bool hasTask = storageManage.read(Config.localStroageStartTask);
-    if (Platform.isAndroid && hasTask) {
+    if ((Platform.isAndroid || Platform.isIOS) && hasTask) {
       var ret = await _service.isRunning();
       if (!ret) {
         _service.startService();
@@ -133,7 +133,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   ///关闭打印服务
   Future closeService() async {
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid || Platform.isIOS) {
       var ret = await _service.isRunning();
       if (ret) {
         _service.invoke("stopService");
