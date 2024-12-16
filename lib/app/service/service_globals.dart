@@ -30,7 +30,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
   printStatus = false;
   try {
     var response = await apiClient.post(Config.getData, data: {"loginUserInfo": jsonEncode(queryData)});
-    //logger.d("打印数据：${response.data}");
+    //logger.d("===>${response.data}");
     if (response.statusCode == 200) {
       if (response.data != null) {
         PrinterModel ret = PrinterModel.fromJson(response.data);
@@ -197,7 +197,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           }
         }
 
-        logger.f(jsonEncode(queueIDs));
+        //logger.f(jsonEncode(queueIDs));
 
         ///发票号码发送给后端
         if (queueIDs.isNotEmpty) {

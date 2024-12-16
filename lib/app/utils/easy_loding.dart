@@ -53,7 +53,7 @@ showLoding(String msg) {
     ..backgroundColor = Colors.black
     ..indicatorColor = Colors.white
     ..textColor = Colors.white
-    ..maskColor = Colors.black.withOpacity(0.5)
+    ..maskColor=Colors.black.withValues(alpha: 0.5)
     ..userInteractions = true
     ..dismissOnTap = false
     ..customAnimation = CustomAnimation();
@@ -73,7 +73,7 @@ showToast(String msg) {
     ..backgroundColor = Colors.black
     ..indicatorColor = Colors.red
     ..textColor = Colors.red
-    ..maskColor = Colors.black.withOpacity(0.5)
+    ..maskColor = Colors.black.withValues(alpha: .5)
     ..userInteractions = true
     ..dismissOnTap = false
     ..customAnimation = CustomAnimation();

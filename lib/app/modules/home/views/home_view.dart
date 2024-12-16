@@ -14,13 +14,13 @@ class HomeView extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Color.fromARGB(255, 63, 32, 245),
-          statusBarIconBrightness: Brightness.light,
-        ),
-        child: Padding(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Color.fromARGB(255, 63, 32, 245),
+        statusBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        body: Padding(
           padding: EdgeInsets.only(top: context.mediaQuery.padding.top),
           child: Obx(
             () => ProgressHUD(

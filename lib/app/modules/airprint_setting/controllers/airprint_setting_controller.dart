@@ -40,7 +40,7 @@ class AirprintSettingController extends GetxController with WidgetsBindingObserv
 
   ///关闭打印服务
   Future closeService() async {
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid || Platform.isIOS) {
       var ret = await _service.isRunning();
       if (ret) {
         _service.invoke("stopService");
@@ -72,7 +72,7 @@ class AirprintSettingController extends GetxController with WidgetsBindingObserv
       return;
     }
 
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid || Platform.isIOS) {
       var ret = await _service.isRunning();
       if (!ret) {
         _service.startService();
@@ -87,7 +87,7 @@ class AirprintSettingController extends GetxController with WidgetsBindingObserv
   }
 
   Future<void> checkServicRuning() async {
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid || Platform.isIOS) {
       isRunning.value = await _service.isRunning();
     }
     if (Platform.isWindows) {
