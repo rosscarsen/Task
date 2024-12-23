@@ -17,10 +17,19 @@ Future<void> initializeService() async {
       isForegroundMode: true,
       autoStartOnBoot: false,
     ),
-    iosConfiguration: IosConfiguration(),
+    iosConfiguration: IosConfiguration(
+      autoStart: false,
+      onForeground: onStart,
+      onBackground: onIosBackground,
+    ),
   );
 }
-
+@pragma('vm:entry-point')
+Future<bool> onIosBackground(ServiceInstance service) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  return true;
+}
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   printStatus = true;
@@ -79,7 +88,8 @@ void onStart(ServiceInstance service) async {
   if (timer != null && timer!.isActive) {
     timer!.cancel();
   }
-  timer = Timer.periodic(const Duration(seconds: 5), (_) async {
+  timer = Timer.periodic(const Duration(seconds: 5), (t) async {
+    //debugPrint("===>${t.tick}");
     try {
       // 如果缓存数据为空，尝试重新获取
       if (cachedLoginUser == null) {
