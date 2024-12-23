@@ -31,6 +31,13 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   return true;
 }
 @pragma('vm:entry-point')
+Future<bool> onIosBackground(ServiceInstance service) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  return true;
+}
+
+@pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   printStatus = true;
   debugPrint("开始服务:$printStatus");
