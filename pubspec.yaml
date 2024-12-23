@@ -22,9 +22,9 @@ dependencies:
   flutter:
     sdk: flutter
   #移动端后台服务
-  flutter_background_service: ^5.0.10
+  flutter_background_service: ^5.1.0
   #Android后台服务
-  flutter_background_service_android: ^6.2.7
+  flutter_background_service_android: ^6.3.0
   #对话提示工具
   flutter_easyloading: ^3.0.5
   #webview
