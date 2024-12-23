@@ -15,95 +15,106 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Color.fromARGB(255, 63, 32, 245),
-          statusBarIconBrightness: Brightness.light,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0.0),
+        child: AppBar(
+          backgroundColor: Color.fromARGB(255, 63, 32, 245),
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Color.fromARGB(255, 63, 32, 245),
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark
+          ),
         ),
-        child: Padding(
-          padding: EdgeInsets.only(top: context.mediaQuery.padding.top),
-          child: Obx(
-            () => ProgressHUD(
-              inAsyncCall: controller.isloading.value,
-              opacity: 0.7,
-              /* child: WebViewWidget(
-                controller: HomeController.to.webViewController,
-              ), */
-              child: InAppWebView(
-                key: HomeController.to.webViewKey,
-                initialUrlRequest: URLRequest(url: WebUri(HomeController.to.initWebUrl)),
-                initialUserScripts: UnmodifiableListView<UserScript>([
-                  UserScript(source: "flutterAirprint='1'", injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END)
-                ]),
-                initialSettings: HomeController.to.settings,
-                pullToRefreshController: HomeController.to.pullToRefreshController,
-                onWebViewCreated: (controller) async {
-                  HomeController.to.webViewController = controller;
-                  //html打开Airprint设置
-                  controller.addJavaScriptHandler(
-                      handlerName: "openAirprintSetting",
-                      callback: (args) {
-                        /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(args[0])));
-                        debugPrint("jsCallFlutter:$args");
-                        return "flutter app已经收到，并且处理完成"; */
-                        Future.delayed(Duration.zero, () {
-                          Get.offAndToNamed(Routes.AIRPRINT_SETTING);
-                        });
-                      });
-                  //window退出登录
-                  controller.addJavaScriptHandler(
-                      handlerName: "logout",
-                      callback: (args) async {
-                        await HomeController.to.windowLogout();
-                      });
-                  //window设置语言
-                  controller.addJavaScriptHandler(
-                      handlerName: "setLang",
-                      callback: (args) async {
-                        await HomeController.to.windowSetLanguage(localLangString: args[0].toString());
-                      });
-                  //日结报表
-                  controller.addJavaScriptHandler(
-                      handlerName: "printDailyReport",
-                      callback: (args) async {
-                        final String dailyReportJson = args[0];
-                        await HomeController.to.printDayReport(dailyReportJson: dailyReportJson);
-                      });
-                  //食品銷售報表
-                  controller.addJavaScriptHandler(
-                      handlerName: "printSalesReport",
-                      callback: (args) async {
-                        final String salesReportJson = args[0];
-                        await HomeController.to.printSalesReport(salesReportJson: salesReportJson);
-                      });
-                },
-                onLoadStart: (controller, url) async {
-                  HomeController.to.isloading.value = true;
-                  debugPrint("开始加载$url");
-                },
-                onPermissionRequest: (controller, request) async {
-                  return PermissionResponse(resources: request.resources, action: PermissionResponseAction.GRANT);
-                },
-                shouldOverrideUrlLoading: (controller, navigationAction) async {
-                  return NavigationActionPolicy.ALLOW;
-                },
-                onLoadStop: (controller, url) async {
-                  HomeController.to.isloading.value = false;
-                  HomeController.to.pullToRefreshController?.endRefreshing();
-                  await HomeController.to.addAirPrintSettingButton(controller: controller);
-                  // await controller.evaluateJavascript(source: "flutterCallJs('我是flutter传过来的数据')");
-                },
-                onReceivedError: (controller, request, error) {
-                  HomeController.to.isloading.value = false;
-                  HomeController.to.pullToRefreshController?.endRefreshing();
-                },
-                onProgressChanged: (controller, progress) {},
-                onUpdateVisitedHistory: (controller, url, isReload) {},
-                onConsoleMessage: (controller, consoleMessage) {
-                  debugPrint("consoleMessage:${consoleMessage.message}");
-                },
-              ),
-            ),
+      ),
+      body: Obx(
+        () => ProgressHUD(
+          inAsyncCall: controller.isloading.value,
+          opacity: 0.7,
+          /* child: WebViewWidget(
+            controller: HomeController.to.webViewController,
+          ), */
+          child: InAppWebView(
+            key: HomeController.to.webViewKey,
+            initialUrlRequest:
+                URLRequest(url: WebUri(HomeController.to.initWebUrl)),
+            initialUserScripts: UnmodifiableListView<UserScript>([
+              UserScript(
+                  source: "flutterAirprint='1'",
+                  injectionTime: UserScriptInjectionTime.AT_DOCUMENT_END)
+            ]),
+            initialSettings: HomeController.to.settings,
+            pullToRefreshController: HomeController.to.pullToRefreshController,
+            onWebViewCreated: (controller) async {
+              HomeController.to.webViewController = controller;
+              //html打开Airprint设置
+              controller.addJavaScriptHandler(
+                  handlerName: "openAirprintSetting",
+                  callback: (args) {
+                    /* ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(args[0])));
+                    debugPrint("jsCallFlutter:$args");
+                    return "flutter app已经收到，并且处理完成"; */
+                    Future.delayed(Duration.zero, () {
+                      Get.offAndToNamed(Routes.AIRPRINT_SETTING);
+                    });
+                  });
+              //window退出登录
+              controller.addJavaScriptHandler(
+                  handlerName: "logout",
+                  callback: (args) async {
+                    await HomeController.to.windowLogout();
+                  });
+              //window设置语言
+              controller.addJavaScriptHandler(
+                  handlerName: "setLang",
+                  callback: (args) async {
+                    await HomeController.to
+                        .windowSetLanguage(localLangString: args[0].toString());
+                  });
+              //日结报表
+              controller.addJavaScriptHandler(
+                  handlerName: "printDailyReport",
+                  callback: (args) async {
+                    final String dailyReportJson = args[0];
+                    await HomeController.to
+                        .printDayReport(dailyReportJson: dailyReportJson);
+                  });
+              //食品銷售報表
+              controller.addJavaScriptHandler(
+                  handlerName: "printSalesReport",
+                  callback: (args) async {
+                    final String salesReportJson = args[0];
+                    await HomeController.to
+                        .printSalesReport(salesReportJson: salesReportJson);
+                  });
+            },
+            onLoadStart: (controller, url) async {
+              HomeController.to.isloading.value = true;
+              debugPrint("开始加载$url");
+            },
+            onPermissionRequest: (controller, request) async {
+              return PermissionResponse(
+                  resources: request.resources,
+                  action: PermissionResponseAction.GRANT);
+            },
+            shouldOverrideUrlLoading: (controller, navigationAction) async {
+              return NavigationActionPolicy.ALLOW;
+            },
+            onLoadStop: (controller, url) async {
+              HomeController.to.isloading.value = false;
+              HomeController.to.pullToRefreshController?.endRefreshing();
+              await HomeController.to
+                  .addAirPrintSettingButton(controller: controller);
+              // await controller.evaluateJavascript(source: "flutterCallJs('我是flutter传过来的数据')");
+            },
+            onReceivedError: (controller, request, error) {
+              HomeController.to.isloading.value = false;
+              HomeController.to.pullToRefreshController?.endRefreshing();
+            },
+            onProgressChanged: (controller, progress) {},
+            onUpdateVisitedHistory: (controller, url, isReload) {},
+            onConsoleMessage: (controller, consoleMessage) {
+              debugPrint("consoleMessage:${consoleMessage.message}");
+            },
           ),
         ),
       ),
