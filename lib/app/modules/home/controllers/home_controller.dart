@@ -147,21 +147,24 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   ///添加airprint网页设置按钮
   Future<void> addAirPrintSettingButton({required InAppWebViewController controller}) async {
     var addAirprintDiv = '''
-        function openAirprintSetting() {
-            try { 
-                window.flutter_inappwebview.callHandler('openAirprintSetting',"js打开airprint设置")
-                document.querySelector('.setting_content').style.display = 'none';
-                document.querySelector('.menu-bt').click();
-            } catch (e) {
-                document.querySelector('.setting_content').style.display = 'none';
-                document.querySelector('.menu-bt').click();
-            }
+    function openAirprintSetting() {
+        try { 
+            window.flutter_inappwebview.callHandler('openAirprintSetting', "js打开airprint设置");
+            document.querySelector('.setting_content').style.display = 'none';
+            document.querySelector('.menu-bt').click();
+        } catch (e) {
+            document.querySelector('.setting_content').style.display = 'none';
+            document.querySelector('.menu-bt').click();
         }
+    }
+
+    // Check if the AirPrint button already exists
+    if (!document.querySelector('.airprint-setting-button')) {
         var newAnchor = document.createElement('a');
         newAnchor.href = "javascript:void(0);";
         newAnchor.onclick = openAirprintSetting;
         newAnchor.innerHTML = '${'airprintSetting'.tr}';
-        newAnchor.className = 'i';
+        newAnchor.className = 'i airprint-setting-button'; // Add a unique class for identification
         newAnchor.style.border = 'none';
         newAnchor.style.background = '#3575f0';
         newAnchor.style.color = '#fff';
@@ -170,11 +173,14 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         newAnchor.style.margin = '20px';
         newAnchor.style.padding = '5px 20px';
         newAnchor.style.textAlign = 'center';
+
         var parentDiv = document.getElementById('setting');
         if (parentDiv) {
             parentDiv.appendChild(newAnchor);
-        } 
-    ''';
+        }
+    }
+  ''';
+
     await controller.evaluateJavascript(source: addAirprintDiv);
   }
 
