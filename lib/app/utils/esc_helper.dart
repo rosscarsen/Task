@@ -48,18 +48,27 @@ class EscHelper {
 
     // 按换行符拆分字符串
     List<String> lines = str.split('\n');
-
-    // 对每行字符串进行分割
     for (var line in lines) {
       Characters chars = line.trim().characters;
-      while (chars.isNotEmpty) {
-        String segment = chars.take(splitLength).toString();
-        while (calculateWidth(segment) > splitLength && chars.length > 1) {
-          chars = chars.skip(1);
-          segment = chars.take(splitLength).toString();
+      StringBuffer buffer = StringBuffer();
+
+      int currentWidth = 0; // 当前行的宽度
+
+      for (var char in chars) {
+        int charWidth = calculateWidth(char);
+        if (currentWidth + charWidth > splitLength) {
+          // 超出宽度，保存当前段落
+          result.add(buffer.toString());
+          buffer.clear();
+          currentWidth = 0;
         }
-        result.add(segment);
-        chars = chars.skip(segment.length);
+        buffer.write(char);
+        currentWidth += charWidth;
+      }
+
+      // 处理剩余字符
+      if (buffer.isNotEmpty) {
+        result.add(buffer.toString());
       }
     }
 
