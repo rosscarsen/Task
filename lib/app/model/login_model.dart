@@ -40,7 +40,6 @@ class UserData {
   String? station;
   String? airPrintStation;
   String? webSit;
-  int? backupCheckCount;
   Dsn? frontDsn;
   Dsn? adminDsn;
   String? invoicePrintIP;
@@ -55,7 +54,6 @@ class UserData {
     this.adminDsn,
     this.airPrintStation,
     this.webSit,
-    this.backupCheckCount,
     this.invoicePrintIP,
     this.invoicePrintType,
   });
@@ -69,7 +67,6 @@ class UserData {
         frontDsn: json["frontDsn"] == null ? null : Dsn.fromJson(json["frontDsn"]),
         adminDsn: json["adminDsn"] == null ? null : Dsn.fromJson(json["adminDsn"]),
         webSit: json["webSit"],
-        backupCheckCount: json["backupCheckCount"] ?? 0,
         invoicePrintIP: json["invoicePrintIP"],
         invoicePrintType: json["invoicePrintType"],
       );
@@ -83,14 +80,13 @@ class UserData {
         "frontDsn": frontDsn?.toJson(),
         "adminDsn": adminDsn?.toJson(),
         "webSit": webSit,
-        "backupCheckCount": backupCheckCount,
         "invoicePrintIP": invoicePrintIP,
         "invoicePrintType": invoicePrintType,
       };
 
   @override
   String toString() {
-    return 'UserData(company: $company, pwd: $pwd, userCode: $userCode, station: $station, airPrintStation: $airPrintStation, webSit: $webSit, frontDsn: $frontDsn, adminDsn: $adminDsn, invoicePrintIP: $invoicePrintIP, backupCheckCount:$backupCheckCount,invoicePrintType: $invoicePrintType)';
+    return 'UserData(company: $company, pwd: $pwd, userCode: $userCode, station: $station, airPrintStation: $airPrintStation, webSit: $webSit, frontDsn: $frontDsn, adminDsn: $adminDsn, invoicePrintIP: $invoicePrintIP, invoicePrintType: $invoicePrintType)';
   }
 }
 
