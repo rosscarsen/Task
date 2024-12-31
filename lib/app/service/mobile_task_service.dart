@@ -35,6 +35,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   printStatus = true;
+  printKitchenErrorCount = 0; // 初始化打印错误计数器
   debugPrint("开始服务:$printStatus");
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
@@ -78,6 +79,7 @@ void onStart(ServiceInstance service) async {
 
   service.on('stopService').listen((event) {
     printStatus = false;
+    printKitchenErrorCount = 0; // 初始化打印错误计数器
     debugPrint("停止服务:$printStatus");
     if (timer != null && timer!.isActive) {
       timer?.cancel();
