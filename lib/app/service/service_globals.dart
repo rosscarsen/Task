@@ -18,6 +18,8 @@ Timer? timer;
 
 /// 缓存Timer
 Timer? cacheTimer;
+int printKitchenErrorCount = 0; //定义错误次数
+int cacheBackupCheckCount = 0; //定义后台设置检查次数
 
 /// 定义一个ApiClient类型的变量，用于调用API
 final ApiClient apiClient = ApiClient();
@@ -34,6 +36,9 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
     if (response.statusCode == 200) {
       if (response.data != null) {
         PrinterModel ret = PrinterModel.fromJson(response.data);
+
+        cacheBackupCheckCount = ret.backupCheckCount!; //缓存备份检查次数
+
         if (ret.qrCodeData == null &&
             ret.kitchen == null &&
             ret.upperMenu == null &&
@@ -56,6 +61,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
             ]);
           }
         }
+        print("===>cacheBackupCheckCount:$cacheBackupCheckCount printKitchenErrorCount:$printKitchenErrorCount");
 
         ///打印厨房、BDL小票
         if (ret.kitchen != null && ret.kitchen!.isNotEmpty) {
@@ -76,45 +82,84 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
 
           ///组装打印厨房数据
           final Map<String, Map<String, Map<int, List<Kitchen>>>> kitchenData = {};
-          groupBy(
-            nomoralKitchen.where((rows) => rows.mLanIP != null),
-            (Kitchen rows) => rows.mLanIP,
-          ).forEach((mLanIP, kitchens) {
-            // 如果 mLanIP 不存在，先插入一个空的 Map
-            if (!kitchenData.containsKey(mLanIP)) {
-              kitchenData[mLanIP!] = {};
-            }
-            // 分组处理
-            final invoiceGroup = groupBy(kitchens, (Kitchen rows) => rows.mInvoiceNo!);
-            invoiceGroup.forEach((mInvoiceNo, kitchenList) {
-              kitchenData[mLanIP]![mInvoiceNo] = groupBy(
-                kitchenList,
-                (Kitchen rows) => rows.mContinue!,
-              );
+          if (cacheBackupCheckCount != 0 && printKitchenErrorCount >= cacheBackupCheckCount) {
+            groupBy(
+              nomoralKitchen.where((rows) => rows.kitchenBackupPrinterIP != null),
+              (Kitchen rows) => rows.kitchenBackupPrinterIP,
+            ).forEach((kitchenBackupPrinterIP, kitchens) {
+              // 如果 mLanIP 不存在，先插入一个空的 Map
+              if (!kitchenData.containsKey(kitchenBackupPrinterIP)) {
+                kitchenData[kitchenBackupPrinterIP!] = {};
+              }
+              // 分组处理
+              final invoiceGroup = groupBy(kitchens, (Kitchen rows) => rows.mInvoiceNo!);
+              invoiceGroup.forEach((mInvoiceNo, kitchenList) {
+                kitchenData[kitchenBackupPrinterIP]![mInvoiceNo] = groupBy(
+                  kitchenList,
+                  (Kitchen rows) => rows.mContinue!,
+                );
+              });
             });
-          });
+          } else {
+            groupBy(
+              nomoralKitchen.where((rows) => rows.mLanIP != null),
+              (Kitchen rows) => rows.mLanIP,
+            ).forEach((mLanIP, kitchens) {
+              // 如果 mLanIP 不存在，先插入一个空的 Map
+              if (!kitchenData.containsKey(mLanIP)) {
+                kitchenData[mLanIP!] = {};
+              }
+              // 分组处理
+              final invoiceGroup = groupBy(kitchens, (Kitchen rows) => rows.mInvoiceNo!);
+              invoiceGroup.forEach((mInvoiceNo, kitchenList) {
+                kitchenData[mLanIP]![mInvoiceNo] = groupBy(
+                  kitchenList,
+                  (Kitchen rows) => rows.mContinue!,
+                );
+              });
+            });
+          }
           kitchenData.removeWhere((key, value) => key.isEmpty);
 
           ///组装打印班地尼数据
           final Map<String, Map<String, Map<int, List<Kitchen>>>> bDLData = {};
-
-          groupBy(
-            nomoralKitchen.where((rows) => rows.bDLLanIP != null),
-            (Kitchen rows) => rows.bDLLanIP,
-          ).forEach((bDLLanIP, kitchens) {
-            // 如果 mLanIP 不存在，先插入一个空的 Map
-            if (!bDLData.containsKey(bDLLanIP)) {
-              bDLData[bDLLanIP!] = {};
-            }
-            // 分组处理
-            final invoiceGroup = groupBy(kitchens, (Kitchen rows) => rows.mInvoiceNo!);
-            invoiceGroup.forEach((mInvoiceNo, kitchenList) {
-              bDLData[bDLLanIP]![mInvoiceNo] = groupBy(
-                kitchenList,
-                (Kitchen rows) => rows.mNonContinue!,
-              );
+          if (cacheBackupCheckCount != 0 && printKitchenErrorCount >= cacheBackupCheckCount) {
+            groupBy(
+              nomoralKitchen.where((rows) => rows.bDLLanBackupPrinterIP != null),
+              (Kitchen rows) => rows.bDLLanBackupPrinterIP,
+            ).forEach((bDLLanBackupPrinterIP, kitchens) {
+              // 如果 mLanIP 不存在，先插入一个空的 Map
+              if (!bDLData.containsKey(bDLLanBackupPrinterIP)) {
+                bDLData[bDLLanBackupPrinterIP!] = {};
+              }
+              // 分组处理
+              final invoiceGroup = groupBy(kitchens, (Kitchen rows) => rows.mInvoiceNo!);
+              invoiceGroup.forEach((mInvoiceNo, kitchenList) {
+                bDLData[bDLLanBackupPrinterIP]![mInvoiceNo] = groupBy(
+                  kitchenList,
+                  (Kitchen rows) => rows.mNonContinue!,
+                );
+              });
             });
-          });
+          } else {
+            groupBy(
+              nomoralKitchen.where((rows) => rows.bDLLanIP != null),
+              (Kitchen rows) => rows.bDLLanIP,
+            ).forEach((bDLLanIP, kitchens) {
+              // 如果 mLanIP 不存在，先插入一个空的 Map
+              if (!bDLData.containsKey(bDLLanIP)) {
+                bDLData[bDLLanIP!] = {};
+              }
+              // 分组处理
+              final invoiceGroup = groupBy(kitchens, (Kitchen rows) => rows.mInvoiceNo!);
+              invoiceGroup.forEach((mInvoiceNo, kitchenList) {
+                bDLData[bDLLanIP]![mInvoiceNo] = groupBy(
+                  kitchenList,
+                  (Kitchen rows) => rows.mNonContinue!,
+                );
+              });
+            });
+          }
           bDLData.removeWhere((key, value) => key.isEmpty);
 
           List<String> printedQueueIDS = [];
@@ -196,8 +241,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
             ]);
           }
         }
-
-        //logger.f(jsonEncode(queueIDs));
+        logger.f(jsonEncode(queueIDs));
 
         ///发票号码发送给后端
         if (queueIDs.isNotEmpty) {
