@@ -3,6 +3,7 @@ class PrinterModel {
   List<QrCodeData>? qrCodeData;
   List<Kitchen>? kitchen;
   int? isPrintPrice;
+  int? backupCheckCount;
   UpperMenu? upperMenu;
   List<Receipt>? receipt;
   List<Receipt>? customerRecord;
@@ -12,6 +13,7 @@ class PrinterModel {
     this.qrCodeData,
     this.kitchen,
     this.isPrintPrice,
+    this.backupCheckCount,
     this.upperMenu,
     this.receipt,
     this.customerRecord,
@@ -33,6 +35,7 @@ class PrinterModel {
       });
     }
     isPrintPrice = json['isPrintPrice'];
+    backupCheckCount = json['backupCheckCount'] ?? 0;
     upperMenu = json['upperMenu'] != null ? UpperMenu.fromJson(json['upperMenu']) : null;
     if (json['receipt'] != null) {
       receipt = <Receipt>[];
@@ -62,6 +65,7 @@ class PrinterModel {
       data['upperMenu'] = upperMenu!.toJson();
     }
     data['isPrintPrice'] = isPrintPrice;
+    data['backupCheckCount'] = backupCheckCount ?? 0;
     if (receipt != null) {
       data['receipt'] = receipt!.map((v) => v.toJson()).toList();
     }
@@ -79,7 +83,7 @@ class PrinterModel {
 
   @override
   String toString() {
-    return 'PrinterModel(qrCodeData: $qrCodeData, kitchen: $kitchen, isPrintPrice: $isPrintPrice, upperMenu: $upperMenu, receipt: $receipt, customerRecord: $customerRecord, openDrawer: $openDrawer, takeaway: $takeaway)';
+    return 'PrinterModel(qrCodeData: $qrCodeData, kitchen: $kitchen, isPrintPrice: $isPrintPrice,backupCheckCount:$backupCheckCount, upperMenu: $upperMenu, receipt: $receipt, customerRecord: $customerRecord, openDrawer: $openDrawer, takeaway: $takeaway)';
   }
 }
 
@@ -296,6 +300,10 @@ class Kitchen {
   String? bDLLanIP;
   String? bDLPrinterType;
   String? mIsPrint;
+  String? kitchenBackupPrinterIP;
+  String? kitchenBackupPrinterType;
+  String? bDLLanBackupPrinterIP;
+  String? bDLLanBackupPrinterType;
   Kitchen({
     this.queueID,
     this.mStationCode,
@@ -320,6 +328,10 @@ class Kitchen {
     this.bDLLanIP,
     this.bDLPrinterType,
     this.mIsPrint,
+    this.kitchenBackupPrinterIP,
+    this.kitchenBackupPrinterType,
+    this.bDLLanBackupPrinterIP,
+    this.bDLLanBackupPrinterType,
   });
 
   Kitchen.fromJson(Map<String, dynamic> json) {
@@ -346,6 +358,10 @@ class Kitchen {
     bDLLanIP = json['BDLLanIP'];
     bDLPrinterType = json['BDLPrinterType'];
     mIsPrint = json['mIsPrint'];
+    kitchenBackupPrinterIP = json['kitchenBackupPrinterIP'];
+    kitchenBackupPrinterType = json['kitchenBackupPrinterType'];
+    bDLLanBackupPrinterIP = json['BDLLanBackupPrinterIP'];
+    bDLLanBackupPrinterType = json['BDLLanBackupPrinterType'];
   }
 
   Map<String, dynamic> toJson() {
@@ -373,12 +389,16 @@ class Kitchen {
     data['BDLLanIP'] = bDLLanIP;
     data['BDLPrinterType'] = bDLPrinterType;
     data['mIsPrint'] = mIsPrint;
+    data['kitchenBackupPrinterIP'] = kitchenBackupPrinterIP;
+    data['kitchenBackupPrinterType'] = kitchenBackupPrinterType;
+    data['BDLLanBackupPrinterIP'] = bDLLanBackupPrinterIP;
+    data['BDLLanBackupPrinterType'] = bDLLanBackupPrinterType;
     return data;
   }
 
   @override
   String toString() {
-    return 'Kitchen(queueID: $queueID, mStationCode: $mStationCode, mPnum: $mPnum, mInvoiceNo: $mInvoiceNo, mTableNo: $mTableNo, invoiceDate: $invoiceDate, invoiceTime: $invoiceTime, mQty: $mQty, mContinue: $mContinue, mNonContinue: $mNonContinue, mRemarks: $mRemarks, mBarcodeName: $mBarcodeName, mInvoiceDetailID: $mInvoiceDetailID, mPrice: $mPrice, mDeviceName: $mDeviceName, mName: $mName, mLanIP: $mLanIP, mPrinterType: $mPrinterType, bDLDeviceName: $bDLDeviceName, bDLName: $bDLName, bDLLanIP: $bDLLanIP, bDLPrinterType: $bDLPrinterType, mIsPrint: $mIsPrint)';
+    return 'Kitchen(queueID: $queueID, mStationCode: $mStationCode, mPnum: $mPnum, mInvoiceNo: $mInvoiceNo, mTableNo: $mTableNo, invoiceDate: $invoiceDate, invoiceTime: $invoiceTime, mQty: $mQty, mContinue: $mContinue, mNonContinue: $mNonContinue, mRemarks: $mRemarks, mBarcodeName: $mBarcodeName, mInvoiceDetailID: $mInvoiceDetailID, mPrice: $mPrice, mDeviceName: $mDeviceName, mName: $mName, mLanIP: $mLanIP, mPrinterType: $mPrinterType, bDLDeviceName: $bDLDeviceName, bDLName: $bDLName, bDLLanIP: $bDLLanIP, bDLPrinterType: $bDLPrinterType, mIsPrint: $mIsPrint, kitchenBackupPrinterIP: $kitchenBackupPrinterIP, kitchenBackupPrinterType: $kitchenBackupPrinterType, bDLLanBackupPrinterIP: $bDLLanBackupPrinterIP, bDLLanBackupPrinterType: $bDLLanBackupPrinterType)';
   }
 }
 
