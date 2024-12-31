@@ -167,6 +167,10 @@ Future<Map<String, List<String>>> printkichen(
     Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
   List<String> queueID = [];
   List<String> detailID = [];
+  if (printKitchenErrorCount >= cacheBackupCheckCount) {
+    printKitchenErrorCount = 0;
+  }
+
   // 遍历第一级 Map，即 mLanIP
   for (var entry in printData.entries) {
     final ip = entry.key;
@@ -375,9 +379,10 @@ Future<Map<String, List<String>>> printkichen(
               for (int i = 0; i < kitchens.length; i++) {
                 //名称
                 var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
-
+                print("===>$printName");
                 if (printName.isNotEmpty) {
                   for (int j = 0; j < printName.length; j++) {
+                    print("===>${printName[j]}");
                     if (j == 0) {
                       bytes += generator.text(
                           EscHelper.columnMaker(content: "${kitchens[i].mQty}", width: 4) +
@@ -438,6 +443,9 @@ Future<Map<String, List<String>>> printkichen(
 
         printer.disconnect();
       } else {
+        if (cacheBackupCheckCount != 0) {
+          printKitchenErrorCount++;
+        }
         debugPrint("打印機$ip連接失敗");
       }
     }
@@ -450,6 +458,9 @@ Future<Map<String, List<String>>> printBDL(
     Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
   List<String> queueID = [];
   List<String> detailID = [];
+  if (printKitchenErrorCount >= cacheBackupCheckCount) {
+    printKitchenErrorCount = 0;
+  }
   // 遍历第一级 Map，即 mLanIP
   for (var entry in printData.entries) {
     final ip = entry.key;
@@ -738,6 +749,9 @@ Future<Map<String, List<String>>> printBDL(
 
         printer.disconnect();
       } else {
+        if (cacheBackupCheckCount != 0) {
+          printKitchenErrorCount++;
+        }
         debugPrint("打印機$ip連接失敗");
       }
     }
@@ -749,8 +763,19 @@ Future<Map<String, List<String>>> printBDL(
 ///d.mIsPrint P正常 PF 追单 PM 改单 PD  删单 PT  转台单 (pd改为D,其它改为Y)
 Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int isPrintPrice) async {
   List<Map<String, dynamic>> resultList = [];
+  if (printKitchenErrorCount >= cacheBackupCheckCount) {
+    printKitchenErrorCount = 0;
+  }
   for (var kitchens in printData) {
-    final printer = PrinterNetworkManager(kitchens.mLanIP!);
+    PrinterNetworkManager? printer;
+    if (cacheBackupCheckCount != 0 &&
+        printKitchenErrorCount >= cacheBackupCheckCount &&
+        kitchens.kitchenBackupPrinterIP != null) {
+      printer = PrinterNetworkManager(kitchens.kitchenBackupPrinterIP!);
+    } else {
+      printer = PrinterNetworkManager(kitchens.mLanIP!);
+    }
+
     PosPrintResult connect = await printer.connect();
 
     if (connect == PosPrintResult.success) {
@@ -904,6 +929,10 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
         });
       }
       printer.disconnect();
+    } else {
+      if (cacheBackupCheckCount != 0) {
+        printKitchenErrorCount++;
+      }
     }
   }
 
