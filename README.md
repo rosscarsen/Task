@@ -133,7 +133,7 @@
 
 ### Android 安装包下载
 
-[**Android task.apk 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.2/Task1127.apk)
+[**Android task.apk 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.3/Task250102.apk)
 
 ### 下载后无需多的设定，直接安装即可使用
 
@@ -145,7 +145,7 @@
 
 #### windows 安装包下载
 
-[**Windows task.msix 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.2/Task1127.apk)
+[**Windows task.msix 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.3/task.msix)
 
 #### 安装说明
 
@@ -203,7 +203,7 @@
 
 #### 证书下载 certificate.pfx
 
-[**Windows certificate.pfx 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.1/certificate.pfx)
+[**Windows certificate.pfx 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.3/certificate.pfx)
 
 #### 证书安装说明
 
