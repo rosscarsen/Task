@@ -85,6 +85,7 @@ class LoginView extends GetView<LoginController> {
             child: SingleChildScrollView(
               child: AnimationLimiter(
                 child: Column(
+                  spacing: 15.0,
                   children: AnimationConfiguration.toStaggeredList(
                     duration: const Duration(milliseconds: 375),
                     childAnimationBuilder: (widget) => SlideAnimation(
@@ -98,7 +99,7 @@ class LoginView extends GetView<LoginController> {
                         inputController: LoginController.to.companyController,
                         lableText: LocaleKeys.company.tr,
                       ),
-                      const SizedBox(height: 15),
+
                       //收银机
                       TextInput(
                         prefixIcon: Icons.price_change,
@@ -106,7 +107,7 @@ class LoginView extends GetView<LoginController> {
                         lableText: LocaleKeys.station.tr,
                         keyboardType: TextInputType.number,
                       ),
-                      const SizedBox(height: 15),
+
                       //用戶
                       TextInput(
                         prefixIcon: Icons.person,
@@ -114,7 +115,7 @@ class LoginView extends GetView<LoginController> {
                         keyboardType: TextInputType.visiblePassword,
                         lableText: LocaleKeys.user.tr,
                       ),
-                      const SizedBox(height: 15),
+
                       //密碼
                       Obx(() {
                         return TextInput(
@@ -129,7 +130,6 @@ class LoginView extends GetView<LoginController> {
                         );
                       }),
 
-                      const SizedBox(height: 15),
                       Obx(() {
                         return CheckboxListTile(
                           controlAffinity: ListTileControlAffinity.leading,
@@ -145,8 +145,6 @@ class LoginView extends GetView<LoginController> {
                           }),
                         );
                       }),
-
-                      const SizedBox(height: 20),
 
                       SizedBox(
                         width: double.infinity,
