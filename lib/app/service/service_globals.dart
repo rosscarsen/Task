@@ -20,6 +20,7 @@ Timer? timer;
 Timer? cacheTimer;
 int printKitchenErrorCount = 0; //定义错误次数
 int cacheBackupCheckCount = 0; //定义后台设置检查次数
+String printlang = "zh_HK";
 
 /// 定义一个ApiClient类型的变量，用于调用API
 final ApiClient apiClient = ApiClient();
@@ -38,7 +39,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
         PrinterModel ret = PrinterModel.fromJson(response.data);
 
         cacheBackupCheckCount = ret.backupCheckCount!; //缓存备份检查次数
-
+        printlang = ret.printLang!; //缓存打印语言
         if (ret.qrCodeData == null &&
             ret.kitchen == null &&
             ret.upperMenu == null &&
