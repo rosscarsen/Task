@@ -1,9 +1,9 @@
 name: task
-version: 1.0.4+4
+version: 1.0.5+5
 publish_to: none
 description: A new Flutter project.
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.6.1
 
 dependencies:
   #字符串处理
@@ -12,9 +12,9 @@ dependencies:
   collection: ^1.18.0
   cupertino_icons: ^1.0.8
   #设备信息
-  device_info_plus: ^11.1.0
+  device_info_plus: ^11.3.0
   #网络请求
-  dio: ^5.7.0
+  dio: ^5.8.0+1
   #escpos工具
   esc_pos_utils_plus: ^2.0.4
   #escpos连接
@@ -47,15 +47,15 @@ dependencies:
   #二维码
   qr_flutter: ^4.1.0
   #托盘
-  tray_manager: ^0.3.1
+  tray_manager: ^0.3.2
   #windows
-  win32: ^5.9.0
+  win32: ^5.10.1
   #交错动画
   flutter_staggered_animations: ^1.1.1
 dev_dependencies:
-  flutter_launcher_icons: ^0.14.1
+  flutter_launcher_icons: ^0.14.3
   flutter_lints: ^5.0.0
-  flutter_native_splash: ^2.4.1
+  flutter_native_splash: ^2.4.4
   flutter_test:
     sdk: flutter
   msix: ^3.16.8
