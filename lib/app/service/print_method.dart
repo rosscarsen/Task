@@ -13,6 +13,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../config.dart';
 import '../model/login_model.dart';
 import '../model/printer_model.dart';
+import '../translations/app_translations.dart';
 import '../utils/esc_helper.dart';
 import '../utils/stroage_manage.dart';
 import 'service_globals.dart';
@@ -34,6 +35,11 @@ Future<bool> deleteQueue(Map<String, dynamic> queryData, List queueIDs) async {
   } catch (e) {
     return true;
   }
+}
+
+//获取本地语言信息
+String printerLocale(String key) {
+  return AppTranslations().keys[printlang]?[key] ?? "";
 }
 
 ///获取本地存储信息
@@ -92,9 +98,9 @@ Future<List<String>> printQrCode({required List<QrCodeData> printData}) async {
 
         bytes += generator.feed(1);
         bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
-        //台名单号
+        //檯號/單號
         bytes += generator.text(
-          "檯號/單號: ${element.mTableNo} / ${element.mInvoiceNo!.substring(element.mInvoiceNo!.length - 4)}",
+          "${printerLocale(LocaleKeys.tableNo)}/${printerLocale(LocaleKeys.orderNo)}: ${element.mTableNo} / ${element.mInvoiceNo!.substring(element.mInvoiceNo!.length - 4)}",
           styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2),
           containsChinese: true,
         );
@@ -103,12 +109,12 @@ Future<List<String>> printQrCode({required List<QrCodeData> printData}) async {
         bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
 
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "員工", width: 6)}:${EscHelper.columnMaker(content: "${element.mSalesmanCode}", width: 22)}${EscHelper.columnMaker(content: "收銀機", width: 6)}:${EscHelper.columnMaker(content: "${element.mSalesmanCode}", width: 12)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.employee), width: 6)}:${EscHelper.columnMaker(content: "${element.mSalesmanCode}", width: 22)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.station), width: 8)}:${EscHelper.columnMaker(content: "${element.mSalesmanCode}", width: 10)}",
           containsChinese: true,
         );
 
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "日期", width: 6)}:${EscHelper.columnMaker(content: "${element.mInvoiceDate}", width: 22)}${EscHelper.columnMaker(content: "人數", width: 6)}:${EscHelper.columnMaker(content: "${element.mPnum}", width: 12)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.date), width: 6)}:${EscHelper.columnMaker(content: "${element.mInvoiceDate}", width: 22)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.peopleNumber), width: 8)}:${EscHelper.columnMaker(content: "${element.mPnum}", width: 10)}",
           containsChinese: true,
         );
 
@@ -134,14 +140,28 @@ Future<List<String>> printQrCode({required List<QrCodeData> printData}) async {
         bytes += generator.feed(1);
         bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         bytes += generator.text(
-          "請掃描上面二維碼自助點餐",
+          printerLocale(LocaleKeys.scanQrCode),
           styles: const PosStyles(
             bold: true,
             width: PosTextSize.size2,
             height: PosTextSize.size2,
+            align: PosAlign.center,
           ),
           containsChinese: true,
         );
+        if ((element.mTradingInvoiceTerms?.isNotEmpty) ?? false) {
+          bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
+          bytes += generator.text(
+            element.mTradingInvoiceTerms!,
+            styles: const PosStyles(
+              bold: true,
+              width: PosTextSize.size2,
+              height: PosTextSize.size2,
+              align: PosAlign.center,
+            ),
+            containsChinese: true,
+          );
+        }
         bytes += generator.feed(2);
         bytes += generator.cut();
         bytes += generator.reset();
@@ -200,7 +220,7 @@ Future<Map<String, List<String>>> printkichen(
                 //台号
                 bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
                 bytes += generator.text(
-                  "檯:${kitchens[i].mTableNo}",
+                  "${printerLocale(LocaleKeys.table)}:${kitchens[i].mTableNo}",
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -213,7 +233,7 @@ Future<Map<String, List<String>>> printkichen(
                       containsChinese: true,
                       styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
                   PosColumn(
-                      text: "單號：",
+                      text: "${printerLocale(LocaleKeys.orderNo)}：",
                       width: 4,
                       containsChinese: true,
                       styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
@@ -237,13 +257,13 @@ Future<Map<String, List<String>>> printkichen(
                       containsChinese: true,
                       styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
                   PosColumn(
-                      text: "人數：",
-                      width: 2,
+                      text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+                      width: 3,
                       containsChinese: true,
                       styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
                   PosColumn(
                       text: "${kitchens[i].mPnum}",
-                      width: 2,
+                      width: 1,
                       containsChinese: true,
                       styles:
                           const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
@@ -302,7 +322,7 @@ Future<Map<String, List<String>>> printkichen(
                 //台号
                 bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
                 bytes += generator.text(
-                  "檯:${kitchens[i].mTableNo}",
+                  "${printerLocale(LocaleKeys.table)}:${kitchens[i].mTableNo}",
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -327,7 +347,7 @@ Future<Map<String, List<String>>> printkichen(
               //台号
               bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
               bytes += generator.text(
-                "檯:${kitchens[0].mTableNo}",
+                "${printerLocale(LocaleKeys.table)}:${kitchens[0].mTableNo}",
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -340,7 +360,7 @@ Future<Map<String, List<String>>> printkichen(
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
                 PosColumn(
-                    text: "單號：",
+                    text: "${printerLocale(LocaleKeys.orderNo)}：",
                     width: 4,
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
@@ -363,13 +383,13 @@ Future<Map<String, List<String>>> printkichen(
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
                 PosColumn(
-                    text: "人數：",
-                    width: 2,
+                    text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+                    width: 3,
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
                 PosColumn(
                     text: "${kitchens.first.mPnum}",
-                    width: 2,
+                    width: 1,
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
               ]);
@@ -379,7 +399,6 @@ Future<Map<String, List<String>>> printkichen(
               for (int i = 0; i < kitchens.length; i++) {
                 //名称
                 var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
-                print("===>$printName");
                 if (printName.isNotEmpty) {
                   for (int j = 0; j < printName.length; j++) {
                     print("===>${printName[j]}");
@@ -425,7 +444,7 @@ Future<Map<String, List<String>>> printkichen(
               //台号
               bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
               bytes += generator.text(
-                "檯:${kitchens.first.mTableNo}",
+                "${printerLocale(LocaleKeys.table)}:${kitchens.first.mTableNo}",
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -490,7 +509,7 @@ Future<Map<String, List<String>>> printBDL(
                 //上菜单
                 bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
                 bytes += generator.text(
-                  "出菜單",
+                  printerLocale(LocaleKeys.pantry),
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -498,7 +517,7 @@ Future<Map<String, List<String>>> printBDL(
                 //台号
                 bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
                 bytes += generator.text(
-                  "檯:${kitchens[i].mTableNo}",
+                  "${printerLocale(LocaleKeys.table)}:${kitchens[i].mTableNo}",
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -511,7 +530,7 @@ Future<Map<String, List<String>>> printBDL(
                       containsChinese: true,
                       styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
                   PosColumn(
-                      text: "單號：",
+                      text: "${printerLocale(LocaleKeys.orderNo)}：",
                       width: 4,
                       containsChinese: true,
                       styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
@@ -535,13 +554,13 @@ Future<Map<String, List<String>>> printBDL(
                       containsChinese: true,
                       styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
                   PosColumn(
-                      text: "人數：",
-                      width: 2,
+                      text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+                      width: 3,
                       containsChinese: true,
                       styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
                   PosColumn(
                       text: "${kitchens[i].mPnum}",
-                      width: 2,
+                      width: 1,
                       containsChinese: true,
                       styles:
                           const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
@@ -600,7 +619,7 @@ Future<Map<String, List<String>>> printBDL(
                 //台号
                 bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
                 bytes += generator.text(
-                  "檯:${kitchens[i].mTableNo}",
+                  "${printerLocale(LocaleKeys.table)}:${kitchens[i].mTableNo}",
                   styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                   containsChinese: true,
                 );
@@ -624,7 +643,7 @@ Future<Map<String, List<String>>> printBDL(
               //上菜单
               bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
               bytes += generator.text(
-                "出菜單",
+                printerLocale(LocaleKeys.pantry),
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -645,7 +664,7 @@ Future<Map<String, List<String>>> printBDL(
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
                 PosColumn(
-                    text: "單號：",
+                    text: "${printerLocale(LocaleKeys.orderNo)}：",
                     width: 4,
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
@@ -668,13 +687,13 @@ Future<Map<String, List<String>>> printBDL(
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
                 PosColumn(
-                    text: "人數：",
-                    width: 2,
+                    text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+                    width: 3,
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
                 PosColumn(
                     text: "${kitchens.first.mPnum}",
-                    width: 2,
+                    width: 1,
                     containsChinese: true,
                     styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
               ]);
@@ -729,7 +748,7 @@ Future<Map<String, List<String>>> printBDL(
               //台号
               bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
               bytes += generator.text(
-                "檯:${kitchens.first.mTableNo}",
+                "${printerLocale(LocaleKeys.table)}:${kitchens.first.mTableNo}",
                 styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
                 containsChinese: true,
               );
@@ -786,15 +805,15 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
       String content = "";
       switch (kitchens.mIsPrint) {
         case "PF":
-          content = "追單";
+          content = printerLocale(LocaleKeys.chaseOrder); //追單
 
         case "PM":
-          content = "改單";
+          content = printerLocale(LocaleKeys.changeOrder); //改單
 
         case "PD":
-          content = "刪單";
+          content = printerLocale(LocaleKeys.deleteOrder); //刪單
         case "PT":
-          content = "轉檯單";
+          content = printerLocale(LocaleKeys.turntableOrder); //轉檯單
         default:
           content = "";
       }
@@ -808,7 +827,7 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
       //台号
       bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
       bytes += generator.text(
-        "檯:${kitchens.mTableNo}",
+        "${printerLocale(LocaleKeys.table)}:${kitchens.mTableNo}",
         styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
         containsChinese: true,
       );
@@ -821,7 +840,7 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
             containsChinese: true,
             styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
         PosColumn(
-            text: "單號：",
+            text: "${printerLocale(LocaleKeys.orderNo)}：",
             width: 4,
             containsChinese: true,
             styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
@@ -845,13 +864,13 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
             containsChinese: true,
             styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
         PosColumn(
-            text: "人數：",
-            width: 2,
+            text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+            width: 3,
             containsChinese: true,
             styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
         PosColumn(
             text: "${kitchens.mPnum}",
-            width: 2,
+            width: 1,
             containsChinese: true,
             styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
       ]);
@@ -908,7 +927,7 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
       //台号
       bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
       bytes += generator.text(
-        "檯:${kitchens.mTableNo}",
+        "${printerLocale(LocaleKeys.table)}:${kitchens.mTableNo}",
         styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
         containsChinese: true,
       );
@@ -959,7 +978,7 @@ Future<List<String>> printOnTheMeun({required UpperMenu printdata}) async {
           //上菜单
           bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            "點餐記錄",
+            printerLocale(LocaleKeys.onTheMenu),
             styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
             containsChinese: true,
           );
@@ -967,7 +986,7 @@ Future<List<String>> printOnTheMeun({required UpperMenu printdata}) async {
           //台号
           bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
           bytes += generator.text(
-            "檯:${upperGroupValue.first.mTableNo}",
+            "${printerLocale(LocaleKeys.table)}:${upperGroupValue.first.mTableNo}",
             styles: const PosStyles(width: PosTextSize.size3, height: PosTextSize.size3, bold: true),
             containsChinese: true,
           );
@@ -976,25 +995,25 @@ Future<List<String>> printOnTheMeun({required UpperMenu printdata}) async {
           bytes += generator.rawBytes(EscHelper.setAlign(align: 0).codeUnits);
           //员工行
           bytes += generator.text(
-            "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "員工", width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.mSalesmanCode}", width: 16)}${EscHelper.columnMaker(content: "單號", width: 8)}${EscHelper.columnMaker(content: ":${EscHelper.setSize(size: 3)}${upperGroupValue.first.mInvoiceNo}", width: 8)}",
+            "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.employee), width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.mSalesmanCode}", width: 16)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.orderNo), width: 8)}${EscHelper.columnMaker(content: ":${EscHelper.setSize(size: 3)}${upperGroupValue.first.mInvoiceNo}", width: 8)}",
             containsChinese: true,
           );
 
           //日期行
           bytes += generator.text(
-            "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "日期", width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.invoiceDate}", width: 16)}${EscHelper.columnMaker(content: "收銀機", width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.mStationCode}", width: 16)}",
+            "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.date), width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.invoiceDate}", width: 16)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.station), width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.mStationCode}", width: 16)}",
             containsChinese: true,
           );
 
           //时间行
           bytes += generator.text(
-            "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "入座時間", width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.invoiceTime}", width: 16)}${EscHelper.columnMaker(content: "人數", width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.mPnum}", width: 16)}",
+            "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.seatingTime), width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.invoiceTime}", width: 16)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.peopleNumber), width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.mPnum}", width: 16)}",
             containsChinese: true,
           );
 
           //结账时间
           bytes += generator.text(
-            "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "結賬時間", width: 8)}${EscHelper.columnMaker(content: ":", width: 16)}${EscHelper.columnMaker(content: "檯", width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.mTableNo}", width: 16)}",
+            "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.paymentTime), width: 8)}${EscHelper.columnMaker(content: ":", width: 16)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.table), width: 8)}${EscHelper.columnMaker(content: ":${upperGroupValue.first.mTableNo}", width: 16)}",
             containsChinese: true,
           );
           bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
@@ -1119,36 +1138,36 @@ Future<List<String>> printCustomerRecord({required List<Receipt> printdata}) asy
         bytes += generator.hr();
         bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         bytes += generator.text(
-          "客戶記錄",
+          printerLocale(LocaleKeys.customerRecords),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         bytes += generator.rawBytes(EscHelper.setAlign().codeUnits);
         //台/单号
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "檯/單號", width: 16)}${EscHelper.columnMaker(content: "${item.mTableNo}", width: 16)}${EscHelper.columnMaker(content: EscHelper.setSize(size: 3) + item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4), width: 8)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "${printerLocale(LocaleKeys.table)}/${printerLocale(LocaleKeys.orderNo)}", width: 16)}${EscHelper.columnMaker(content: "${item.mTableNo}", width: 16)}${EscHelper.columnMaker(content: EscHelper.setSize(size: 3) + item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4), width: 8)}",
           containsChinese: true,
         );
         bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         //人数行
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "人數", width: 8)}${EscHelper.columnMaker(content: ":${item.mPnum}", width: 20)}${EscHelper.columnMaker(content: "客戶", width: 6)}${EscHelper.columnMaker(content: ":${item.mCustomerCode}", width: 14)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.peopleNumber), width: 8)}${EscHelper.columnMaker(content: ":${item.mPnum}", width: 20)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.customer), width: 8)}${EscHelper.columnMaker(content: ":${item.mCustomerCode}", width: 12)}",
           containsChinese: true,
         );
         //入坐时间行
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "入座時間", width: 8)}${EscHelper.columnMaker(content: ":${item.mInvoiceDate}", width: 20)}${EscHelper.columnMaker(content: "收銀機", width: 6)}${EscHelper.columnMaker(content: ":${item.mStationCode}", width: 14)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.seatingTime), width: 8)}${EscHelper.columnMaker(content: ":${item.mInvoiceDate}", width: 20)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.station), width: 8)}${EscHelper.columnMaker(content: ":${item.mStationCode}", width: 12)}",
           containsChinese: true,
         );
         //结账时间行
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "結賬時間", width: 8)}${EscHelper.columnMaker(content: ":${item.payTime}", width: 20)}${EscHelper.columnMaker(content: "員工", width: 6)}${EscHelper.columnMaker(content: ":${item.mSalesmanCode}", width: 14)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.paymentTime), width: 8)}${EscHelper.columnMaker(content: ":${item.payTime}", width: 20)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.employee), width: 8)}${EscHelper.columnMaker(content: ":${item.mSalesmanCode}", width: 12)}",
           containsChinese: true,
         );
-        bytes += generator.feed(2);
+        bytes += generator.feed(1);
         //明细表头
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "項目", width: 34)}${EscHelper.columnMaker(content: "數量", width: 6)}${EscHelper.columnMaker(content: "金額", width: 8, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.item), width: 34)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.quantity), width: 6)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.amount), width: 8, align: 2)}",
           containsChinese: true,
         );
 
@@ -1177,27 +1196,27 @@ Future<List<String>> printCustomerRecord({required List<Receipt> printdata}) asy
         bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         //小计
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "小計", width: 24)}${EscHelper.columnMaker(content: "${item.mNetAmt}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.subtotal), width: 24)}${EscHelper.columnMaker(content: "${item.mNetAmt}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //服务费
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "服務費", width: 24)}${EscHelper.columnMaker(content: "${item.mCharge}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.serviceFee), width: 24)}${EscHelper.columnMaker(content: "${item.mCharge}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //折扣
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "折扣", width: 24)}${EscHelper.columnMaker(content: "${item.mDiscRate}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.discount), width: 24)}${EscHelper.columnMaker(content: "${item.mDiscRate}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //折扣(\$)
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "${"折扣"}(\$)", width: 24)}${EscHelper.columnMaker(content: "${item.mDiscAmt}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: "${printerLocale(LocaleKeys.discount)}(\$)", width: 24)}${EscHelper.columnMaker(content: "${item.mDiscAmt}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //合計
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "總計", width: 24)}${EscHelper.columnMaker(content: "${item.mAmount}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.total), width: 24)}${EscHelper.columnMaker(content: "${item.mAmount}", width: 24, align: 2)}",
           containsChinese: true,
         );
 
@@ -1205,7 +1224,7 @@ Future<List<String>> printCustomerRecord({required List<Receipt> printdata}) asy
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.hr();
         bytes += generator.rawBytes(EscHelper.setAlign().codeUnits);
-        bytes += generator.text("客戶簽名",
+        bytes += generator.text(printerLocale(LocaleKeys.signature),
             containsChinese: true,
             styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: false));
 
@@ -1286,36 +1305,36 @@ Future<List<String>> printRecipt({required List<Receipt> printdata}) async {
         bytes += generator.feed(1);
         bytes += generator.hr();
         bytes += generator.text(
-          "收據",
+          printerLocale(LocaleKeys.recepipt),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         bytes += generator.rawBytes(EscHelper.setAlign().codeUnits);
         //台/单号
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "檯/單號", width: 16)}${EscHelper.columnMaker(content: "${item.mTableNo}", width: 16)}${EscHelper.columnMaker(content: EscHelper.setSize(size: 3) + item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4), width: 8)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "${printerLocale(LocaleKeys.table)}/${printerLocale(LocaleKeys.orderNo)}", width: 16)}${EscHelper.columnMaker(content: "${item.mTableNo}", width: 16)}${EscHelper.columnMaker(content: EscHelper.setSize(size: 3) + item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4), width: 8)}",
           containsChinese: true,
         );
         bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         //人数行
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "人數", width: 8)}${EscHelper.columnMaker(content: ":${item.mPnum}", width: 20)}${EscHelper.columnMaker(content: "客戶", width: 6)}${EscHelper.columnMaker(content: ":${item.mCustomerCode}", width: 14)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.peopleNumber), width: 8)}${EscHelper.columnMaker(content: ":${item.mPnum}", width: 20)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.customer), width: 8)}${EscHelper.columnMaker(content: ":${item.mCustomerCode}", width: 12)}",
           containsChinese: true,
         );
         //入坐时间行
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "入座時間", width: 8)}${EscHelper.columnMaker(content: ":${item.mInvoiceDate}", width: 20)}${EscHelper.columnMaker(content: "收銀機", width: 6)}${EscHelper.columnMaker(content: ":${item.mStationCode}", width: 14)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.seatingTime), width: 8)}${EscHelper.columnMaker(content: ":${item.mInvoiceDate}", width: 20)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.station), width: 8)}${EscHelper.columnMaker(content: ":${item.mStationCode}", width: 12)}",
           containsChinese: true,
         );
         //结账时间行
         bytes += generator.text(
-          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: "結賬時間", width: 8)}${EscHelper.columnMaker(content: ":${item.payTime}", width: 20)}${EscHelper.columnMaker(content: "員工", width: 6)}${EscHelper.columnMaker(content: ":${item.mSalesmanCode}", width: 14)}",
+          "${EscHelper.setSize(size: 1)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.paymentTime), width: 8)}${EscHelper.columnMaker(content: ":${item.payTime}", width: 20)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.employee), width: 8)}${EscHelper.columnMaker(content: ":${item.mSalesmanCode}", width: 12)}",
           containsChinese: true,
         );
-        bytes += generator.feed(2);
+        bytes += generator.feed(1);
         //明细表头
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "項目", width: 34)}${EscHelper.columnMaker(content: "數量", width: 6)}${EscHelper.columnMaker(content: "金額", width: 8, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.item), width: 34)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.quantity), width: 6)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.amount), width: 8, align: 2)}",
           containsChinese: true,
         );
 
@@ -1344,37 +1363,37 @@ Future<List<String>> printRecipt({required List<Receipt> printdata}) async {
         bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         //小计
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "小計", width: 24)}${EscHelper.columnMaker(content: "${item.mNetAmt}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.subtotal), width: 24)}${EscHelper.columnMaker(content: "${item.mNetAmt}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //服务费
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "服務費", width: 24)}${EscHelper.columnMaker(content: "${item.mCharge}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.serviceFee), width: 24)}${EscHelper.columnMaker(content: "${item.mCharge}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //折扣
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "折扣", width: 24)}${EscHelper.columnMaker(content: "${item.mDiscRate}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.discount), width: 24)}${EscHelper.columnMaker(content: "${item.mDiscRate}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //折扣(\$)
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "${"折扣"}(\$)", width: 24)}${EscHelper.columnMaker(content: "${item.mDiscAmt}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: "${printerLocale(LocaleKeys.discount)}(\$)", width: 24)}${EscHelper.columnMaker(content: "${item.mDiscAmt}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //合計
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "總計", width: 24)}${EscHelper.columnMaker(content: "${item.mAmount}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.total), width: 24)}${EscHelper.columnMaker(content: "${item.mAmount}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //付款金额
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "支付金額", width: 24)}${EscHelper.columnMaker(content: "${item.mPayAmount}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.paymentAmount), width: 24)}${EscHelper.columnMaker(content: "${item.mPayAmount}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //找零
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "找零", width: 24)}${EscHelper.columnMaker(content: "${item.mChange}", width: 24, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.change), width: 24)}${EscHelper.columnMaker(content: "${item.mChange}", width: 24, align: 2)}",
           containsChinese: true,
         );
         //分割線
@@ -1384,7 +1403,7 @@ Future<List<String>> printRecipt({required List<Receipt> printdata}) async {
         //支付方式
         bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
         bytes += generator.text(
-          "${EscHelper.columnMaker(content: "支付方式", width: 30)}${EscHelper.columnMaker(content: "金額", width: 10)}${EscHelper.columnMaker(content: "小費", width: 8, align: 2)}",
+          "${EscHelper.columnMaker(content: printerLocale(LocaleKeys.paymentMethod), width: 30)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.amount), width: 10)}${EscHelper.columnMaker(content: printerLocale(LocaleKeys.tips), width: 8, align: 2)}",
           containsChinese: true,
         );
         //分割線
@@ -1478,7 +1497,7 @@ Future<List<String>> printTakeaway({required List<Takeaway> printdata}) async {
         bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         //手机外卖
         bytes += generator.text(
-          "外賣訂單",
+          printerLocale(LocaleKeys.takeawayOrder),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
@@ -1498,17 +1517,17 @@ Future<List<String>> printTakeaway({required List<Takeaway> printdata}) async {
         String address = "";
 
         if (item.mCustTel.toString() == "0") {
-          method += "自取:"; //自取
+          method += "${printerLocale(LocaleKeys.selfPickUp)}:"; //自取
           if (item.mCustFax.toString() == "0") {
-            method += "儘快"; //儘快
+            method += printerLocale(LocaleKeys.asap); //儘快
           } else {
             method += DateFormat('HH:mm').format(DateTime.parse(item.mCustDelTime.toString()));
           }
         } else if (item.mCustTel.toString() == "1") {
-          method += "送餐:"; //送餐
+          method += "${printerLocale(LocaleKeys.foodDlivery)}:"; //送餐
 
           if (item.mCustFax.toString() == "0") {
-            method += "儘快"; //儘快
+            method += printerLocale(LocaleKeys.asap); //儘快
           } else {
             var mCustDelTime = item.mCustDelTime;
             method += DateFormat('HH:mm').format(DateTime.parse(mCustDelTime.toString()));
