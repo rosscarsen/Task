@@ -9,6 +9,7 @@ class PrinterModel {
   List<Receipt>? customerRecord;
   OpenDrawer? openDrawer;
   List<Takeaway>? takeaway;
+  String? printLang;
   PrinterModel({
     this.qrCodeData,
     this.kitchen,
@@ -19,6 +20,7 @@ class PrinterModel {
     this.customerRecord,
     this.openDrawer,
     this.takeaway,
+    this.printLang,
   });
 
   PrinterModel.fromJson(Map<String, dynamic> json) {
@@ -51,6 +53,7 @@ class PrinterModel {
     }
     openDrawer = json['openDrawer'] != null ? OpenDrawer.fromJson(json['openDrawer']) : null;
     takeaway = json["takeaway"] == null ? [] : List<Takeaway>.from(json["takeaway"]!.map((x) => Takeaway.fromJson(x)));
+    printLang = json['printLang'];
   }
 
   Map<String, dynamic> toJson() {
@@ -78,12 +81,13 @@ class PrinterModel {
     if (takeaway != null) {
       data['takeaway'] = List<dynamic>.from(takeaway!.map((x) => x.toJson()));
     }
+    data['printLang'] = printLang;
     return data;
   }
 
   @override
   String toString() {
-    return 'PrinterModel(qrCodeData: $qrCodeData, kitchen: $kitchen, isPrintPrice: $isPrintPrice,backupCheckCount:$backupCheckCount, upperMenu: $upperMenu, receipt: $receipt, customerRecord: $customerRecord, openDrawer: $openDrawer, takeaway: $takeaway)';
+    return 'PrinterModel(qrCodeData: $qrCodeData, kitchen: $kitchen, isPrintPrice: $isPrintPrice,backupCheckCount:$backupCheckCount, upperMenu: $upperMenu, receipt: $receipt, customerRecord: $customerRecord, openDrawer: $openDrawer, takeaway: $takeaway),printLang:$printLang';
   }
 }
 
@@ -219,6 +223,7 @@ class QrCodeData {
   String? url;
   String? imageUrl;
   int? queueID;
+  String? mTradingInvoiceTerms;
 
   QrCodeData({
     this.mInvoiceNo,
@@ -234,6 +239,7 @@ class QrCodeData {
     this.url,
     this.imageUrl,
     this.queueID,
+    this.mTradingInvoiceTerms,
   });
 
   QrCodeData.fromJson(Map<String, dynamic> json) {
@@ -250,6 +256,7 @@ class QrCodeData {
     imageUrl = json['imageUrl'];
     mPrinterType = json['mPrinterType'];
     queueID = json['queueID'];
+    mTradingInvoiceTerms = json['mTrading_Invoice_Terms'];
   }
 
   Map<String, dynamic> toJson() {
@@ -267,12 +274,13 @@ class QrCodeData {
     data['imageUrl'] = imageUrl;
     data['mPrinterType'] = mPrinterType;
     data['queueID'] = queueID;
+    data['mTrading_Invoice_Terms'] = mTradingInvoiceTerms;
     return data;
   }
 
   @override
   String toString() {
-    return 'QrCodeData(mInvoiceNo: $mInvoiceNo, mNameChinese: $mNameChinese, mNameEnglish: $mNameEnglish, mAddress: $mAddress, mTableNo: $mTableNo, mSalesmanCode: $mSalesmanCode, mInvoiceDate: $mInvoiceDate, mPnum: $mPnum, ip: $ip, mPrinterType: $mPrinterType, url: $url, imageUrl: $imageUrl, queueID: $queueID)';
+    return 'QrCodeData(mInvoiceNo: $mInvoiceNo, mNameChinese: $mNameChinese, mNameEnglish: $mNameEnglish, mAddress: $mAddress, mTableNo: $mTableNo, mSalesmanCode: $mSalesmanCode, mInvoiceDate: $mInvoiceDate, mPnum: $mPnum, ip: $ip, mPrinterType: $mPrinterType, url: $url, imageUrl: $imageUrl, queueID: $queueID, mTrading_Invoice_Terms: $mTradingInvoiceTerms)';
   }
 }
 
@@ -494,6 +502,8 @@ class Receipt {
       });
     }
   }
+
+  get mDiscAmtRate => null;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
