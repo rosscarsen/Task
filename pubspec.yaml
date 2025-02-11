@@ -3,7 +3,7 @@ version: 1.0.5+5
 publish_to: none
 description: A new Flutter project.
 environment:
-  sdk: ^3.6.1
+  sdk: ^3.6.2
 
 dependencies:
   #字符串处理
@@ -52,10 +52,11 @@ dependencies:
   win32: ^5.10.1
   #交错动画
   flutter_staggered_animations: ^1.1.1
-dev_dependencies:
-  flutter_launcher_icons: ^0.14.3
-  flutter_lints: ^5.0.0
   flutter_native_splash: ^2.4.4
+  flutter_launcher_icons: ^0.14.3
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
   msix: ^3.16.8
@@ -84,7 +85,9 @@ flutter_native_splash:
   image: assets/launcher.png
   color_dark: "#6A3DE8"
   fullscreen: true
-  color: "#022200"
+  color: "#6A3DE8"
+  color_android: "#6A3DE8"
+  color_ios: "#6A3DE8"
   android_12:
     color: "#6A3DE8"
     image: assets/launcher.png
