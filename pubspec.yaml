@@ -99,7 +99,7 @@ flutter_native_splash:
 msix_config:
   display_name: Task
   identity_name: net.pericles.task
-  msix_version: 1.0.0.3
+  msix_version: 1.0.0.4
   certificate_path: C:\certificate\certificate.pfx
   certificate_password: 123456
   capabilities: internetClient,Escpos
