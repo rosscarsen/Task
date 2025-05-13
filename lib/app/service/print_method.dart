@@ -122,11 +122,7 @@ Future<List<String>> printQrCode({required List<QrCodeData> printData}) async {
         try {
           final String qrData = element.url!;
           const double qrSize = 300;
-          final uiImg = await QrPainter(
-            data: qrData,
-            version: QrVersions.auto,
-            gapless: false,
-          ).toImageData(qrSize);
+          final uiImg = await QrPainter(data: qrData, version: QrVersions.auto, gapless: false).toImageData(qrSize);
           final dir = await getTemporaryDirectory();
           final pathName = '${dir.path}/qr_tmp.png';
           final qrFile = File(pathName);
@@ -184,7 +180,9 @@ Future<List<String>> printQrCode({required List<QrCodeData> printData}) async {
 
 ///开始打印厨房单
 Future<Map<String, List<String>>> printkichen(
-    Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
+  Map<String, Map<String, Map<int, List<Kitchen>>>> printData,
+  int isPrintPrice,
+) async {
   List<String> queueID = [];
   List<String> detailID = [];
   if (printKitchenErrorCount >= cacheBackupCheckCount) {
@@ -228,45 +226,51 @@ Future<Map<String, List<String>>> printkichen(
                 //单号
                 bytes += generator.row([
                   PosColumn(
-                      text: "${kitchens[i].mStationCode}",
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+                    text: "${kitchens[i].mStationCode}",
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                  ),
                   PosColumn(
-                      text: "${printerLocale(LocaleKeys.orderNo)}：",
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+                    text: "${printerLocale(LocaleKeys.orderNo)}：",
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                  ),
                   PosColumn(
-                      text: kitchens[i].mInvoiceNo!.substring(kitchens[i].mInvoiceNo!.length - 4),
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true))
+                    text: kitchens[i].mInvoiceNo!.substring(kitchens[i].mInvoiceNo!.length - 4),
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
+                  ),
                 ]);
 
                 //日期人数
                 bytes += generator.row([
                   PosColumn(
-                      text: "${kitchens[i].invoiceDate}",
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                    text: "${kitchens[i].invoiceDate}",
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                  ),
                   PosColumn(
-                      text: "${kitchens[i].invoiceTime}",
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                    text: "${kitchens[i].invoiceTime}",
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                  ),
                   PosColumn(
-                      text: "${printerLocale(LocaleKeys.peopleNumber)}：",
-                      width: 3,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                    text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+                    width: 3,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                  ),
                   PosColumn(
-                      text: "${kitchens[i].mPnum}",
-                      width: 1,
-                      containsChinese: true,
-                      styles:
-                          const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
+                    text: "${kitchens[i].mPnum}",
+                    width: 1,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left),
+                  ),
                 ]);
 
                 bytes += generator.feed(1);
@@ -278,16 +282,18 @@ Future<Map<String, List<String>>> printkichen(
                   for (int j = 0; j < printName.length; j++) {
                     if (j == 0) {
                       bytes += generator.text(
-                          EscHelper.columnMaker(content: '${kitchens[i].mQty}', width: 4) +
-                              EscHelper.columnMaker(content: printName[j], width: 20),
-                          styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                          containsChinese: true);
+                        EscHelper.columnMaker(content: '${kitchens[i].mQty}', width: 4) +
+                            EscHelper.columnMaker(content: printName[j], width: 20),
+                        styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+                        containsChinese: true,
+                      );
                     } else if (printName[j].isNotEmpty) {
                       bytes += generator.text(
-                          EscHelper.columnMaker(content: '', width: 4) +
-                              EscHelper.columnMaker(content: printName[j], width: 20),
-                          styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                          containsChinese: true);
+                        EscHelper.columnMaker(content: '', width: 4) +
+                            EscHelper.columnMaker(content: printName[j], width: 20),
+                        styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+                        containsChinese: true,
+                      );
                     }
                   }
                 }
@@ -309,11 +315,7 @@ Future<Map<String, List<String>>> printkichen(
                 if (isPrintPrice == 0) {
                   bytes += generator.text(
                     EscHelper.columnMaker(content: "\$${kitchens[i].mPrice}", width: 24, align: 2),
-                    styles: const PosStyles(
-                      width: PosTextSize.size2,
-                      height: PosTextSize.size2,
-                      bold: true,
-                    ),
+                    styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
                   );
                 }
 
@@ -355,43 +357,50 @@ Future<Map<String, List<String>>> printkichen(
               //单号
               bytes += generator.row([
                 PosColumn(
-                    text: "${kitchens.first.mStationCode}",
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+                  text: "${kitchens.first.mStationCode}",
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                ),
                 PosColumn(
-                    text: "${printerLocale(LocaleKeys.orderNo)}：",
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+                  text: "${printerLocale(LocaleKeys.orderNo)}：",
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                ),
                 PosColumn(
-                    text: kitchens.first.mInvoiceNo!.substring(kitchens.first.mInvoiceNo!.length - 4),
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true))
+                  text: kitchens.first.mInvoiceNo!.substring(kitchens.first.mInvoiceNo!.length - 4),
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
+                ),
               ]);
               //日期人数
               bytes += generator.row([
                 PosColumn(
-                    text: "${kitchens.first.invoiceDate}",
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                  text: "${kitchens.first.invoiceDate}",
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                ),
                 PosColumn(
-                    text: "${kitchens.first.invoiceTime}",
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                  text: "${kitchens.first.invoiceTime}",
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                ),
                 PosColumn(
-                    text: "${printerLocale(LocaleKeys.peopleNumber)}：",
-                    width: 3,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                  text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+                  width: 3,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                ),
                 PosColumn(
-                    text: "${kitchens.first.mPnum}",
-                    width: 1,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
+                  text: "${kitchens.first.mPnum}",
+                  width: 1,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left),
+                ),
               ]);
 
               bytes += generator.feed(1);
@@ -404,16 +413,18 @@ Future<Map<String, List<String>>> printkichen(
                     print("===>${printName[j]}");
                     if (j == 0) {
                       bytes += generator.text(
-                          EscHelper.columnMaker(content: "${kitchens[i].mQty}", width: 4) +
-                              EscHelper.columnMaker(content: printName[j], width: 20),
-                          styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                          containsChinese: true);
+                        EscHelper.columnMaker(content: "${kitchens[i].mQty}", width: 4) +
+                            EscHelper.columnMaker(content: printName[j], width: 20),
+                        styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+                        containsChinese: true,
+                      );
                     } else if (printName[j].isNotEmpty) {
                       bytes += generator.text(
-                          EscHelper.columnMaker(content: "", width: 4) +
-                              EscHelper.columnMaker(content: printName[j], width: 20),
-                          styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                          containsChinese: true);
+                        EscHelper.columnMaker(content: "", width: 4) +
+                            EscHelper.columnMaker(content: printName[j], width: 20),
+                        styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+                        containsChinese: true,
+                      );
                     }
                   }
                 }
@@ -474,7 +485,9 @@ Future<Map<String, List<String>>> printkichen(
 
 //打印BDL单
 Future<Map<String, List<String>>> printBDL(
-    Map<String, Map<String, Map<int, List<Kitchen>>>> printData, int isPrintPrice) async {
+  Map<String, Map<String, Map<int, List<Kitchen>>>> printData,
+  int isPrintPrice,
+) async {
   List<String> queueID = [];
   List<String> detailID = [];
   if (printKitchenErrorCount >= cacheBackupCheckCount) {
@@ -525,45 +538,51 @@ Future<Map<String, List<String>>> printBDL(
                 //单号
                 bytes += generator.row([
                   PosColumn(
-                      text: "${kitchens[i].mStationCode}",
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+                    text: "${kitchens[i].mStationCode}",
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                  ),
                   PosColumn(
-                      text: "${printerLocale(LocaleKeys.orderNo)}：",
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+                    text: "${printerLocale(LocaleKeys.orderNo)}：",
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                  ),
                   PosColumn(
-                      text: kitchens[i].mInvoiceNo!.substring(kitchens[i].mInvoiceNo!.length - 4),
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true))
+                    text: kitchens[i].mInvoiceNo!.substring(kitchens[i].mInvoiceNo!.length - 4),
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
+                  ),
                 ]);
 
                 //日期人数
                 bytes += generator.row([
                   PosColumn(
-                      text: "${kitchens[i].invoiceDate}",
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                    text: "${kitchens[i].invoiceDate}",
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                  ),
                   PosColumn(
-                      text: "${kitchens[i].invoiceTime}",
-                      width: 4,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                    text: "${kitchens[i].invoiceTime}",
+                    width: 4,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                  ),
                   PosColumn(
-                      text: "${printerLocale(LocaleKeys.peopleNumber)}：",
-                      width: 3,
-                      containsChinese: true,
-                      styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                    text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+                    width: 3,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                  ),
                   PosColumn(
-                      text: "${kitchens[i].mPnum}",
-                      width: 1,
-                      containsChinese: true,
-                      styles:
-                          const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
+                    text: "${kitchens[i].mPnum}",
+                    width: 1,
+                    containsChinese: true,
+                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left),
+                  ),
                 ]);
 
                 bytes += generator.feed(1);
@@ -575,16 +594,18 @@ Future<Map<String, List<String>>> printBDL(
                   for (int j = 0; j < printName.length; j++) {
                     if (j == 0) {
                       bytes += generator.text(
-                          EscHelper.columnMaker(content: '${kitchens[i].mQty}', width: 4) +
-                              EscHelper.columnMaker(content: printName[j], width: 20),
-                          styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                          containsChinese: true);
+                        EscHelper.columnMaker(content: '${kitchens[i].mQty}', width: 4) +
+                            EscHelper.columnMaker(content: printName[j], width: 20),
+                        styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+                        containsChinese: true,
+                      );
                     } else if (printName[j].isNotEmpty) {
                       bytes += generator.text(
-                          EscHelper.columnMaker(content: '', width: 4) +
-                              EscHelper.columnMaker(content: printName[j], width: 20),
-                          styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                          containsChinese: true);
+                        EscHelper.columnMaker(content: '', width: 4) +
+                            EscHelper.columnMaker(content: printName[j], width: 20),
+                        styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+                        containsChinese: true,
+                      );
                     }
                   }
                 }
@@ -606,11 +627,7 @@ Future<Map<String, List<String>>> printBDL(
                 if (isPrintPrice == 0) {
                   bytes += generator.text(
                     EscHelper.columnMaker(content: "\$${kitchens[i].mPrice}", width: 24, align: 2),
-                    styles: const PosStyles(
-                      width: PosTextSize.size2,
-                      height: PosTextSize.size2,
-                      bold: true,
-                    ),
+                    styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
                   );
                 }
 
@@ -659,43 +676,50 @@ Future<Map<String, List<String>>> printBDL(
               //单号
               bytes += generator.row([
                 PosColumn(
-                    text: "${kitchens.first.mStationCode}",
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+                  text: "${kitchens.first.mStationCode}",
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                ),
                 PosColumn(
-                    text: "${printerLocale(LocaleKeys.orderNo)}：",
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+                  text: "${printerLocale(LocaleKeys.orderNo)}：",
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+                ),
                 PosColumn(
-                    text: kitchens.first.mInvoiceNo!.substring(kitchens.first.mInvoiceNo!.length - 4),
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true))
+                  text: kitchens.first.mInvoiceNo!.substring(kitchens.first.mInvoiceNo!.length - 4),
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
+                ),
               ]);
               //日期人数
               bytes += generator.row([
                 PosColumn(
-                    text: "${kitchens.first.invoiceDate}",
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                  text: "${kitchens.first.invoiceDate}",
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                ),
                 PosColumn(
-                    text: "${kitchens.first.invoiceTime}",
-                    width: 4,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                  text: "${kitchens.first.invoiceTime}",
+                  width: 4,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                ),
                 PosColumn(
-                    text: "${printerLocale(LocaleKeys.peopleNumber)}：",
-                    width: 3,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+                  text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+                  width: 3,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+                ),
                 PosColumn(
-                    text: "${kitchens.first.mPnum}",
-                    width: 1,
-                    containsChinese: true,
-                    styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
+                  text: "${kitchens.first.mPnum}",
+                  width: 1,
+                  containsChinese: true,
+                  styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left),
+                ),
               ]);
 
               bytes += generator.feed(1);
@@ -708,16 +732,18 @@ Future<Map<String, List<String>>> printBDL(
                   for (int j = 0; j < printName.length; j++) {
                     if (j == 0) {
                       bytes += generator.text(
-                          EscHelper.columnMaker(content: "${kitchens[i].mQty}", width: 4) +
-                              EscHelper.columnMaker(content: printName[j], width: 20),
-                          styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                          containsChinese: true);
+                        EscHelper.columnMaker(content: "${kitchens[i].mQty}", width: 4) +
+                            EscHelper.columnMaker(content: printName[j], width: 20),
+                        styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+                        containsChinese: true,
+                      );
                     } else if (printName[j].isNotEmpty) {
                       bytes += generator.text(
-                          EscHelper.columnMaker(content: "", width: 4) +
-                              EscHelper.columnMaker(content: printName[j], width: 20),
-                          styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                          containsChinese: true);
+                        EscHelper.columnMaker(content: "", width: 4) +
+                            EscHelper.columnMaker(content: printName[j], width: 20),
+                        styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+                        containsChinese: true,
+                      );
                     }
                   }
                 }
@@ -835,44 +861,51 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
       //单号
       bytes += generator.row([
         PosColumn(
-            text: "${kitchens.mStationCode}",
-            width: 4,
-            containsChinese: true,
-            styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+          text: "${kitchens.mStationCode}",
+          width: 4,
+          containsChinese: true,
+          styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+        ),
         PosColumn(
-            text: "${printerLocale(LocaleKeys.orderNo)}：",
-            width: 4,
-            containsChinese: true,
-            styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true)),
+          text: "${printerLocale(LocaleKeys.orderNo)}：",
+          width: 4,
+          containsChinese: true,
+          styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, bold: true),
+        ),
         PosColumn(
-            text: kitchens.mInvoiceNo!.substring(kitchens.mInvoiceNo!.length - 4),
-            width: 4,
-            containsChinese: true,
-            styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true))
+          text: kitchens.mInvoiceNo!.substring(kitchens.mInvoiceNo!.length - 4),
+          width: 4,
+          containsChinese: true,
+          styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
+        ),
       ]);
 
       //日期人数
       bytes += generator.row([
         PosColumn(
-            text: "${kitchens.invoiceDate}",
-            width: 4,
-            containsChinese: true,
-            styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+          text: "${kitchens.invoiceDate}",
+          width: 4,
+          containsChinese: true,
+          styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+        ),
         PosColumn(
-            text: "${kitchens.invoiceTime}",
-            width: 4,
-            containsChinese: true,
-            styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+          text: "${kitchens.invoiceTime}",
+          width: 4,
+          containsChinese: true,
+          styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+        ),
         PosColumn(
-            text: "${printerLocale(LocaleKeys.peopleNumber)}：",
-            width: 3,
-            containsChinese: true,
-            styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2)),
+          text: "${printerLocale(LocaleKeys.peopleNumber)}：",
+          width: 3,
+          containsChinese: true,
+          styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2),
+        ),
         PosColumn(
-            text: "${kitchens.mPnum}",
-            width: 1,
-            containsChinese: true,
-            styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left)),
+          text: "${kitchens.mPnum}",
+          width: 1,
+          containsChinese: true,
+          styles: const PosStyles(width: PosTextSize.size1, height: PosTextSize.size2, align: PosAlign.left),
+        ),
       ]);
 
       bytes += generator.feed(1);
@@ -884,15 +917,17 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
         for (int j = 0; j < printName.length; j++) {
           if (j == 0) {
             bytes += generator.text(
-                EscHelper.columnMaker(content: '${kitchens.mQty}', width: 4) +
-                    EscHelper.columnMaker(content: printName[j], width: 20),
-                styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                containsChinese: true);
+              EscHelper.columnMaker(content: '${kitchens.mQty}', width: 4) +
+                  EscHelper.columnMaker(content: printName[j], width: 20),
+              styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+              containsChinese: true,
+            );
           } else if (printName[j].isNotEmpty) {
             bytes += generator.text(
-                EscHelper.columnMaker(content: '', width: 4) + EscHelper.columnMaker(content: printName[j], width: 20),
-                styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
-                containsChinese: true);
+              EscHelper.columnMaker(content: '', width: 4) + EscHelper.columnMaker(content: printName[j], width: 20),
+              styles: const PosStyles(height: PosTextSize.size2, width: PosTextSize.size2, bold: true),
+              containsChinese: true,
+            );
           }
         }
       }
@@ -914,11 +949,7 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
       if (isPrintPrice == 0) {
         bytes += generator.text(
           EscHelper.columnMaker(content: "\$${kitchens.mPrice}", width: 24, align: 2),
-          styles: const PosStyles(
-            width: PosTextSize.size2,
-            height: PosTextSize.size2,
-            bold: true,
-          ),
+          styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
         );
       }
 
@@ -1064,11 +1095,7 @@ Future<List<String>> printOnTheMeun({required UpperMenu printdata}) async {
 
           bytes += generator.feed(2);
 
-          bytes += generator.barcode(
-              Barcode.code39(
-                "${upperGroupValue.first.mInvoiceNo}".split(""),
-              ),
-              height: 60);
+          bytes += generator.barcode(Barcode.code39("${upperGroupValue.first.mInvoiceNo}".split("")), height: 60);
 
           bytes += generator.feed(1);
           bytes += generator.cut();
@@ -1224,17 +1251,18 @@ Future<List<String>> printCustomerRecord({required List<Receipt> printdata}) asy
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.hr();
         bytes += generator.rawBytes(EscHelper.setAlign().codeUnits);
-        bytes += generator.text(printerLocale(LocaleKeys.signature),
-            containsChinese: true,
-            styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: false));
+        bytes += generator.text(
+          printerLocale(LocaleKeys.signature),
+          containsChinese: true,
+          styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: false),
+        );
 
         bytes += generator.feed(2);
 
         bytes += generator.barcode(
-            Barcode.code39(
-              item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split(""),
-            ),
-            height: 60);
+          Barcode.code39(item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split("")),
+          height: 60,
+        );
 
         bytes += generator.feed(1);
         bytes += generator.cut();
@@ -1426,10 +1454,9 @@ Future<List<String>> printRecipt({required List<Receipt> printdata}) async {
         bytes += generator.feed(2);
 
         bytes += generator.barcode(
-            Barcode.code39(
-              item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split(""),
-            ),
-            height: 60);
+          Barcode.code39(item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split("")),
+          height: 60,
+        );
 
         bytes += generator.feed(1);
         bytes += generator.cut();
@@ -1632,10 +1659,9 @@ Future<List<String>> printTakeaway({required List<Takeaway> printdata}) async {
         bytes += generator.text(EscHelper.columnMaker(content: "${item.mAmount}", width: 48, align: 2));
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.barcode(
-            Barcode.code39(
-              item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split(""),
-            ),
-            height: 60);
+          Barcode.code39(item.mInvoiceNo!.substring(item.mInvoiceNo!.length - 4).split("")),
+          height: 60,
+        );
         bytes += generator.feed(1);
         bytes += generator.cut();
         bytes += generator.reset();
