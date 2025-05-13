@@ -272,7 +272,7 @@ Future<Map<String, List<String>>> printkichen(
                 bytes += generator.feed(1);
 
                 //名称
-                var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName!, splitLength: 20);
+                var printName = EscHelper.splitString(str: kitchens[i].mBarcodeName ?? "", splitLength: 20);
 
                 if (printName.isNotEmpty) {
                   for (int j = 0; j < printName.length; j++) {
@@ -292,7 +292,7 @@ Future<Map<String, List<String>>> printkichen(
                   }
                 }
                 //备注
-                if (kitchens[i].mRemarks != '') {
+                if (kitchens[i].mRemarks?.isNotEmpty ?? false) {
                   var printRemarks = EscHelper.splitString(str: kitchens[i].mRemarks ?? "", splitLength: 20);
                   if (printRemarks.isNotEmpty) {
                     for (int k = 0; k < printRemarks.length; k++) {
@@ -418,7 +418,7 @@ Future<Map<String, List<String>>> printkichen(
                   }
                 }
                 //备注
-                if (kitchens[i].mRemarks != '') {
+                if (kitchens[i].mRemarks?.isNotEmpty ?? false) {
                   var printRemarks = EscHelper.splitString(str: kitchens[i].mRemarks ?? "", splitLength: 20);
                   if (printRemarks.isNotEmpty) {
                     for (int k = 0; k < printRemarks.length; k++) {
@@ -589,7 +589,7 @@ Future<Map<String, List<String>>> printBDL(
                   }
                 }
                 //备注
-                if (kitchens[i].mRemarks != '') {
+                if (kitchens[i].mRemarks?.isNotEmpty ?? false) {
                   var printRemarks = EscHelper.splitString(str: kitchens[i].mRemarks ?? "", splitLength: 20);
                   if (printRemarks.isNotEmpty) {
                     for (int k = 0; k < printRemarks.length; k++) {
@@ -722,7 +722,7 @@ Future<Map<String, List<String>>> printBDL(
                   }
                 }
                 //备注
-                if (kitchens[i].mRemarks != '') {
+                if (kitchens[i].mRemarks?.isNotEmpty ?? false) {
                   var printRemarks = EscHelper.splitString(str: kitchens[i].mRemarks ?? "", splitLength: 20);
                   if (printRemarks.isNotEmpty) {
                     for (int k = 0; k < printRemarks.length; k++) {
@@ -878,7 +878,7 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
       bytes += generator.feed(1);
 
       //名称
-      var printName = EscHelper.splitString(str: kitchens.mBarcodeName!, splitLength: 20);
+      var printName = EscHelper.splitString(str: kitchens.mBarcodeName ?? "", splitLength: 20);
 
       if (printName.isNotEmpty) {
         for (int j = 0; j < printName.length; j++) {
@@ -897,7 +897,7 @@ Future<List<Map<String, dynamic>>> printOtherkichen(List<Kitchen> printData, int
         }
       }
       //备注
-      if (kitchens.mRemarks != '') {
+      if (kitchens.mRemarks?.isNotEmpty ?? false) {
         var printRemarks = EscHelper.splitString(str: kitchens.mRemarks ?? "", splitLength: 20);
         if (printRemarks.isNotEmpty) {
           for (int k = 0; k < printRemarks.length; k++) {
@@ -1122,7 +1122,7 @@ Future<List<String>> printCustomerRecord({required List<Receipt> printdata}) asy
         }
         //地址
         if (item.mAddress != null && item.mAddress!.isNotEmpty) {
-          List<String> addressList = EscHelper.splitString(str: item.mAddress!, splitLength: 24);
+          List<String> addressList = EscHelper.splitString(str: item.mAddress ?? "", splitLength: 24);
           for (var address in addressList) {
             bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
             bytes += generator.text(
@@ -1175,8 +1175,8 @@ Future<List<String>> printCustomerRecord({required List<Receipt> printdata}) asy
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.hr();
         //明细内容
-        final List<Detail> detail = item.detail!;
-        if (detail.isNotEmpty) {
+        final List<Detail>? detail = item.detail;
+        if (detail != null && detail.isNotEmpty) {
           bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
           for (int i = 0; i < detail.length; i++) {
             var printName = EscHelper.splitString(str: detail[i].mPrintName ?? "", splitLength: 34);
@@ -1342,8 +1342,8 @@ Future<List<String>> printRecipt({required List<Receipt> printdata}) async {
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.hr();
         //明细内容
-        final List<Detail> detail = item.detail!;
-        if (detail.isNotEmpty) {
+        final List<Detail>? detail = item.detail;
+        if (detail != null && detail.isNotEmpty) {
           bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
           for (int i = 0; i < detail.length; i++) {
             var printName = EscHelper.splitString(str: detail[i].mPrintName ?? "", splitLength: 34);
@@ -1409,8 +1409,8 @@ Future<List<String>> printRecipt({required List<Receipt> printdata}) async {
         //分割線
         bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
         bytes += generator.hr();
-        final List<PayType> payType = item.payType!;
-        if (payType.isNotEmpty) {
+        final List<PayType>? payType = item.payType;
+        if (payType != null && payType.isNotEmpty) {
           for (int i = 0; i < payType.length; i++) {
             bytes += generator.rawBytes(EscHelper.setSize(size: 1).codeUnits);
             bytes += generator.text(
@@ -1565,23 +1565,25 @@ Future<List<String>> printTakeaway({required List<Takeaway> printdata}) async {
         bytes += generator.rawBytes(EscHelper.setAlign(align: 1).codeUnits);
         //时间
         bytes += generator.text(
-          DateFormat('yyyy-MM-dd HH:mm:ss').format(item.mInvoiceDate!),
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(item.mInvoiceDate ?? DateTime.now()),
           styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
           containsChinese: true,
         );
         //电话
-        bytes += generator.text(
-          item.mCustomerCode!.replaceFirst("+852", "+852 "),
-          styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
-          containsChinese: true,
-        );
+        if (item.mCustomerCode?.isNotEmpty ?? false) {
+          bytes += generator.text(
+            item.mCustomerCode!.replaceFirst("+852", "+852 "),
+            styles: const PosStyles(width: PosTextSize.size2, height: PosTextSize.size2, bold: true),
+            containsChinese: true,
+          );
+        }
 
         bytes += generator.feed(1);
 
         bytes += generator.hr();
         bytes += generator.rawBytes(EscHelper.setAlign().codeUnits + EscHelper.setSize(size: 1).codeUnits);
-        final List<Map<String, InvoiceDetail>> details = item.invoiceDetails!;
-        if (details.isNotEmpty) {
+        final List<Map<String, InvoiceDetail>>? details = item.invoiceDetails;
+        if (details != null && details.isNotEmpty) {
           for (var detail in details) {
             for (var li in detail.entries) {
               //父商品名称
