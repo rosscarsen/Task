@@ -148,7 +148,7 @@
 
 #### windows 安装包下载
 
-[**Windows task.msix 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.3/task.msix)
+[**Windows task.msix 下载**](https://github.com/rosscarsen/Task/releases/download/1.0.4/task.msix)
 
 #### 安装说明
 
