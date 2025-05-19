@@ -12,14 +12,13 @@ UserData? cachedLoginUser;
 // 防止电脑进入睡眠状态
 void preventSleep() {
   // 设置线程执行状态，防止电脑进入睡眠状态
-  SetThreadExecutionState(
-      EXECUTION_STATE.ES_CONTINUOUS | EXECUTION_STATE.ES_SYSTEM_REQUIRED | EXECUTION_STATE.ES_AWAYMODE_REQUIRED);
+  SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED);
 }
 
 // 允许睡眠
 void allowSleep() {
   // 设置线程执行状态为连续执行
-  SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
+  SetThreadExecutionState(ES_CONTINUOUS);
 }
 
 // 定义一个函数，用于启动Windows任务
