@@ -36,6 +36,7 @@ Future<void> win32StartTask() async {
     }
     await updateCachedData();
     timer = Timer.periodic(const Duration(seconds: 5), (_) async {
+      print("==>$printlang");
       try {
         // 如果缓存数据为空，尝试重新获取
         if (cachedLoginUser == null) {
@@ -55,7 +56,7 @@ Future<void> win32StartTask() async {
           return;
         }
 
-        debugPrint("打印状态：$printStatus");
+        //debugPrint("打印状态：$printStatus");
         if (printStatus) {
           printStatus = false;
           getPrintData(queryData: cachedLoginUser!.toJson());
@@ -75,6 +76,12 @@ Future<void> win32StartTask() async {
   }
 }
 
+// 更改打印语言
+void win32UpdatePrintLang({required String lang}) {
+  printlang = lang;
+}
+
+// 更新缓存信息
 Future<void> updateCachedData() async {
   int retryCount = 0;
   const maxRetry = 3;
@@ -95,6 +102,7 @@ Future<void> updateCachedData() async {
   }
 }
 
+// 停止Windows任务
 Future<void> win32StopTask() async {
   printStatus = false;
   printKitchenErrorCount = 0; // 初始化打印错误计数器

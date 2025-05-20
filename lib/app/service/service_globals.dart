@@ -39,7 +39,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
         PrinterModel ret = PrinterModel.fromJson(response.data);
 
         cacheBackupCheckCount = ret.backupCheckCount!; //缓存备份检查次数
-        printlang = ret.printLang!; //缓存打印语言
+        //printlang = ret.printLang!; //缓存打印语言
         if (ret.qrCodeData == null &&
             ret.kitchen == null &&
             ret.upperMenu == null &&
@@ -58,11 +58,11 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           List<String> uniqueQrCodeIDs = qrcodeIDs.toSet().toList();
           if (uniqueQrCodeIDs.isNotEmpty) {
             queueIDs.addAll([
-              {"qrcode": uniqueQrCodeIDs}
+              {"qrcode": uniqueQrCodeIDs},
             ]);
           }
         }
-        print("===>cacheBackupCheckCount:$cacheBackupCheckCount printKitchenErrorCount:$printKitchenErrorCount");
+        //print("===>cacheBackupCheckCount:$cacheBackupCheckCount printKitchenErrorCount:$printKitchenErrorCount");
 
         ///打印厨房、BDL小票
         if (ret.kitchen != null && ret.kitchen!.isNotEmpty) {
@@ -102,10 +102,10 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
               });
             });
           } else {
-            groupBy(
-              nomoralKitchen.where((rows) => rows.mLanIP != null),
-              (Kitchen rows) => rows.mLanIP,
-            ).forEach((mLanIP, kitchens) {
+            groupBy(nomoralKitchen.where((rows) => rows.mLanIP != null), (Kitchen rows) => rows.mLanIP).forEach((
+              mLanIP,
+              kitchens,
+            ) {
               // 如果 mLanIP 不存在，先插入一个空的 Map
               if (!kitchenData.containsKey(mLanIP)) {
                 kitchenData[mLanIP!] = {};
@@ -113,10 +113,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
               // 分组处理
               final invoiceGroup = groupBy(kitchens, (Kitchen rows) => rows.mInvoiceNo!);
               invoiceGroup.forEach((mInvoiceNo, kitchenList) {
-                kitchenData[mLanIP]![mInvoiceNo] = groupBy(
-                  kitchenList,
-                  (Kitchen rows) => rows.mContinue!,
-                );
+                kitchenData[mLanIP]![mInvoiceNo] = groupBy(kitchenList, (Kitchen rows) => rows.mContinue!);
               });
             });
           }
@@ -143,10 +140,10 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
               });
             });
           } else {
-            groupBy(
-              nomoralKitchen.where((rows) => rows.bDLLanIP != null),
-              (Kitchen rows) => rows.bDLLanIP,
-            ).forEach((bDLLanIP, kitchens) {
+            groupBy(nomoralKitchen.where((rows) => rows.bDLLanIP != null), (Kitchen rows) => rows.bDLLanIP).forEach((
+              bDLLanIP,
+              kitchens,
+            ) {
               // 如果 mLanIP 不存在，先插入一个空的 Map
               if (!bDLData.containsKey(bDLLanIP)) {
                 bDLData[bDLLanIP!] = {};
@@ -154,10 +151,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
               // 分组处理
               final invoiceGroup = groupBy(kitchens, (Kitchen rows) => rows.mInvoiceNo!);
               invoiceGroup.forEach((mInvoiceNo, kitchenList) {
-                bDLData[bDLLanIP]![mInvoiceNo] = groupBy(
-                  kitchenList,
-                  (Kitchen rows) => rows.mNonContinue!,
-                );
+                bDLData[bDLLanIP]![mInvoiceNo] = groupBy(kitchenList, (Kitchen rows) => rows.mNonContinue!);
               });
             });
           }
@@ -191,7 +185,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           }
           if (printedKitchen.isNotEmpty) {
             queueIDs.addAll([
-              {"kitchen": printedKitchen}
+              {"kitchen": printedKitchen},
             ]);
           }
         }
@@ -201,7 +195,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           List<String> tempIDs = await printOnTheMeun(printdata: ret.upperMenu!);
           if (tempIDs.isNotEmpty) {
             queueIDs.addAll([
-              {"onTheMenu": tempIDs}
+              {"onTheMenu": tempIDs},
             ]);
           }
         }
@@ -211,7 +205,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           List<String> tempIDs = await printCustomerRecord(printdata: ret.customerRecord!);
           if (tempIDs.isNotEmpty) {
             queueIDs.addAll([
-              {"customerRecord": tempIDs}
+              {"customerRecord": tempIDs},
             ]);
           }
         }
@@ -221,7 +215,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           List<String> tempIDs = await printRecipt(printdata: ret.receipt!);
           if (tempIDs.isNotEmpty) {
             queueIDs.addAll([
-              {"receipt": tempIDs}
+              {"receipt": tempIDs},
             ]);
           }
         }
@@ -230,7 +224,7 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           final bool openDrawerResult = await openDrawer(printData: ret.openDrawer!);
           if (openDrawerResult) {
             queueIDs.addAll([
-              {"openDrawer": ret.openDrawer!.queueID!}
+              {"openDrawer": ret.openDrawer!.queueID!},
             ]);
           }
         }
@@ -238,11 +232,11 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
           List<String> tempIDs = await printTakeaway(printdata: ret.takeaway!);
           if (tempIDs.isNotEmpty) {
             queueIDs.addAll([
-              {"takeaway": tempIDs}
+              {"takeaway": tempIDs},
             ]);
           }
         }
-        logger.f(jsonEncode(queueIDs));
+        //logger.f(jsonEncode(queueIDs));
 
         ///发票号码发送给后端
         if (queueIDs.isNotEmpty) {

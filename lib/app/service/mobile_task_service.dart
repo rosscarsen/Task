@@ -17,11 +17,7 @@ Future<void> initializeService() async {
       isForegroundMode: true,
       autoStartOnBoot: false,
     ),
-    iosConfiguration: IosConfiguration(
-      autoStart: false,
-      onForeground: onStart,
-      onBackground: onIosBackground,
-    ),
+    iosConfiguration: IosConfiguration(autoStart: false, onForeground: onStart, onBackground: onIosBackground),
   );
 }
 
@@ -65,6 +61,7 @@ void onStart(ServiceInstance service) async {
   // 初始化缓存数据
   await updateCachedData();
 
+  // 设置前台服务
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
       debugPrint("设置前台服务");
@@ -77,6 +74,7 @@ void onStart(ServiceInstance service) async {
     });
   }
 
+  // 监听停止服务事件
   service.on('stopService').listen((event) {
     printStatus = false;
     printKitchenErrorCount = 0; // 初始化打印错误计数器
@@ -89,11 +87,20 @@ void onStart(ServiceInstance service) async {
     }
     service.stopSelf();
   });
+
+  // 更改打印语言
+  service.on('updatePrintLang').listen((event) {
+    printlang = event?['lang'] ?? "zh_HK";
+  });
+
+  // 获取数据定时器存在则关闭它
   if (timer != null && timer!.isActive) {
     timer!.cancel();
   }
+
+  // 启动打印定时任务
   timer = Timer.periodic(const Duration(seconds: 5), (t) async {
-    //debugPrint("===>${t.tick}");
+    // debugPrint("===>$printlang");
     try {
       // 如果缓存数据为空，尝试重新获取
       if (cachedLoginUser == null) {
@@ -132,10 +139,11 @@ void onStart(ServiceInstance service) async {
     }
   });
 
-  // 定期刷新缓存数据
+  // 缓存定时器存在则关闭它
   if (cacheTimer != null && cacheTimer!.isActive) {
     cacheTimer!.cancel();
   }
+  // 定期刷新缓存数据
   cacheTimer = Timer.periodic(const Duration(minutes: 1), (_) async {
     await updateCachedData();
   });

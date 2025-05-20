@@ -65,9 +65,10 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     var loginUserJson = storageManage.read(Config.localStroageloginInfo);
     String localeString = storageManage.read(Config.localStroagelanguage) ?? "zh_HK";
 
-    String webLang = localeString == "zh_CN"
-        ? "zh-cn"
-        : localeString == "en_US"
+    String webLang =
+        localeString == "zh_CN"
+            ? "zh-cn"
+            : localeString == "en_US"
             ? 'en-us'
             : 'zh-tw';
 
@@ -94,20 +95,19 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       userAgent: "flutter",
       javaScriptEnabled: true,
     );
-    pullToRefreshController = kIsWeb || ![TargetPlatform.iOS, TargetPlatform.android].contains(defaultTargetPlatform)
-        ? null
-        : PullToRefreshController(
-            settings: PullToRefreshSettings(
-              color: Colors.blue,
-            ),
-            onRefresh: () async {
-              if (defaultTargetPlatform == TargetPlatform.android) {
-                webViewController?.reload();
-              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-                webViewController?.loadUrl(urlRequest: URLRequest(url: await webViewController?.getUrl()));
-              }
-            },
-          );
+    pullToRefreshController =
+        kIsWeb || ![TargetPlatform.iOS, TargetPlatform.android].contains(defaultTargetPlatform)
+            ? null
+            : PullToRefreshController(
+              settings: PullToRefreshSettings(color: Colors.blue),
+              onRefresh: () async {
+                if (defaultTargetPlatform == TargetPlatform.android) {
+                  webViewController?.reload();
+                } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+                  webViewController?.loadUrl(urlRequest: URLRequest(url: await webViewController?.getUrl()));
+                }
+              },
+            );
     super.onInit();
   }
 
@@ -124,10 +124,22 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       var ret = await _service.isRunning();
       if (!ret) {
         _service.startService();
+        updatePrintLang();
       }
     }
     if (Platform.isWindows && hasTask) {
       await win32StartTask();
+      updatePrintLang();
+    }
+  }
+
+  /// 更改打印语言
+  void updatePrintLang() {
+    if ((Platform.isAndroid || Platform.isIOS)) {
+      _service.invoke("updatePrintLang", {'lang': Get.locale.toString()});
+    }
+    if (Platform.isWindows) {
+      win32UpdatePrintLang(lang: Get.locale.toString());
     }
   }
 
@@ -248,17 +260,19 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   ///window设置语言
   Future<void> windowSetLanguage({required String localLangString}) async {
-    Locale locale = localLangString.isNotEmpty
-        ? localLangString == "zh-cn"
-            ? const Locale("zh", "CN")
-            : localLangString == "zh-tw"
+    Locale locale =
+        localLangString.isNotEmpty
+            ? localLangString == "zh-cn"
+                ? const Locale("zh", "CN")
+                : localLangString == "zh-tw"
                 ? const Locale("zh", "HK")
                 : const Locale("en", "US")
-        : const Locale("zh", "HK");
+            : const Locale("zh", "HK");
 
     await storageManage.delete(Config.localStroagelanguage);
     await storageManage.save(Config.localStroagelanguage, locale.toString());
     Get.updateLocale(locale);
+    updatePrintLang();
   }
 
   ///打印日结报表
@@ -464,10 +478,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         //日結分析
         final String? auditTrail = printData.auditTrail;
         if (auditTrail!.isNotEmpty) {
-          bytes += generator.text(
-            "${EscHelper.setSize(size: 3)}$auditTrail",
-            containsChinese: true,
-          );
+          bytes += generator.text("${EscHelper.setSize(size: 3)}$auditTrail", containsChinese: true);
 
           bytes += generator.rawBytes(EscHelper.setSize().codeUnits);
           bytes += generator.hr();
@@ -611,10 +622,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
               "${EscHelper.columnMaker(content: "${saleReportList[i].mCode}", width: 16)}${EscHelper.columnMaker(content: "${double.parse(saleReportList[i].mQty!).toInt()}", width: 16, align: 1)}${EscHelper.columnMaker(content: "${double.tryParse(saleReportList[i].mAmount!)?.toStringAsFixed(2)}", width: 16, align: 2)}",
               containsChinese: true,
             );
-            bytes += generator.text(
-              "${saleReportList[i].mDesc1}",
-              containsChinese: true,
-            );
+            bytes += generator.text("${saleReportList[i].mDesc1}", containsChinese: true);
           }
           bytes += generator.rawBytes(EscHelper.setSize().codeUnits + EscHelper.setBold(bold: false).codeUnits);
           bytes += generator.hr();
