@@ -3,8 +3,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:get_storage/get_storage.dart';
 
+import '../config.dart';
 import '../model/login_model.dart';
+import '../utils/stroage_manage.dart';
 import 'print_method.dart';
 import 'service_globals.dart';
 
@@ -30,36 +33,15 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
+  await GetStorage.init("task");
+  final StorageManage storageManage = StorageManage();
+  final cacheLang = storageManage.read(Config.localStroagelanguage);
+  printlang = cacheLang ?? "zh_HK";
   printStatus = true;
   printKitchenErrorCount = 0; // 初始化打印错误计数器
   debugPrint("开始服务:$printStatus");
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
-
-  UserData? cachedLoginUser;
-
-  Future<void> updateCachedData() async {
-    int retryCount = 0;
-    const maxRetry = 3;
-    while (retryCount < maxRetry) {
-      try {
-        cachedLoginUser = await getLoginInfo();
-        if (cachedLoginUser != null) break;
-      } catch (e) {
-        debugPrint("更新缓存数据失败: $e");
-      }
-      retryCount++;
-      await Future.delayed(const Duration(seconds: 2));
-    }
-    if (cachedLoginUser == null) {
-      debugPrint("多次尝试后仍无法获取登录信息");
-    } else {
-      debugPrint("缓存数据更新完成: ${cachedLoginUser?.toJson()}");
-    }
-  }
-
-  // 初始化缓存数据
-  await updateCachedData();
 
   // 设置前台服务
   if (service is AndroidServiceInstance) {
@@ -93,6 +75,31 @@ void onStart(ServiceInstance service) async {
     printlang = event?['lang'] ?? "zh_HK";
   });
 
+  UserData? cachedLoginUser;
+
+  Future<void> updateCachedData() async {
+    int retryCount = 0;
+    const maxRetry = 3;
+    while (retryCount < maxRetry) {
+      try {
+        cachedLoginUser = await getLoginInfo();
+        if (cachedLoginUser != null) break;
+      } catch (e) {
+        debugPrint("更新缓存数据失败: $e");
+      }
+      retryCount++;
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    if (cachedLoginUser == null) {
+      debugPrint("多次尝试后仍无法获取登录信息");
+    } else {
+      debugPrint("缓存数据更新完成: ${cachedLoginUser?.toJson()}");
+    }
+  }
+
+  // 初始化缓存数据
+  await updateCachedData();
+
   // 获取数据定时器存在则关闭它
   if (timer != null && timer!.isActive) {
     timer!.cancel();
@@ -100,7 +107,7 @@ void onStart(ServiceInstance service) async {
 
   // 启动打印定时任务
   timer = Timer.periodic(const Duration(seconds: 5), (t) async {
-    // debugPrint("===>$printlang");
+    debugPrint("===>$printlang");
     try {
       // 如果缓存数据为空，尝试重新获取
       if (cachedLoginUser == null) {

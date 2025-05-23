@@ -62,9 +62,7 @@ class AirprintSettingController extends GetxController with WidgetsBindingObserv
     if (station != airprintStation) {
       Get.defaultDialog(
         title: LocaleKeys.systemMessages.tr,
-        content: Text(
-          LocaleKeys.currentStationCannotSetUpAirprintService.trArgs(["$station"]),
-        ),
+        content: Text(LocaleKeys.currentStationCannotSetUpAirprintService.trArgs(["$station"])),
         textConfirm: LocaleKeys.confirm.tr,
         onConfirm: () => Get.back(),
         barrierDismissible: false,
@@ -80,7 +78,7 @@ class AirprintSettingController extends GetxController with WidgetsBindingObserv
       }
     }
     if (Platform.isWindows) {
-      await win32StartTask();
+      await win32StartTask(Get.locale?.toString() ?? "zh_HK");
       await checkServicRuning();
     }
     storageManage.save(Config.localStroageStartTask, true);

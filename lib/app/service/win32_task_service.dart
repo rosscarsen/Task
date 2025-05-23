@@ -22,7 +22,8 @@ void allowSleep() {
 }
 
 // 定义一个函数，用于启动Windows任务
-Future<void> win32StartTask() async {
+Future<void> win32StartTask(String initPrintLang) async {
+  printlang = initPrintLang;
   printStatus = true;
   printKitchenErrorCount = 0; // 初始化打印错误计数器
   final bool isRunning = win32TimerIsRunning();

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -26,7 +27,7 @@ Future<Locale> getSavedLocale() async {
 
 Future<void> initService() async {
   // 初始化存储
-  await GetStorage.init();
+  await GetStorage.init("task");
   if (Platform.isAndroid || Platform.isIOS) {
     await initializeService();
   }
@@ -34,6 +35,17 @@ Future<void> initService() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
+  }
   await initService();
   final Locale initialLocale = await getSavedLocale();
 
@@ -54,11 +66,7 @@ class MyApp extends StatelessWidget {
       locale: initialLocale,
       fallbackLocale: initialLocale,
       // 设置支持的语言
-      supportedLocales: const [
-        Locale('zh', 'CN'),
-        Locale('zh', 'HK'),
-        Locale('en', 'US'),
-      ],
+      supportedLocales: const [Locale('zh', 'CN'), Locale('zh', 'HK'), Locale('en', 'US')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

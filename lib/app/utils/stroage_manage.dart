@@ -2,7 +2,7 @@ import 'package:get_storage/get_storage.dart';
 
 class StorageManage {
   // 定义一个_box变量，类型为GetStorage()，用于存储获取的存储实例
-  final _box = GetStorage();
+  final _box = GetStorage("task");
 
   // 定义一个_instance变量，类型为StorageManage，用于存储全局的StorageManage实例
   static final StorageManage _instance = StorageManage._internal();

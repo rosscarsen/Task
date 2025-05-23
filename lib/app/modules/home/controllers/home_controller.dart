@@ -124,22 +124,26 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       var ret = await _service.isRunning();
       if (!ret) {
         _service.startService();
-        updatePrintLang();
       }
     }
     if (Platform.isWindows && hasTask) {
-      await win32StartTask();
-      updatePrintLang();
+      await win32StartTask(Get.locale?.toString() ?? "zh_HK");
     }
   }
 
   /// 更改打印语言
-  void updatePrintLang() {
+  Future<void> updatePrintLang() async {
     if ((Platform.isAndroid || Platform.isIOS)) {
-      _service.invoke("updatePrintLang", {'lang': Get.locale.toString()});
+      final isRunning = await _service.isRunning();
+      if (isRunning) {
+        _service.invoke("updatePrintLang", {'lang': Get.locale?.toString() ?? "zh_HK"});
+      }
     }
     if (Platform.isWindows) {
-      win32UpdatePrintLang(lang: Get.locale.toString());
+      final isRunning = win32TimerIsRunning();
+      if (isRunning) {
+        win32UpdatePrintLang(lang: Get.locale?.toString() ?? "zh_HK");
+      }
     }
   }
 
