@@ -29,13 +29,16 @@ class LoginView extends GetView<LoginController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text("简体"),
-                    Icon(Icons.check,
-                        color: LoginController.to.locale.value == const Locale('zh', "CN")
-                            ? Colors.green
-                            : Colors.transparent)
+                    Icon(
+                      Icons.check,
+                      color: LoginController.to.locale.value == const Locale('zh', "CN")
+                          ? Colors.green
+                          : Colors.transparent,
+                    ),
                   ],
                 ),
               ),
+
               const PopupMenuDivider(),
               PopupMenuItem(
                 value: "zh_HK",
@@ -47,10 +50,12 @@ class LoginView extends GetView<LoginController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text("繁體"),
-                    Icon(Icons.check,
-                        color: LoginController.to.locale.value == const Locale('zh', "HK")
-                            ? Colors.green
-                            : Colors.transparent)
+                    Icon(
+                      Icons.check,
+                      color: LoginController.to.locale.value == const Locale('zh', "HK")
+                          ? Colors.green
+                          : Colors.transparent,
+                    ),
                   ],
                 ),
               ),
@@ -60,10 +65,12 @@ class LoginView extends GetView<LoginController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text("English"),
-                    Icon(Icons.check,
-                        color: LoginController.to.locale.value == const Locale('en', "US")
-                            ? Colors.green
-                            : Colors.transparent)
+                    Icon(
+                      Icons.check,
+                      color: LoginController.to.locale.value == const Locale('en', "US")
+                          ? Colors.green
+                          : Colors.transparent,
+                    ),
                   ],
                 ),
                 onTap: () {
@@ -74,7 +81,7 @@ class LoginView extends GetView<LoginController> {
             ],
             icon: const Icon(Icons.more_horiz),
             iconSize: 25,
-          )
+          ),
         ],
       ),
       body: SafeArea(
@@ -163,19 +170,15 @@ class LoginView extends GetView<LoginController> {
                               return Colors.white;
                             }),
                             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-                            padding: WidgetStateProperty.all(
-                              const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
+                              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                             ),
+                            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 60, vertical: 12)),
                           ),
                           onPressed: () {
                             FocusManager.instance.primaryFocus?.unfocus();
                             LoginController.to.login();
                           },
-                          child: Text(
-                            LocaleKeys.login.tr,
-                            style: const TextStyle(fontSize: 18),
-                          ),
+                          child: Text(LocaleKeys.login.tr, style: const TextStyle(fontSize: 18)),
                         ),
                       ),
                     ],
