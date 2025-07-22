@@ -10,23 +10,25 @@ import '../../../config.dart';
 import '../../../model/ip_ping.dart';
 import '../../../model/login_model.dart';
 import '../../../service/api_client.dart';
-import '../../../utils/easy_loding.dart';
+import '../../../utils/easy_loading.dart';
+import '../../../utils/stroage_manage.dart';
 
 class IpPingController extends GetxController {
   static IpPingController get to => Get.find();
   final apiCli = ApiClient();
-  GetStorage box = GetStorage();
+  final StorageManage box = StorageManage();
   RxList<IpData> allIp = <IpData>[].obs;
-  RxBool loadding = false.obs;
+  RxBool loading = false.obs;
 
   ///获取所有ip
   Future<void> getAllIP() async {
     UserData? loginUser = getLoginInfo();
-
+    print(loginUser);
     if (loginUser != null) {
       try {
-        loadding(true);
+        loading(true);
         var response = await apiCli.post(Config.getAllLocalIP, data: {"loginUserInfo": jsonEncode(loginUser)});
+        print(response.data);
         if (response.statusCode == 200) {
           final ipPing = ipPingFromJson(json.encode(response.data));
           if (ipPing.state == 200) {
@@ -36,7 +38,7 @@ class IpPingController extends GetxController {
       } catch (e) {
         debugPrint(e.toString());
       } finally {
-        loadding(false);
+        loading(false);
       }
     }
   }
@@ -53,13 +55,13 @@ class IpPingController extends GetxController {
 
   /// ping测试
   Future<void> testConnection(String host, {int port = 9100}) async {
-    showLoding("$host ${LocaleKeys.testConnect.tr}...");
+    showLoading("$host ${LocaleKeys.testConnect.tr}...");
     try {
       final socket = await Socket.connect(host, port, timeout: const Duration(seconds: 5));
       socket.destroy();
-      successLoding("$host ${LocaleKeys.connectSuccess.tr}");
+      successLoading("$host ${LocaleKeys.connectSuccess.tr}");
     } catch (e) {
-      errorLoding("$host ${LocaleKeys.connectFailed.tr}");
+      errorLoading("$host ${LocaleKeys.connectFailed.tr}");
     }
   }
 }

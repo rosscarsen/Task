@@ -3,7 +3,7 @@ version: 1.0.7+7
 publish_to: none
 description: A new Flutter project.
 environment:
-  sdk: ^3.8.0
+  sdk: ^3.8.1
 
 dependencies:
   #字符串处理
@@ -12,7 +12,7 @@ dependencies:
   collection: ^1.19.1
   cupertino_icons: ^1.0.8
   #设备信息
-  device_info_plus: ^11.4.0
+  device_info_plus: ^11.5.0
   #网络请求
   dio: ^5.8.0+1
   #escpos工具
@@ -41,7 +41,7 @@ dependencies:
   #国际化
   intl: ^0.20.2
   #日志
-  logger: ^2.5.0
+  logger: ^2.6.1
   #路径
   path_provider: ^2.1.5
   #二维码
@@ -49,12 +49,12 @@ dependencies:
   #托盘
   tray_manager: ^0.5.0
   #windows
-  win32: ^5.13.0
+  win32: ^5.14.0
   #交错动画
   flutter_staggered_animations: ^1.1.1
 dev_dependencies:
-  flutter_launcher_icons: ^0.14.3
-  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^6.0.0
   flutter_native_splash: ^2.4.6
   flutter_test:
     sdk: flutter

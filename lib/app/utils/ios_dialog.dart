@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 
-iosDialog({
+Future iosDialog({
   required BuildContext context,
   required Widget content,
   required Widget titleWidget,
   String? cancelText,
   required String confirmText,
-  void Function()? candel,
+  void Function()? cancel,
   required void Function() confirm,
 }) {
   return showCupertinoDialog(
@@ -17,14 +17,8 @@ iosDialog({
         content: content,
         actions: [
           if (cancelText != null)
-            CupertinoDialogAction(
-              child: Text(cancelText),
-              onPressed: () => candel ?? Navigator.pop(context),
-            ),
-          CupertinoDialogAction(
-            onPressed: confirm,
-            child: Text(confirmText),
-          )
+            CupertinoDialogAction(child: Text(cancelText), onPressed: () => cancel ?? Navigator.pop(context)),
+          CupertinoDialogAction(onPressed: confirm, child: Text(confirmText)),
         ],
       );
     },

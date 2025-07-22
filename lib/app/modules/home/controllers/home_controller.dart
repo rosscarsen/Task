@@ -18,7 +18,7 @@ import '../../../routes/app_pages.dart';
 import '../../../service/api_client.dart';
 import '../../../service/win32_task_service.dart';
 import '../../../translations/app_translations.dart';
-import '../../../utils/easy_loding.dart';
+import '../../../utils/easy_loading.dart';
 import '../../../utils/esc_helper.dart';
 import '../../../utils/stroage_manage.dart';
 
@@ -65,12 +65,11 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     var loginUserJson = storageManage.read(Config.localStroageloginInfo);
     String localeString = storageManage.read(Config.localStroagelanguage) ?? "zh_HK";
 
-    String webLang =
-        localeString == "zh_CN"
-            ? "zh-cn"
-            : localeString == "en_US"
-            ? 'en-us'
-            : 'zh-tw';
+    String webLang = localeString == "zh_CN"
+        ? "zh-cn"
+        : localeString == "en_US"
+        ? 'en-us'
+        : 'zh-tw';
 
     final UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
     initWebUrl =
@@ -95,19 +94,18 @@ class HomeController extends GetxController with WidgetsBindingObserver {
       userAgent: "flutter",
       javaScriptEnabled: true,
     );
-    pullToRefreshController =
-        kIsWeb || ![TargetPlatform.iOS, TargetPlatform.android].contains(defaultTargetPlatform)
-            ? null
-            : PullToRefreshController(
-              settings: PullToRefreshSettings(color: Colors.blue),
-              onRefresh: () async {
-                if (defaultTargetPlatform == TargetPlatform.android) {
-                  webViewController?.reload();
-                } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-                  webViewController?.loadUrl(urlRequest: URLRequest(url: await webViewController?.getUrl()));
-                }
-              },
-            );
+    pullToRefreshController = kIsWeb || ![TargetPlatform.iOS, TargetPlatform.android].contains(defaultTargetPlatform)
+        ? null
+        : PullToRefreshController(
+            settings: PullToRefreshSettings(color: Colors.blue),
+            onRefresh: () async {
+              if (defaultTargetPlatform == TargetPlatform.android) {
+                webViewController?.reload();
+              } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+                webViewController?.loadUrl(urlRequest: URLRequest(url: await webViewController?.getUrl()));
+              }
+            },
+          );
     super.onInit();
   }
 
@@ -162,7 +160,8 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   ///添加airprint网页设置按钮
   Future<void> addAirPrintSettingButton({required InAppWebViewController controller}) async {
-    var addAirprintDiv = '''
+    var addAirprintDiv =
+        '''
     function openAirprintSetting() {
         try { 
             window.flutter_inappwebview.callHandler('openAirprintSetting', "js打开airprint设置");
@@ -203,7 +202,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   ///退出登录
   Future<void> logout() async {
     Get.back();
-    showLoding("${LocaleKeys.logout.tr}...");
+    showLoading("${LocaleKeys.logout.tr}...");
     final UserData? loginUser = getLoginInfo();
     if (loginUser != null) {
       String? company = loginUser.company;
@@ -212,16 +211,16 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         var response = await apiClient.post(Config.logout, data: {"company": company, "station": station});
 
         if (response.statusCode == 200) {
-          dismissLoding();
+          dismissLoading();
           await closeService();
           storageManage.delete(Config.localStroagehasLogin);
           Get.offAllNamed(Routes.LOGIN);
         }
       } catch (e) {
-        errorLoding(LocaleKeys.logoutFailed.tr);
+        errorLoading(LocaleKeys.logoutFailed.tr);
       }
     } else {
-      errorLoding(LocaleKeys.logoutFailed.tr);
+      errorLoading(LocaleKeys.logoutFailed.tr);
     }
   }
 
@@ -264,14 +263,13 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   ///window设置语言
   Future<void> windowSetLanguage({required String localLangString}) async {
-    Locale locale =
-        localLangString.isNotEmpty
-            ? localLangString == "zh-cn"
-                ? const Locale("zh", "CN")
-                : localLangString == "zh-tw"
-                ? const Locale("zh", "HK")
-                : const Locale("en", "US")
-            : const Locale("zh", "HK");
+    Locale locale = localLangString.isNotEmpty
+        ? localLangString == "zh-cn"
+              ? const Locale("zh", "CN")
+              : localLangString == "zh-tw"
+              ? const Locale("zh", "HK")
+              : const Locale("en", "US")
+        : const Locale("zh", "HK");
 
     await storageManage.delete(Config.localStroagelanguage);
     await storageManage.save(Config.localStroagelanguage, locale.toString());
@@ -284,7 +282,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     final UserData? loginUser = getLoginInfo();
     if (loginUser != null) {
       if (loginUser.invoicePrintIP == null && loginUser.invoicePrintIP == "") {
-        errorLoding(LocaleKeys.printDoesNotExits.tr);
+        errorLoading(LocaleKeys.printDoesNotExits.tr);
         return;
       }
     }
@@ -536,13 +534,13 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         PosPrintResult printing = await printer.printTicket(bytes);
         printer.disconnect();
         if (printing.msg == "Success") {
-          successLoding(LocaleKeys.printSuccess.tr);
+          successLoading(LocaleKeys.printSuccess.tr);
         }
       } else {
-        errorLoding("打印機$invoicePrintIP連接失敗");
+        errorLoading("打印機$invoicePrintIP連接失敗");
       }
     } catch (e) {
-      errorLoding("打印过程中出现错误: $e");
+      errorLoading("打印过程中出现错误: $e");
     }
   }
 
@@ -551,7 +549,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     final UserData? loginUser = getLoginInfo();
     if (loginUser != null) {
       if (loginUser.invoicePrintIP == null && loginUser.invoicePrintIP == "") {
-        errorLoding(LocaleKeys.printDoesNotExits.tr);
+        errorLoading(LocaleKeys.printDoesNotExits.tr);
         return;
       }
     }
@@ -643,13 +641,13 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         PosPrintResult printing = await printer.printTicket(bytes);
         printer.disconnect();
         if (printing.msg == "Success") {
-          successLoding(LocaleKeys.printSuccess.tr);
+          successLoading(LocaleKeys.printSuccess.tr);
         }
       } else {
-        errorLoding("打印機$invoicePrintIP連接失敗");
+        errorLoading("打印機$invoicePrintIP連接失敗");
       }
     } catch (e) {
-      errorLoding("打印过程中出现错误: $e");
+      errorLoading("打印过程中出现错误: $e");
     }
   }
 

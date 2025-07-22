@@ -67,8 +67,9 @@ Future<void> getPrintData({Map<String, dynamic>? queryData}) async {
         ///打印厨房、BDL小票
         if (ret.kitchen != null && ret.kitchen!.isNotEmpty) {
           final List<Kitchen> nomoralKitchen = ret.kitchen!.where((rows) => rows.mIsPrint == "P").toList();
-          final List<Kitchen> otherKitchen =
-              ret.kitchen!.where((rows) => rows.mIsPrint != "P" && rows.mLanIP != null).toList();
+          final List<Kitchen> otherKitchen = ret.kitchen!
+              .where((rows) => rows.mIsPrint != "P" && rows.mLanIP != null)
+              .toList();
           //定义接收返回的已打印厨房单据
           List<Map<String, dynamic>> printedKitchen = [];
 

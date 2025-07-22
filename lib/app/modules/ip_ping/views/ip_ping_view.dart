@@ -31,13 +31,10 @@ class IpPingView extends GetView<IpPingController> {
               await state.controller!.getAllIP();
             },
             builder: (ctl) {
-              return ctl.loadding.value
+              return ctl.loading.value
                   ? const Center(child: CircularProgressIndicator())
                   : ListView.separated(
-                      separatorBuilder: (context, index) => const Divider(
-                        indent: 15,
-                        endIndent: 15,
-                      ),
+                      separatorBuilder: (context, index) => const Divider(indent: 15, endIndent: 15),
                       itemCount: ctl.allIp.length,
                       itemBuilder: (context, index) {
                         return ListTile(

@@ -11,7 +11,7 @@ import '../../../model/login_model.dart';
 import '../../../routes/app_pages.dart';
 import '../../../service/api_client.dart';
 import '../../../translations/app_translations.dart';
-import '../../../utils/easy_loding.dart';
+import '../../../utils/easy_loading.dart';
 import '../../../utils/stroage_manage.dart';
 
 class LoginController extends GetxController {
@@ -58,7 +58,7 @@ class LoginController extends GetxController {
     }
 
     if (formKey.currentState!.validate()) {
-      showLoding(LocaleKeys.loggingIn.tr);
+      showLoading(LocaleKeys.loggingIn.tr);
       var loginForm = formKey.currentState;
       loginForm!.validate();
       Map<String, dynamic> loginData = {
@@ -80,7 +80,7 @@ class LoginController extends GetxController {
             storageManage.delete(Config.localStroagehasLogin);
             final String? mobileUrl = ret.data!.webSit;
             if (mobileUrl!.isEmpty || mobileUrl == "") {
-              errorLoding('websiteNotExist'.tr);
+              errorLoading('websiteNotExist'.tr);
               return;
             }
 
@@ -92,19 +92,19 @@ class LoginController extends GetxController {
             }
             storageManage.save(Config.localStroageloginInfo, ret.data!.toJson());
             storageManage.save(Config.localStroagehasLogin, true);
-            successLoding(LocaleKeys.loginSuccess.tr);
+            successLoading(LocaleKeys.loginSuccess.tr);
 
             Future.delayed(const Duration(milliseconds: 1000), () {
               Get.offAllNamed(Routes.HOME);
             });
           } else if (ret.status == 201) {
-            errorLoding(LocaleKeys.companyError.tr);
+            errorLoading(LocaleKeys.companyError.tr);
           } else if (ret.status == 202) {
-            errorLoding(LocaleKeys.stationDoesNotExist.tr);
+            errorLoading(LocaleKeys.stationDoesNotExist.tr);
           } else if (ret.status == 203) {
-            errorLoding(LocaleKeys.useOrPasswordError.tr);
+            errorLoading(LocaleKeys.useOrPasswordError.tr);
           } else if (ret.status == 204) {
-            dismissLoding();
+            dismissLoading();
             showCupertinoDialog(
               context: Get.context!,
               builder: (BuildContext context) {
@@ -126,21 +126,21 @@ class LoginController extends GetxController {
                         LocaleKeys.confirm.tr,
                         style: TextStyle(color: Theme.of(Get.context!).colorScheme.error),
                       ),
-                    )
+                    ),
                   ],
                 );
               },
             );
           } else {
-            errorLoding('${ret.info}');
+            errorLoading('${ret.info}');
           }
         } else {
-          errorLoding(LocaleKeys.loginFailed.tr);
+          errorLoading(LocaleKeys.loginFailed.tr);
         }
       } on DioException {
-        errorLoding(LocaleKeys.requestFailed.tr);
+        errorLoading(LocaleKeys.requestFailed.tr);
       } on Exception {
-        errorLoding(LocaleKeys.requestFailed.tr);
+        errorLoading(LocaleKeys.requestFailed.tr);
       }
     }
   }

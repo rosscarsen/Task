@@ -142,24 +142,25 @@ class UpperMenuData {
   String? mAmount;
   String? hasFirstPrint;
 
-  UpperMenuData(
-      {this.queueID,
-      this.invoiceNo,
-      this.mSalesmanCode,
-      this.mStationCode,
-      this.mPnum,
-      this.mTableNo,
-      this.mInvoiceNo,
-      this.invoiceDate,
-      this.invoiceTime,
-      this.mQty,
-      this.mtime,
-      this.mRemarks,
-      this.mBarcodeName,
-      this.mInvoiceDetailID,
-      this.mAmount,
-      this.mPrice,
-      this.hasFirstPrint});
+  UpperMenuData({
+    this.queueID,
+    this.invoiceNo,
+    this.mSalesmanCode,
+    this.mStationCode,
+    this.mPnum,
+    this.mTableNo,
+    this.mInvoiceNo,
+    this.invoiceDate,
+    this.invoiceTime,
+    this.mQty,
+    this.mtime,
+    this.mRemarks,
+    this.mBarcodeName,
+    this.mInvoiceDetailID,
+    this.mAmount,
+    this.mPrice,
+    this.hasFirstPrint,
+  });
 
   UpperMenuData.fromJson(Map<String, dynamic> json) {
     queueID = json['queueID'];
@@ -503,7 +504,7 @@ class Receipt {
     }
   }
 
-  get mDiscAmtRate => null;
+  Null get mDiscAmtRate => null;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -649,42 +650,46 @@ class Takeaway {
   });
 
   factory Takeaway.fromJson(Map<String, dynamic> json) => Takeaway(
-        tInvoiceId: json["t_invoice_id"],
-        mInvoiceNo: json["mInvoice_No"],
-        mCustTel: json["mCust_tel"],
-        mCustFax: json["mCust_fax"],
-        mCustDelTime: json["mCust_del_time"] == null ? null : DateTime.parse(json["mCust_del_time"]),
-        mCustAttn: json["mCust_attn"],
-        mInvoiceDate: json["mInvoice_Date"] == null ? null : DateTime.parse(json["mInvoice_Date"]),
-        mCustomerCode: json["mCustomer_Code"],
-        mAmount: json["mAmount"],
-        queueId: json["queueID"],
-        mLanIp: json["mLanIP"],
-        mPrinterType: json["mPrinterType"],
-        invoiceDetails: json["invoiceDetails"] == null
-            ? []
-            : List<Map<String, InvoiceDetail>>.from(json["invoiceDetails"]!
-                .map((x) => Map.from(x).map((k, v) => MapEntry<String, InvoiceDetail>(k, InvoiceDetail.fromJson(v))))),
-      );
+    tInvoiceId: json["t_invoice_id"],
+    mInvoiceNo: json["mInvoice_No"],
+    mCustTel: json["mCust_tel"],
+    mCustFax: json["mCust_fax"],
+    mCustDelTime: json["mCust_del_time"] == null ? null : DateTime.parse(json["mCust_del_time"]),
+    mCustAttn: json["mCust_attn"],
+    mInvoiceDate: json["mInvoice_Date"] == null ? null : DateTime.parse(json["mInvoice_Date"]),
+    mCustomerCode: json["mCustomer_Code"],
+    mAmount: json["mAmount"],
+    queueId: json["queueID"],
+    mLanIp: json["mLanIP"],
+    mPrinterType: json["mPrinterType"],
+    invoiceDetails: json["invoiceDetails"] == null
+        ? []
+        : List<Map<String, InvoiceDetail>>.from(
+            json["invoiceDetails"]!.map(
+              (x) => Map.from(x).map((k, v) => MapEntry<String, InvoiceDetail>(k, InvoiceDetail.fromJson(v))),
+            ),
+          ),
+  );
 
   Map<String, dynamic> toJson() => {
-        "t_invoice_id": tInvoiceId,
-        "mInvoice_No": mInvoiceNo,
-        "mCust_tel": mCustTel,
-        "mCust_fax": mCustFax,
-        "mCust_del_time": mCustDelTime?.toIso8601String(),
-        "mCust_attn": mCustAttn,
-        "mInvoice_Date": mInvoiceDate?.toIso8601String(),
-        "mCustomer_Code": mCustomerCode,
-        "mAmount": mAmount,
-        "queueID": queueId,
-        "mLanIP": mLanIp,
-        "mPrinterType": mPrinterType,
-        "invoiceDetails": invoiceDetails == null
-            ? []
-            : List<dynamic>.from(
-                invoiceDetails!.map((x) => Map.from(x).map((k, v) => MapEntry<String, dynamic>(k, v.toJson())))),
-      };
+    "t_invoice_id": tInvoiceId,
+    "mInvoice_No": mInvoiceNo,
+    "mCust_tel": mCustTel,
+    "mCust_fax": mCustFax,
+    "mCust_del_time": mCustDelTime?.toIso8601String(),
+    "mCust_attn": mCustAttn,
+    "mInvoice_Date": mInvoiceDate?.toIso8601String(),
+    "mCustomer_Code": mCustomerCode,
+    "mAmount": mAmount,
+    "queueID": queueId,
+    "mLanIP": mLanIp,
+    "mPrinterType": mPrinterType,
+    "invoiceDetails": invoiceDetails == null
+        ? []
+        : List<dynamic>.from(
+            invoiceDetails!.map((x) => Map.from(x).map((k, v) => MapEntry<String, dynamic>(k, v.toJson()))),
+          ),
+  };
 
   @override
   String toString() {
@@ -716,28 +721,28 @@ class InvoiceDetail {
   });
 
   factory InvoiceDetail.fromJson(Map<String, dynamic> json) => InvoiceDetail(
-        mItem: json["mItem"],
-        mBarcodeName: json["mBarcode_Name"],
-        mQty: json["mQty"],
-        mPrice: json["mPrice"],
-        mAmount: json["mAmount"],
-        mRemarks: json["mRemarks"],
-        mParent: json["mParent"],
-        mTime: json["mTime"],
-        children: json["children"] == null
-            ? []
-            : List<InvoiceDetail>.from(json["children"]!.map((x) => InvoiceDetail.fromJson(x))),
-      );
+    mItem: json["mItem"],
+    mBarcodeName: json["mBarcode_Name"],
+    mQty: json["mQty"],
+    mPrice: json["mPrice"],
+    mAmount: json["mAmount"],
+    mRemarks: json["mRemarks"],
+    mParent: json["mParent"],
+    mTime: json["mTime"],
+    children: json["children"] == null
+        ? []
+        : List<InvoiceDetail>.from(json["children"]!.map((x) => InvoiceDetail.fromJson(x))),
+  );
 
   Map<String, dynamic> toJson() => {
-        "mItem": mItem,
-        "mBarcode_Name": mBarcodeName,
-        "mQty": mQty,
-        "mPrice": mPrice,
-        "mAmount": mAmount,
-        "mRemarks": mRemarks,
-        "mParent": mParent,
-        "mTime": mTime,
-        "children": children == null ? [] : List<dynamic>.from(children!.map((x) => x.toJson())),
-      };
+    "mItem": mItem,
+    "mBarcode_Name": mBarcodeName,
+    "mQty": mQty,
+    "mPrice": mPrice,
+    "mAmount": mAmount,
+    "mRemarks": mRemarks,
+    "mParent": mParent,
+    "mTime": mTime,
+    "children": children == null ? [] : List<dynamic>.from(children!.map((x) => x.toJson())),
+  };
 }

@@ -3,7 +3,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import 'custom_animation.dart';
 
-successLoding(String msg) {
+void successLoading(String msg) {
   EasyLoading.instance
     ..indicatorType = EasyLoadingIndicatorType.fadingCircle
     ..loadingStyle = EasyLoadingStyle.custom
@@ -17,13 +17,10 @@ successLoding(String msg) {
     ..userInteractions = true
     ..dismissOnTap = false
     ..customAnimation = CustomAnimation();
-  EasyLoading.showSuccess(
-    msg,
-    maskType: EasyLoadingMaskType.custom,
-  );
+  EasyLoading.showSuccess(msg, maskType: EasyLoadingMaskType.custom);
 }
 
-errorLoding(String msg) {
+void errorLoading(String msg) {
   EasyLoading.instance
     ..indicatorType = EasyLoadingIndicatorType.fadingCircle
     ..loadingStyle = EasyLoadingStyle.custom
@@ -37,13 +34,10 @@ errorLoding(String msg) {
     ..userInteractions = true
     ..dismissOnTap = false
     ..customAnimation = CustomAnimation();
-  EasyLoading.showError(
-    msg,
-    maskType: EasyLoadingMaskType.custom,
-  );
+  EasyLoading.showError(msg, maskType: EasyLoadingMaskType.custom);
 }
 
-showLoding(String msg) {
+void showLoading(String msg) {
   EasyLoading.instance
     ..indicatorType = EasyLoadingIndicatorType.fadingCircle
     ..loadingStyle = EasyLoadingStyle.custom
@@ -53,17 +47,14 @@ showLoding(String msg) {
     ..backgroundColor = Colors.black
     ..indicatorColor = Colors.white
     ..textColor = Colors.white
-    ..maskColor=Colors.black.withValues(alpha: 0.5)
+    ..maskColor = Colors.black.withValues(alpha: 0.5)
     ..userInteractions = true
     ..dismissOnTap = false
     ..customAnimation = CustomAnimation();
-  EasyLoading.show(
-    status: msg,
-    maskType: EasyLoadingMaskType.custom,
-  );
+  EasyLoading.show(status: msg, maskType: EasyLoadingMaskType.custom);
 }
 
-showToast(String msg) {
+void showToast(String msg) {
   EasyLoading.instance
     ..indicatorType = EasyLoadingIndicatorType.fadingCircle
     ..loadingStyle = EasyLoadingStyle.custom
@@ -77,13 +68,10 @@ showToast(String msg) {
     ..userInteractions = true
     ..dismissOnTap = false
     ..customAnimation = CustomAnimation();
-  EasyLoading.showToast(
-    msg,
-    maskType: EasyLoadingMaskType.custom,
-  );
+  EasyLoading.showToast(msg, maskType: EasyLoadingMaskType.custom);
 }
 
-dismissLoding() {
+void dismissLoading() {
   if (EasyLoading.isShow) {
     EasyLoading.dismiss();
   }
