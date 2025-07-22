@@ -12,7 +12,7 @@ import '../../../routes/app_pages.dart';
 import '../../../service/api_client.dart';
 import '../../../translations/app_translations.dart';
 import '../../../utils/easy_loading.dart';
-import '../../../utils/stroage_manage.dart';
+import '../../../utils/storage_manage.dart';
 
 class LoginController extends GetxController {
   static LoginController get to => Get.find();
@@ -76,8 +76,8 @@ class LoginController extends GetxController {
           final LoginModel ret = LoginModel.fromJson(response.data);
 
           if (ret.status == 200) {
-            storageManage.delete(Config.localStroageloginInfo);
-            storageManage.delete(Config.localStroagehasLogin);
+            storageManage.delete(Config.localStorageLoginInfo);
+            storageManage.delete(Config.localStorageHasLogin);
             final String? mobileUrl = ret.data!.webSit;
             if (mobileUrl!.isEmpty || mobileUrl == "") {
               errorLoading('websiteNotExist'.tr);
@@ -90,8 +90,8 @@ class LoginController extends GetxController {
               ret.data!.userCode = "";
               ret.data!.pwd = "";
             }
-            storageManage.save(Config.localStroageloginInfo, ret.data!.toJson());
-            storageManage.save(Config.localStroagehasLogin, true);
+            storageManage.save(Config.localStorageLoginInfo, ret.data!.toJson());
+            storageManage.save(Config.localStorageHasLogin, true);
             successLoading(LocaleKeys.loginSuccess.tr);
 
             Future.delayed(const Duration(milliseconds: 1000), () {
@@ -146,7 +146,7 @@ class LoginController extends GetxController {
   }
 
   void getLoginInfo() {
-    var loginUserJson = storageManage.read(Config.localStroageloginInfo);
+    var loginUserJson = storageManage.read(Config.localStorageLoginInfo);
     UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
     if (loginUser != null) {
       companyController.text = loginUser.company ?? '';
@@ -158,7 +158,7 @@ class LoginController extends GetxController {
 
   ///获取语言
   void getLanguage() {
-    var localeString = storageManage.read(Config.localStroagelanguage) ?? "zh_HK";
+    var localeString = storageManage.read(Config.localStorageLanguage) ?? "zh_HK";
     if (localeString != null) {
       List<String> localeParts = localeString.split('_');
       locale.value = Locale(localeParts[0], localeParts.length > 1 ? localeParts[1] : '');
@@ -174,6 +174,6 @@ class LoginController extends GetxController {
 
   ///保存语言
   void saveLanguage(Locale locale) {
-    storageManage.save(Config.localStroagelanguage, locale.toString());
+    storageManage.save(Config.localStorageLanguage, locale.toString());
   }
 }

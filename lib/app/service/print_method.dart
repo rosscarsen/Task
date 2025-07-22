@@ -15,7 +15,7 @@ import '../model/login_model.dart';
 import '../model/printer_model.dart';
 import '../translations/app_translations.dart';
 import '../utils/esc_helper.dart';
-import '../utils/stroage_manage.dart';
+import '../utils/storage_manage.dart';
 import 'service_globals.dart';
 
 ///发送已打印队列ids到后端
@@ -45,7 +45,7 @@ String printerLocale(String key) {
 ///获取本地存储信息
 Future<UserData?> getLoginInfo() async {
   final StorageManage box = StorageManage();
-  var loginUserJson = await box.read(Config.localStroageloginInfo);
+  var loginUserJson = await box.read(Config.localStorageLoginInfo);
   UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
   if (loginUser != null) {
     return loginUser;

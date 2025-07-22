@@ -20,7 +20,7 @@ import '../../../service/win32_task_service.dart';
 import '../../../translations/app_translations.dart';
 import '../../../utils/easy_loading.dart';
 import '../../../utils/esc_helper.dart';
-import '../../../utils/stroage_manage.dart';
+import '../../../utils/storage_manage.dart';
 
 class HomeController extends GetxController with WidgetsBindingObserver {
   static HomeController get to => Get.find();
@@ -62,8 +62,8 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   //初始化网址
   void initUrl() {
-    var loginUserJson = storageManage.read(Config.localStroageloginInfo);
-    String localeString = storageManage.read(Config.localStroagelanguage) ?? "zh_HK";
+    var loginUserJson = storageManage.read(Config.localStorageLoginInfo);
+    String localeString = storageManage.read(Config.localStorageLanguage) ?? "zh_HK";
 
     String webLang = localeString == "zh_CN"
         ? "zh-cn"
@@ -117,7 +117,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     if (station != airprintStation) {
       return;
     }
-    final bool hasTask = storageManage.read(Config.localStroageStartTask);
+    final bool hasTask = storageManage.read(Config.localStorageStartTask);
     if ((Platform.isAndroid || Platform.isIOS) && hasTask) {
       var ret = await _service.isRunning();
       if (!ret) {
@@ -213,7 +213,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
         if (response.statusCode == 200) {
           dismissLoading();
           await closeService();
-          storageManage.delete(Config.localStroagehasLogin);
+          storageManage.delete(Config.localStorageHasLogin);
           Get.offAllNamed(Routes.LOGIN);
         }
       } catch (e) {
@@ -226,7 +226,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
 
   ///获取登录信息
   UserData? getLoginInfo() {
-    var loginUserJson = storageManage.read(Config.localStroageloginInfo);
+    var loginUserJson = storageManage.read(Config.localStorageLoginInfo);
     UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
     if (loginUser != null) {
       return loginUser;
@@ -271,8 +271,8 @@ class HomeController extends GetxController with WidgetsBindingObserver {
               : const Locale("en", "US")
         : const Locale("zh", "HK");
 
-    await storageManage.delete(Config.localStroagelanguage);
-    await storageManage.save(Config.localStroagelanguage, locale.toString());
+    await storageManage.delete(Config.localStorageLanguage);
+    await storageManage.save(Config.localStorageLanguage, locale.toString());
     Get.updateLocale(locale);
     updatePrintLang();
   }

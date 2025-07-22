@@ -19,12 +19,12 @@ class Config {
   ///本地存储key
 
   //本地登录信息
-  static String localStroageloginInfo = "localStroageLoginInfo";
+  static String localStorageLoginInfo = "localStorageLoginInfo";
 
   //登录标识
-  static String localStroagehasLogin = "localStroageHasLogin";
+  static String localStorageHasLogin = "localStorageHasLogin";
   //本地语言
-  static String localStroagelanguage = "localStroageLanguage";
+  static String localStorageLanguage = "localStorageLanguage";
   //本地启动任务
-  static String localStroageStartTask = "localStroageStartTask";
+  static String localStorageStartTask = "localStorageStartTask";
 }

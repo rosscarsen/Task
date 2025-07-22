@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:task/app/translations/app_translations.dart';
 
 import '../../../config.dart';
@@ -11,7 +10,7 @@ import '../../../model/ip_ping.dart';
 import '../../../model/login_model.dart';
 import '../../../service/api_client.dart';
 import '../../../utils/easy_loading.dart';
-import '../../../utils/stroage_manage.dart';
+import '../../../utils/storage_manage.dart';
 
 class IpPingController extends GetxController {
   static IpPingController get to => Get.find();
@@ -45,7 +44,7 @@ class IpPingController extends GetxController {
 
   ///获取登录信息
   UserData? getLoginInfo() {
-    var loginUserJson = box.read(Config.localStroageloginInfo);
+    var loginUserJson = box.read(Config.localStorageLoginInfo);
     UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
     if (loginUser != null) {
       return loginUser;

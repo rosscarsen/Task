@@ -7,7 +7,7 @@ import 'package:get_storage/get_storage.dart';
 
 import '../config.dart';
 import '../model/login_model.dart';
-import '../utils/stroage_manage.dart';
+import '../utils/storage_manage.dart';
 import 'print_method.dart';
 import 'service_globals.dart';
 
@@ -35,7 +35,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 void onStart(ServiceInstance service) async {
   await GetStorage.init("task");
   final StorageManage storageManage = StorageManage();
-  final cacheLang = storageManage.read(Config.localStroagelanguage);
+  final cacheLang = storageManage.read(Config.localStorageLanguage);
   printlang = cacheLang ?? "zh_HK";
   printStatus = true;
   printKitchenErrorCount = 0; // 初始化打印错误计数器

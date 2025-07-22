@@ -8,7 +8,7 @@ import '../../../config.dart';
 import '../../../model/login_model.dart';
 import '../../../service/win32_task_service.dart';
 import '../../../translations/app_translations.dart';
-import '../../../utils/stroage_manage.dart';
+import '../../../utils/storage_manage.dart';
 
 class AirprintSettingController extends GetxController with WidgetsBindingObserver {
   static AirprintSettingController get to => Get.find();
@@ -51,7 +51,7 @@ class AirprintSettingController extends GetxController with WidgetsBindingObserv
       await win32StopTask();
       await checkServicRuning();
     }
-    storageManage.save(Config.localStroageStartTask, false);
+    storageManage.save(Config.localStorageStartTask, false);
   }
 
   ///启动打印服务
@@ -81,7 +81,7 @@ class AirprintSettingController extends GetxController with WidgetsBindingObserv
       await win32StartTask(Get.locale?.toString() ?? "zh_HK");
       await checkServicRuning();
     }
-    storageManage.save(Config.localStroageStartTask, true);
+    storageManage.save(Config.localStorageStartTask, true);
   }
 
   Future<void> checkServicRuning() async {
@@ -95,7 +95,7 @@ class AirprintSettingController extends GetxController with WidgetsBindingObserv
 
   ///获取登录信息
   UserData? getLoginInfo() {
-    var loginUserJson = box.read(Config.localStroageloginInfo);
+    var loginUserJson = box.read(Config.localStorageLoginInfo);
     UserData? loginUser = loginUserJson != null ? UserData.fromJson(loginUserJson) : null;
     if (loginUser != null) {
       return loginUser;
