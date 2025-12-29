@@ -83,7 +83,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
     return updatedUri.toString();
   }
 
-  ///初始化weview
+  ///初始化webview
   void initWebview() {
     settings = InAppWebViewSettings(
       isInspectable: kDebugMode,
