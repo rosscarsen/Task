@@ -29,7 +29,7 @@ class HomeView extends GetView<HomeController> {
       body: SafeArea(
         child: Obx(
           () => ProgressHUD(
-            inAsyncCall: controller.isloading.value,
+            inAsyncCall: controller.isLoading.value,
             opacity: 0.7,
             /* child: WebViewWidget(
               controller: HomeController.to.webViewController,
@@ -88,7 +88,7 @@ class HomeView extends GetView<HomeController> {
                 );
               },
               onLoadStart: (controller, url) async {
-                HomeController.to.isloading.value = true;
+                HomeController.to.isLoading.value = true;
                 debugPrint("开始加载$url");
               },
               onPermissionRequest: (controller, request) async {
@@ -98,13 +98,13 @@ class HomeView extends GetView<HomeController> {
                 return NavigationActionPolicy.ALLOW;
               },
               onLoadStop: (controller, url) async {
-                HomeController.to.isloading.value = false;
+                HomeController.to.isLoading.value = false;
                 HomeController.to.pullToRefreshController?.endRefreshing();
                 await HomeController.to.addAirPrintSettingButton(controller: controller);
                 // await controller.evaluateJavascript(source: "flutterCallJs('我是flutter传过来的数据')");
               },
               onReceivedError: (controller, request, error) {
-                HomeController.to.isloading.value = false;
+                HomeController.to.isLoading.value = false;
                 HomeController.to.pullToRefreshController?.endRefreshing();
               },
               onProgressChanged: (controller, progress) {},

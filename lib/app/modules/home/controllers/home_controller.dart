@@ -33,7 +33,7 @@ class HomeController extends GetxController with WidgetsBindingObserver {
   late InAppWebViewController? webViewController;
   late InAppWebViewSettings? settings;
   PullToRefreshController? pullToRefreshController;
-  RxBool isloading = true.obs;
+  RxBool isLoading = true.obs;
   final ApiClient apiClient = ApiClient();
   late String initWebUrl;
 
