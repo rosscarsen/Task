@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:logger/logger.dart';
 
 import '../config.dart';
@@ -25,12 +28,25 @@ class ApiClient {
 
     _dio = Dio(baseOptions);
 
-    _dio.interceptors.add(InterceptorsWrapper(
-      onError: (DioException e, handler) {
-        logger.d('API Error: ${e.message}');
-        return handler.next(e);
-      },
-    ));
+    (_dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient();
+      client.findProxy = (uri) {
+        return "DIRECT";
+      };
+      client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+        return true;
+      };
+      return client;
+    };
+
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onError: (DioException e, handler) {
+          logger.d('API Error: ${e.message}');
+          return handler.next(e);
+        },
+      ),
+    );
 
     return _instance;
   }
