@@ -3,7 +3,7 @@ version: 1.0.8+8
 publish_to: none
 description: A new Flutter project.
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.10.4
 
 dependencies:
   #字符串处理
@@ -12,7 +12,7 @@ dependencies:
   collection: ^1.19.1
   cupertino_icons: ^1.0.8
   #设备信息
-  device_info_plus: ^12.2.0
+  device_info_plus: ^12.3.0
   #网络请求
   dio: ^5.9.0
   #escpos工具
@@ -33,11 +33,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   #状态管理
-  get: ^4.7.2
+  get: ^4.7.3
   #本地存储
   get_storage: ^2.1.1
   #图片处理
-  image: ^4.5.4
+  image: ^4.7.2
   #国际化
   intl: ^0.20.2
   #日志
@@ -107,3 +107,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+
